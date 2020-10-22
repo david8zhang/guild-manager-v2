@@ -1,2 +1,2 @@
-export { HomeScreen } from './Home/HomeScreen'
-export { OnboardScreen } from './Onboard/OnboardScreen'
+export { default as HomeScreen } from './Home/HomeScreen'
+export { default as OnboardScreen } from './Onboard/OnboardScreen'

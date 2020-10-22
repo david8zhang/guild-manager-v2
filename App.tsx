@@ -1,21 +1,26 @@
-import React from 'react';
-import { StyleSheet } from 'react-native';
+import React from 'react'
+import { StyleSheet } from 'react-native'
 import * as ScreenOrientation from 'expo-screen-orientation'
-import 'react-native-gesture-handler';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { HomeScreen, OnboardScreen } from './screens';
+import 'react-native-gesture-handler'
+import { NavigationContainer } from '@react-navigation/native'
+import { createStackNavigator } from '@react-navigation/stack'
+import { HomeScreen, OnboardScreen } from './screens'
+import { Provider } from 'react-redux'
+import { store } from './redux/store'
 
 export default function App() {
   ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT)
-  const Stack = createStackNavigator();
+  const Stack = createStackNavigator()
   return (
-    <NavigationContainer>
-      <Stack.Navigator headerMode='none'>
-        <Stack.Screen name='Onboard' component={OnboardScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
+    <Provider store={store}>
+      <NavigationContainer>
+        <Stack.Navigator headerMode='none' initialRouteName='Home'>
+          <Stack.Screen name='Onboard' component={OnboardScreen} />
+          <Stack.Screen name='Home' component={HomeScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -25,4 +30,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+})
