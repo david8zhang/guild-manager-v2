@@ -7,19 +7,56 @@ import { HeroDrilldownModal, StarterHero } from './components'
 import { FontAwesome } from '@expo/vector-icons'
 
 interface Props {
+  navigation: any
   guild: any
   addStarterHeroes: Function
+  addReserveHeroes: Function
 }
 
-const StarterHeroes: React.FC<Props> = ({ guild, addStarterHeroes }) => {
+const StarterHeroes: React.FC<Props> = ({
+  navigation,
+  guild,
+  addStarterHeroes,
+  addReserveHeroes,
+}) => {
+  const [isAddingReserves, setIsAddingReserves] = React.useState(false)
   const [starterHeroes, setStarterHeroes] = React.useState([])
+  const [reserveHeroes, setReserveHeroes] = React.useState([])
   React.useEffect(() => {
-    const heroes: any = RandomHeroGenerator.generateStarterHeroes(5)
-    setStarterHeroes(heroes)
+    const starters: any = RandomHeroGenerator.generateStarterHeroes(5)
+    const reserves: any = RandomHeroGenerator.generateReserveHeroes(5)
+    setStarterHeroes(starters)
+    setReserveHeroes(reserves)
   }, [])
 
   const [heroToDrilldown, setHeroToDrilldown] = React.useState<any>(null)
   const [pickedHeroes, setPickedHeroes] = React.useState<string[]>([])
+
+  const onContinue = () => {
+    if (isAddingReserves) {
+      const pickedReserves: any[] = []
+      reserveHeroes.forEach((h: any) => {
+        if (pickedHeroes.includes(h.heroId)) {
+          pickedReserves.push({ ...h, isStarter: false })
+        }
+      })
+      addReserveHeroes(reserveHeroes)
+      setPickedHeroes([])
+      navigation.navigate('Home')
+    } else {
+      const pickedStarters: any[] = []
+      starterHeroes.forEach((h: any) => {
+        if (pickedHeroes.includes(h.heroId)) {
+          pickedStarters.push({ ...h, isStarter: true })
+        }
+      })
+      addStarterHeroes(pickedStarters)
+      setPickedHeroes([])
+      setIsAddingReserves(true)
+    }
+  }
+
+  const heroesToRender = isAddingReserves ? reserveHeroes : starterHeroes
 
   return (
     <View style={{ padding: 15 }}>
@@ -31,7 +68,7 @@ const StarterHeroes: React.FC<Props> = ({ guild, addStarterHeroes }) => {
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <View style={{ flexDirection: 'column', flex: 1 }}>
           <Text style={{ fontSize: 24, textAlign: 'center' }}>
-            Pick 3 starter heroes!
+            Pick 3 {isAddingReserves ? 'reserve' : 'starter'} heroes!
           </Text>
           <Text style={{ fontSize: 12, textAlign: 'center', marginBottom: 5 }}>
             Tap 'More Info' on each hero to see more information
@@ -44,6 +81,9 @@ const StarterHeroes: React.FC<Props> = ({ guild, addStarterHeroes }) => {
               right: 0,
               top: 0,
               alignItems: 'center',
+            }}
+            onPress={() => {
+              onContinue()
             }}
           >
             <FontAwesome name='chevron-right' size={20} />
@@ -59,7 +99,7 @@ const StarterHeroes: React.FC<Props> = ({ guild, addStarterHeroes }) => {
           flexWrap: 'wrap',
         }}
       >
-        {starterHeroes.map((h: any) => (
+        {heroesToRender.map((h: any) => (
           <StarterHero
             {...h}
             key={h.heroId}

@@ -38,14 +38,17 @@ export const StarterHero: React.FC<Props> = ({
         style={{
           flexDirection: 'row',
           backgroundColor: 'white',
-          padding: 10,
           height: 115,
           borderRadius: 5,
         }}
       >
-        <View style={{ flex: 1 }}></View>
-        <View style={{ flex: 2, flexDirection: 'column' }}>
-          <Text style={{ fontSize: 14 }}>{name}</Text>
+        <View style={{ flex: 1 }}>
+          <View
+            style={{ backgroundColor: 'gray', width: '90%', height: '100%' }}
+          ></View>
+        </View>
+        <View style={{ flex: 1, flexDirection: 'column', padding: 5 }}>
+          <Text style={{ fontSize: 14, height: 35 }}>{name}</Text>
           <Text style={{ fontSize: 30 }}>{overall}</Text>
           <Pressable
             onPress={() => {

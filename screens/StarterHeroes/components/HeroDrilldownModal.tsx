@@ -33,7 +33,7 @@ export const HeroDrilldownModal: React.FC<Props> = ({
   const ovr = Math.round((attack + defense + speed) / 3)
   const stars = []
   for (let i = 0; i < potential; i++) {
-    stars.push(<FontAwesome name='star' size={20} />)
+    stars.push(<FontAwesome key={`star-${i}`} name='star' size={20} />)
   }
   return (
     <CustomModal
@@ -60,7 +60,7 @@ export const HeroDrilldownModal: React.FC<Props> = ({
         <View style={{ flex: 2, flexDirection: 'column' }}>
           {/* Header Section */}
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text style={{ flex: 1, fontSize: 40 }}>{name}</Text>
+            <Text style={{ flex: 1, fontSize: 30 }}>{name}</Text>
             <View
               style={{
                 flexDirection: 'column',
