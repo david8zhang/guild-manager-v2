@@ -5,15 +5,25 @@ interface Props {
   isOpen: boolean
   onClose: Function
   children: any
+  customWidth?: number
+  customHeight?: number
+  style?: any
 }
 
-export const CustomModal: React.FC<Props> = ({ isOpen, onClose, children }) => {
+export const CustomModal: React.FC<Props> = ({
+  isOpen,
+  onClose,
+  children,
+  customWidth,
+  customHeight,
+  style,
+}) => {
   if (!isOpen) {
     return <View />
   }
 
-  const width = Dimensions.get('window').width * 0.9
-  const height = Dimensions.get('window').height * 0.9
+  const width = customWidth || Dimensions.get('window').width * 0.9
+  const height = customHeight || Dimensions.get('window').height * 0.9
 
   return (
     <View
@@ -27,6 +37,7 @@ export const CustomModal: React.FC<Props> = ({ isOpen, onClose, children }) => {
         height,
         width,
         padding: 10,
+        ...style,
       }}
     >
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>

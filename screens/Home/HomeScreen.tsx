@@ -11,7 +11,7 @@ interface Props {
 const HomeScreen: React.FC<Props> = ({ navigation, guild }) => {
   React.useEffect(() => {
     if (!guild) {
-      navigation.navigate('Onboard')
+      navigation.navigate('Create')
     }
   }, [])
 

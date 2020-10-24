@@ -1,2 +1,3 @@
 export { default as HomeScreen } from './Home/HomeScreen'
-export { default as OnboardScreen } from './Onboard/OnboardScreen'
+export { default as CreateGuild } from './CreateGuild/CreateGuild'
+export { default as StarterHeroes } from './StarterHeroes/StarterHeroes'

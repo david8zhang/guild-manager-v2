@@ -27,7 +27,7 @@ const cities = [
 
 const colors = ['#3498db', '#2ecc71', '#c0392b', '#000000', '#8e44ad']
 
-const OnboardScreen: React.FC<Props> = ({ navigation, createGuild }) => {
+const CreateGuild: React.FC<Props> = ({ navigation, createGuild }) => {
   const [guildName, setGuildName] = React.useState('')
   const [homeCity, setHomeCity] = React.useState('')
   const [showColorModal, setShowColorModal] = React.useState(false)
@@ -43,7 +43,7 @@ const OnboardScreen: React.FC<Props> = ({ navigation, createGuild }) => {
       secondaryColor,
     }
     createGuild(newGuild)
-    navigation.navigate('Home')
+    navigation.navigate('StarterHeroes')
   }
 
   return (
@@ -122,7 +122,7 @@ const mapStateToProps = (state: any) => ({
   guild: state.guild,
 })
 
-export default connect(mapStateToProps, { ...guildActions })(OnboardScreen)
+export default connect(mapStateToProps, { ...guildActions })(CreateGuild)
 
 const styles = StyleSheet.create({
   root: {

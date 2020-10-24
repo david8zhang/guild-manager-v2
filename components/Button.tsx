@@ -5,9 +5,15 @@ interface Props {
   onPress: Function
   text: string
   style?: any
+  textStyle?: any
 }
 
-export const Button: React.FC<Props> = ({ onPress, text, style }) => {
+export const Button: React.FC<Props> = ({
+  onPress,
+  text,
+  style,
+  textStyle,
+}) => {
   const [isPressing, setIsPressing] = React.useState(false)
   return (
     <Pressable
@@ -23,7 +29,7 @@ export const Button: React.FC<Props> = ({ onPress, text, style }) => {
       onPressIn={() => setIsPressing(true)}
       onPressOut={() => setIsPressing(false)}
     >
-      <Text style={{ textAlign: 'center' }}>{text}</Text>
+      <Text style={{ textAlign: 'center', ...textStyle }}>{text}</Text>
     </Pressable>
   )
 }
