@@ -2,6 +2,8 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { View, Text, StyleSheet } from 'react-native'
 import { Navbar } from '../../components/Navbar'
+import { ScrollView } from 'react-native-gesture-handler'
+import { MenuOption } from './components'
 
 interface Props {
   navigation: any
@@ -9,7 +11,6 @@ interface Props {
 }
 
 const HomeScreen: React.FC<Props> = ({ navigation, guild }) => {
-  console.log(guild)
   React.useEffect(() => {
     if (!guild) {
       navigation.navigate('Create')
@@ -19,7 +20,29 @@ const HomeScreen: React.FC<Props> = ({ navigation, guild }) => {
   return (
     <View style={styles.root}>
       <Navbar title='Home' />
-      <Text>Home screen</Text>
+      <ScrollView horizontal style={{ paddingTop: 10, paddingLeft: 10 }}>
+        <MenuOption optionName='My Team' iconName='group' onPress={() => {}} />
+        <MenuOption
+          optionName='Season'
+          iconName='calendar'
+          onPress={() => {}}
+        />
+        <MenuOption
+          optionName='Front Office'
+          iconName='address-book-o'
+          onPress={() => {}}
+        />
+        <MenuOption
+          optionName='News Headlines'
+          iconName='newspaper-o'
+          onPress={() => {}}
+        />
+        <MenuOption
+          optionName='Trophy Case'
+          iconName='trophy'
+          onPress={() => {}}
+        />
+      </ScrollView>
     </View>
   )
 }
