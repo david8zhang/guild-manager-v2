@@ -1,57 +1,118 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import * as guildActions from '../../redux/guildWidget'
-import { Text, View } from 'react-native'
-import { Navbar } from '../../components'
-import { TeamGenerator } from '../../lib/TeamGenerator'
-import { HOME_CITIES } from '../../lib/constants/homeCities'
-import { NAME_POOL } from '../../lib/constants/teamNames'
+import { Pressable, Text, View } from 'react-native'
+import { Button, Navbar } from '../../components'
 import { SeasonManager } from '../../lib/SeasonManager'
-import { Team } from '../../lib/model/Team'
+import { TeamRecord } from './components/TeamRecord'
+import { Schedule } from '../../lib/model/Schedule'
+import { MatchupTeam } from './components/MatchupTeam'
 
 interface Props {
   guild: any
   navigation: any
   setOtherTeams: Function
+  setSchedule: Function
 }
 
-const Season: React.FC<Props> = ({ navigation, guild, setOtherTeams }) => {
+const Season: React.FC<Props> = ({
+  navigation,
+  guild,
+  setOtherTeams,
+  setSchedule,
+}) => {
   const [
     seasonManager,
     setSeasonManager,
   ] = React.useState<SeasonManager | null>(null)
+
   React.useEffect(() => {
-    let otherGuilds = guild.league
-    if (!otherGuilds) {
-      otherGuilds = TeamGenerator.generateRandomTeams({
-        numTeams: 7,
-        homeCityPool: HOME_CITIES,
-        namePool: NAME_POOL,
-        playerHomeCity: guild.homeCity,
-      })
-      const serializedGuilds = otherGuilds.map((team: Team) => team.serialize())
-      setOtherTeams(serializedGuilds)
+    const seasonManager = new SeasonManager(guild)
+    setSeasonManager(seasonManager)
+    if (!guild.league || !guild.schedule) {
+      const serializedState = seasonManager.serialize()
+      setOtherTeams(serializedState.teams)
+      setSchedule(serializedState.schedule)
     }
-    setSeasonManager(new SeasonManager(otherGuilds, guild))
   }, [])
 
   if (!seasonManager) {
     return <View />
   }
 
+  const schedule: Schedule = seasonManager.getPlayerSchedule()
+  const currentMatchup = schedule.getCurrentMatch()
+  const playerTeam = seasonManager.getPlayer()
+
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: 'white' }}>
       <Navbar title='Season' navigation={navigation} />
       <View style={{ flexDirection: 'row' }}>
-        <View style={{ flex: 2 }}></View>
+        <View style={{ flex: 1.4, flexDirection: 'column' }}>
+          <Pressable onPress={() => {}}>
+            <Text
+              style={{
+                textAlign: 'left',
+                fontSize: 12,
+                color: 'blue',
+                textDecorationLine: 'underline',
+                fontWeight: 'bold',
+                marginTop: 10,
+                marginLeft: 20,
+              }}
+            >
+              Show full season calendar
+            </Text>
+          </Pressable>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <MatchupTeam
+              team={playerTeam}
+              record={seasonManager.getTeamRecord(playerTeam.teamId)}
+            />
+            <Text style={{ fontSize: 20, textAlign: 'center' }}>@</Text>
+            <MatchupTeam
+              team={currentMatchup.teamInfo}
+              record={seasonManager.getTeamRecord(
+                currentMatchup.teamInfo.teamId
+              )}
+            />
+          </View>
+          <Button
+            style={{ alignSelf: 'center', marginTop: 10 }}
+            onPress={() => {}}
+            text='Start Game'
+          />
+        </View>
         <View style={{ flex: 1 }}>
-          {seasonManager.getAllTeams().map((t) => {
-            return (
-              <View key={t.teamId}>
-                <Text>{t.name}</Text>
-              </View>
-            )
-          })}
+          <View style={{ padding: 10 }}>
+            <Text style={{ textAlign: 'center', fontSize: 24 }}>
+              Season Rankings
+            </Text>
+            <Text
+              style={{ textAlign: 'center', fontSize: 12, marginBottom: 10 }}
+            >
+              Tap a team to view their full roster
+            </Text>
+            {seasonManager.getAllTeams().map((t) => {
+              const record = seasonManager.getTeamRecord(t.teamId)
+              return (
+                <TeamRecord
+                  key={t.teamId}
+                  record={record}
+                  onPress={() => {}}
+                  name={t.name}
+                  abbrev={t.getNameAbbrev()}
+                />
+              )
+            })}
+          </View>
         </View>
       </View>
     </View>

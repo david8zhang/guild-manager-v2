@@ -3,6 +3,8 @@ import { Text, View, StyleSheet, Pressable, StatusBar } from 'react-native'
 import { BorderedPicker, Input, Button } from '../../components'
 import { Picker } from '@react-native-community/picker'
 import { ColorPickerModal } from './components'
+import 'react-native-get-random-values'
+import { v4 as uuidv4 } from 'uuid'
 
 import { connect } from 'react-redux'
 import * as guildActions from '../../redux/guildWidget'
@@ -25,10 +27,11 @@ const CreateGuild: React.FC<Props> = ({ navigation, createGuild }) => {
 
   const onSubmit = () => {
     const newGuild = {
-      guildName,
+      name: `${homeCity} ${guildName}`,
       homeCity,
       primaryColor,
       secondaryColor,
+      teamId: uuidv4(),
     }
     createGuild(newGuild)
     navigation.navigate('StarterHeroes')

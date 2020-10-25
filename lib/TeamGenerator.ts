@@ -13,7 +13,7 @@ export class TeamGenerator {
     const eligibleShuffledHomeCities = shuffle(
       homeCityPool.filter((c: string) => c !== playerHomeCity)
     )
-    const shuffledNames = shuffle(namePool)
+    const uniqShuffledNames = Array.from(new Set(shuffle(namePool)))
     const teams = []
     for (let i = 0; i < numTeams; i++) {
       const starters = RandomHeroGenerator.generateStarterHeroes(3)
@@ -21,11 +21,11 @@ export class TeamGenerator {
       const roster = starters.concat(reserves)
       const starterIds = starters.map((h) => h.heroId)
       teams.push(
-        new Team(
+        new Team({
           roster,
           starterIds,
-          `${eligibleShuffledHomeCities[i]} ${shuffledNames[i]}`
-        )
+          name: `${eligibleShuffledHomeCities[i]} ${uniqShuffledNames[i]}`,
+        })
       )
     }
     return teams

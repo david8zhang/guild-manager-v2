@@ -33,7 +33,6 @@ export const NAME_POOL = [
   'Falcons',
   'Ravens',
   'Bills',
-  'Panthers',
   'Bears',
   'Bengals',
   'Browns',

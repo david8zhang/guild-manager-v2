@@ -7,8 +7,14 @@ export class Team {
   public starterIds: string[]
   public teamId: string
 
-  constructor(roster: any[], starterIds: string[], name: string) {
-    this.teamId = uuidv4()
+  constructor(config: {
+    roster: any[]
+    teamId?: string
+    name: string
+    starterIds: string[]
+  }) {
+    const { roster, teamId, name, starterIds } = config
+    this.teamId = teamId || uuidv4()
     this.starterIds = starterIds
     this.roster = roster.map((h) => Hero.deserializeHeroObj(h))
     this.name = name
@@ -28,6 +34,13 @@ export class Team {
     return starterHeroes
   }
 
+  public getNameAbbrev(): string {
+    const nameTokens = this.name.split(' ')
+    const cityNameAbb = nameTokens[0].slice(0, 2)
+    const teamNameAbb = nameTokens[1].slice(0, 1)
+    return `${cityNameAbb}${teamNameAbb}`.toUpperCase()
+  }
+
   public serialize(): any {
     return {
       teamId: this.teamId,
@@ -38,13 +51,13 @@ export class Team {
   }
 
   public static deserializeObj(guildObj: any): Team {
-    const { roster, name } = guildObj
+    const { roster, name, teamId } = guildObj
     const starterIds: string[] = []
     roster.forEach((h: any) => {
       if (h.isStarter) {
         starterIds.push(h.heroId)
       }
     })
-    return new Team(roster, starterIds, name)
+    return new Team({ roster, starterIds, name, teamId })
   }
 }
