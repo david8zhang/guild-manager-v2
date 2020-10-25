@@ -19,13 +19,15 @@ const HomeScreen: React.FC<Props> = ({ navigation, guild }) => {
 
   return (
     <View style={styles.root}>
-      <Navbar title='Home' />
+      <Navbar title='Home' navigation={navigation} />
       <ScrollView horizontal style={{ paddingTop: 10, paddingLeft: 10 }}>
         <MenuOption optionName='My Team' iconName='group' onPress={() => {}} />
         <MenuOption
           optionName='Season'
           iconName='calendar'
-          onPress={() => {}}
+          onPress={() => {
+            navigation.navigate('Season')
+          }}
         />
         <MenuOption
           optionName='Front Office'

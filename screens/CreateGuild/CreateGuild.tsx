@@ -6,30 +6,18 @@ import { ColorPickerModal } from './components'
 
 import { connect } from 'react-redux'
 import * as guildActions from '../../redux/guildWidget'
+import { HOME_CITIES } from '../../lib/constants/homeCities'
 
 interface Props {
   navigation: any
   createGuild: Function
 }
 
-const cities = [
-  'Ironborn',
-  'Bonepoint',
-  'Cavebell',
-  'Nightland',
-  'Roguemire',
-  'Grimborn',
-  'Faycoast',
-  'Quickwater',
-  'Deadmere',
-  'Thornford',
-]
-
 const colors = ['#3498db', '#2ecc71', '#c0392b', '#000000', '#8e44ad']
 
 const CreateGuild: React.FC<Props> = ({ navigation, createGuild }) => {
   const [guildName, setGuildName] = React.useState('')
-  const [homeCity, setHomeCity] = React.useState('')
+  const [homeCity, setHomeCity] = React.useState(HOME_CITIES[0])
   const [showColorModal, setShowColorModal] = React.useState(false)
   const [pickingPrimary, setPickingPrimary] = React.useState(true)
   const [primaryColor, setPrimaryColor] = React.useState(colors[0])
@@ -72,7 +60,7 @@ const CreateGuild: React.FC<Props> = ({ navigation, createGuild }) => {
         selectedValue={homeCity}
         onValueChange={(homeCity: string) => setHomeCity(homeCity)}
       >
-        {cities.map((city: string) => {
+        {HOME_CITIES.map((city: string) => {
           return <Picker.Item key={city} label={city} value={city} />
         })}
       </BorderedPicker>

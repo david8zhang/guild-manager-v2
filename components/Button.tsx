@@ -6,6 +6,7 @@ interface Props {
   text: string
   style?: any
   textStyle?: any
+  disabled?: boolean
 }
 
 export const Button: React.FC<Props> = ({
@@ -13,10 +14,12 @@ export const Button: React.FC<Props> = ({
   text,
   style,
   textStyle,
+  disabled,
 }) => {
   const [isPressing, setIsPressing] = React.useState(false)
   return (
     <Pressable
+      disabled={disabled}
       onPress={() => onPress()}
       style={{
         width: 100,

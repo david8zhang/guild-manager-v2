@@ -5,9 +5,10 @@ import { FontAwesome } from '@expo/vector-icons'
 interface Props {
   title: string
   style?: any
+  navigation?: any
 }
 
-export const Navbar: React.FC<Props> = ({ title, style }) => {
+export const Navbar: React.FC<Props> = ({ title, style, navigation }) => {
   const navStyle: any = {
     padding: 20,
     flexDirection: 'row',
