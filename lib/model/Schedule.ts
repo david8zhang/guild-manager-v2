@@ -69,6 +69,10 @@ export class Schedule {
     return this.matchList[this.currentMatchupIndex]
   }
 
+  public getCurrentMatchIndex(): number {
+    return this.currentMatchupIndex
+  }
+
   private generateSchedule(): Matchup[] {
     const numCycles = Math.ceil(
       Schedule.NUM_MATCHUPS_IN_SCHEDULE / this.teamInfoList.length

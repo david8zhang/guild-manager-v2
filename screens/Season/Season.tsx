@@ -7,6 +7,7 @@ import { SeasonManager } from '../../lib/SeasonManager'
 import { TeamRecord } from './components/TeamRecord'
 import { Schedule } from '../../lib/model/Schedule'
 import { MatchupTeam } from './components/MatchupTeam'
+import { SeasonCalendar } from './components/SeasonCalendar'
 
 interface Props {
   guild: any
@@ -49,7 +50,11 @@ const Season: React.FC<Props> = ({
       <Navbar title='Season' navigation={navigation} />
       <View style={{ flexDirection: 'row' }}>
         <View style={{ flex: 1.4, flexDirection: 'column' }}>
-          <Pressable onPress={() => {}}>
+          <SeasonCalendar
+            currentMatchIndex={schedule.getCurrentMatchIndex()}
+            matchList={schedule.getMatchupList()}
+          />
+          {/* <Pressable onPress={() => {}}>
             <Text
               style={{
                 textAlign: 'left',
@@ -63,10 +68,10 @@ const Season: React.FC<Props> = ({
             >
               Show full season calendar
             </Text>
-          </Pressable>
+          </Pressable> */}
           <View
             style={{
-              flex: 1,
+              flex: 5,
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',

@@ -41,6 +41,13 @@ export class Team {
     return `${cityNameAbb}${teamNameAbb}`.toUpperCase()
   }
 
+  public static getNameAbbrevForName(name: string) {
+    const nameTokens = name.split(' ')
+    const cityNameAbb = nameTokens[0].slice(0, 2)
+    const teamNameAbb = nameTokens[1].slice(0, 1)
+    return `${cityNameAbb}${teamNameAbb}`.toUpperCase()
+  }
+
   public serialize(): any {
     return {
       teamId: this.teamId,
