@@ -5,6 +5,7 @@ import { shuffle } from 'lodash'
 import { TeamGenerator } from './TeamGenerator'
 import { NAME_POOL } from './constants/teamNames'
 import { HOME_CITIES } from './constants/homeCities'
+import { Hero } from './model/Hero'
 
 export class SeasonManager {
   public numGamesInSeason: number = 21
@@ -45,6 +46,23 @@ export class SeasonManager {
 
   public getPlayer(): Team {
     return this.playerTeam
+  }
+
+  public getTeam(teamId: string): Team | null {
+    const team = this.teams.find((t) => t.teamId === teamId)
+    if (!team) {
+      return null
+    }
+    return team
+  }
+
+  public getHeroRosters(
+    enemyTeamId: string
+  ): { playerHeroes: Hero[]; enemyHeroes: Hero[] } {
+    return {
+      playerHeroes: this.playerTeam.roster,
+      enemyHeroes: (this.getTeam(enemyTeamId) as Team).roster,
+    }
   }
 
   public getAllTeams(): Team[] {

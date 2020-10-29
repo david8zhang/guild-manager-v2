@@ -32,7 +32,7 @@ export const SeasonCalendar: React.FC<Props> = ({
     >
       {matchList.map((m, index: number) => {
         return (
-          <View style={{ margin: 10 }}>
+          <View key={`match-${index}`} style={{ margin: 10 }}>
             <Text
               style={{
                 fontWeight: currentMatchIndex === index ? 'bold' : 'normal',

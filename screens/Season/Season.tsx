@@ -8,6 +8,7 @@ import { TeamRecord } from './components/TeamRecord'
 import { Schedule } from '../../lib/model/Schedule'
 import { MatchupTeam } from './components/MatchupTeam'
 import { SeasonCalendar } from './components/SeasonCalendar'
+import { Match } from './components/Match'
 
 interface Props {
   guild: any
@@ -26,6 +27,7 @@ const Season: React.FC<Props> = ({
     seasonManager,
     setSeasonManager,
   ] = React.useState<SeasonManager | null>(null)
+  const [showMatch, setShowMatch] = React.useState(false)
 
   React.useEffect(() => {
     const seasonManager = new SeasonManager(guild)
@@ -45,6 +47,13 @@ const Season: React.FC<Props> = ({
   const currentMatchup = schedule.getCurrentMatch()
   const playerTeam = seasonManager.getPlayer()
 
+  if (showMatch) {
+    const { playerHeroes, enemyHeroes } = seasonManager.getHeroRosters(
+      currentMatchup.teamInfo.teamId
+    )
+    return <Match playerHeroes={playerHeroes} enemyHeroes={enemyHeroes} />
+  }
+
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
       <Navbar title='Season' navigation={navigation} />
@@ -54,21 +63,6 @@ const Season: React.FC<Props> = ({
             currentMatchIndex={schedule.getCurrentMatchIndex()}
             matchList={schedule.getMatchupList()}
           />
-          {/* <Pressable onPress={() => {}}>
-            <Text
-              style={{
-                textAlign: 'left',
-                fontSize: 12,
-                color: 'blue',
-                textDecorationLine: 'underline',
-                fontWeight: 'bold',
-                marginTop: 10,
-                marginLeft: 20,
-              }}
-            >
-              Show full season calendar
-            </Text>
-          </Pressable> */}
           <View
             style={{
               flex: 5,
@@ -91,7 +85,9 @@ const Season: React.FC<Props> = ({
           </View>
           <Button
             style={{ alignSelf: 'center', marginTop: 10 }}
-            onPress={() => {}}
+            onPress={() => {
+              setShowMatch(true)
+            }}
             text='Start Game'
           />
         </View>
