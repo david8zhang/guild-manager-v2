@@ -13,4 +13,8 @@ export class HeroInMatch {
     this.isDead = false
     this.heroStats = new HeroStats()
   }
+
+  public getHeroRef(): Hero {
+    return this.hero
+  }
 }

@@ -3,9 +3,16 @@ import { Hero } from './model/Hero'
 import { HeroInMatch } from './model/HeroInMatch'
 import { MatchEvent } from './model/MatchEvent'
 
+interface TeamInfo {
+  name: string
+  abbrev: string
+}
+
 export interface MatchManagerConfig {
   playerHeroes: Hero[]
   enemyHeroes: Hero[]
+  playerTeamInfo: TeamInfo
+  enemyTeamInfo: TeamInfo
   onTickCallback: Function
 }
 
@@ -15,6 +22,10 @@ export class MatchManager {
 
   private playerHeroes: HeroInMatch[]
   private enemyHeroes: HeroInMatch[]
+
+  private playerTeamInfo: TeamInfo
+  private enemyTeamInfo: TeamInfo
+
   private arena: Arena
   private eventLog: MatchEvent[]
   private interval: number = 0
@@ -29,6 +40,8 @@ export class MatchManager {
     this.eventLog = []
     this.onTickCallback = config.onTickCallback
     this.currentTime = MatchManager.MATCH_DURATION
+    this.playerTeamInfo = config.playerTeamInfo
+    this.enemyTeamInfo = config.enemyTeamInfo
   }
 
   private startMatchTimer(): void {
@@ -55,18 +68,25 @@ export class MatchManager {
     this.arena.initializeArena()
     this.startMatchTimer()
     this.score = {
-      player: 0,
-      enemy: 0,
+      [this.playerTeamInfo.abbrev]: 0,
+      [this.enemyTeamInfo.abbrev]: 0,
     }
   }
 
   public stopMatch() {
-    console.log(this.interval)
     this.stopMatchTimer()
     this.currentTime = MatchManager.MATCH_DURATION
   }
 
   public getScore(): any {
     return this.score
+  }
+
+  public getArena(): any {
+    return {
+      map: this.arena.getMap(),
+      rows: Arena.NUM_ROWS,
+      cols: Arena.NUM_COLS,
+    }
   }
 }

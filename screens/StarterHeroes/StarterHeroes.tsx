@@ -37,7 +37,7 @@ const StarterHeroes: React.FC<Props> = ({
       const pickedReserves: any[] = []
       reserveHeroes.forEach((h: any) => {
         if (pickedHeroes.includes(h.heroId)) {
-          pickedReserves.push({ ...h, isStarter: false })
+          pickedReserves.push(h)
         }
       })
       addReserveHeroes(reserveHeroes)
@@ -47,7 +47,7 @@ const StarterHeroes: React.FC<Props> = ({
       const pickedStarters: any[] = []
       starterHeroes.forEach((h: any) => {
         if (pickedHeroes.includes(h.heroId)) {
-          pickedStarters.push({ ...h, isStarter: true })
+          pickedStarters.push(h)
         }
       })
       addStarterHeroes(pickedStarters)

@@ -19,8 +19,6 @@ export const StarterHero: React.FC<Props> = ({
   attack,
   defense,
   speed,
-  potential,
-  health,
   onPick,
   isPicked,
   name,

@@ -9,6 +9,8 @@ import { Schedule } from '../../lib/model/Schedule'
 import { MatchupTeam } from './components/MatchupTeam'
 import { SeasonCalendar } from './components/SeasonCalendar'
 import { Match } from './components/Match'
+import { Hero } from '../../lib/model/Hero'
+import { Team } from '../../lib/model/Team'
 
 interface Props {
   guild: any
@@ -48,10 +50,14 @@ const Season: React.FC<Props> = ({
   const playerTeam = seasonManager.getPlayer()
 
   if (showMatch) {
-    const { playerHeroes, enemyHeroes } = seasonManager.getHeroRosters(
-      currentMatchup.teamInfo.teamId
+    return (
+      <Match
+        playerTeam={playerTeam}
+        enemyTeam={
+          seasonManager.getTeam(currentMatchup.teamInfo.teamId) as Team
+        }
+      />
     )
-    return <Match playerHeroes={playerHeroes} enemyHeroes={enemyHeroes} />
   }
 
   return (

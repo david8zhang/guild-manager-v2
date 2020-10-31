@@ -52,19 +52,13 @@ export class Team {
     return {
       teamId: this.teamId,
       roster: this.roster.map((h: Hero) => h.serialize()),
-      starters: this.starterIds,
+      starterIds: this.starterIds,
       name: this.name,
     }
   }
 
   public static deserializeObj(guildObj: any): Team {
-    const { roster, name, teamId } = guildObj
-    const starterIds: string[] = []
-    roster.forEach((h: any) => {
-      if (h.isStarter) {
-        starterIds.push(h.heroId)
-      }
-    })
+    const { roster, name, teamId, starterIds } = guildObj
     return new Team({ roster, starterIds, name, teamId })
   }
 }

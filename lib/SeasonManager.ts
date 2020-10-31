@@ -1,7 +1,6 @@
 import { Record } from './model/Record'
 import { Team } from './model/Team'
 import { Schedule } from './model/Schedule'
-import { shuffle } from 'lodash'
 import { TeamGenerator } from './TeamGenerator'
 import { NAME_POOL } from './constants/teamNames'
 import { HOME_CITIES } from './constants/homeCities'
@@ -62,6 +61,21 @@ export class SeasonManager {
     return {
       playerHeroes: this.playerTeam.roster,
       enemyHeroes: (this.getTeam(enemyTeamId) as Team).roster,
+    }
+  }
+
+  public getStarters(enemyTeamId: string) {
+    const enemyTeam = this.getTeam(enemyTeamId) as Team
+    const playerStarterIds = this.playerTeam.starterIds
+    const enemyStarterIds = enemyTeam.starterIds
+
+    return {
+      playerHeroes: this.playerTeam.roster.filter((h: Hero) =>
+        playerStarterIds.includes(h.heroId)
+      ),
+      enemyHeroes: enemyTeam.roster.filter((h: Hero) =>
+        enemyStarterIds.includes(h.heroId)
+      ),
     }
   }
 

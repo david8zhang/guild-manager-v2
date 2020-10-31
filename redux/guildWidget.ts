@@ -39,16 +39,17 @@ export default (state = initialState, action: any) => {
     case ADD_STARTER_HEROES: {
       return {
         ...state,
-        roster: state.heroes
-          ? state.heroes.concat(action.payload)
+        roster: state.roster
+          ? state.roster.concat(action.payload)
           : action.payload,
+        starterIds: action.payload.map((h: any) => h.heroId),
       }
     }
     case ADD_RESERVE_HEROES: {
       return {
         ...state,
-        roster: state.heroes
-          ? state.heroes.concat(action.payload)
+        roster: state.roster
+          ? state.roster.concat(action.payload)
           : action.payload,
       }
     }
