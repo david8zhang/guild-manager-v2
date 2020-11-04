@@ -15,7 +15,6 @@ export const Match: React.FC<Props> = ({ playerTeam, enemyTeam }) => {
     null
   )
   const [lineupConfirmed, setLineupConfirmed] = React.useState(false)
-  const [matchTime, setMatchTime] = React.useState(0)
   React.useEffect(() => {
     const playerHeroes = playerTeam.roster.filter((h) =>
       playerTeam.starterIds.includes(h.heroId)
@@ -35,15 +34,9 @@ export const Match: React.FC<Props> = ({ playerTeam, enemyTeam }) => {
       },
       playerHeroes,
       enemyHeroes,
-      onTickCallback: (currentTime: number) => {
-        setMatchTime(currentTime)
-      },
     }
     const manager = new MatchManager(config)
     setMatchManager(manager)
-    return () => {
-      matchManager?.stopMatch()
-    }
   }, [])
 
   if (!matchManager) {
@@ -61,15 +54,10 @@ export const Match: React.FC<Props> = ({ playerTeam, enemyTeam }) => {
       />
     )
   }
-
-  const minutes = Math.floor(matchTime / 60)
-  const seconds = matchTime % 60
-
-  const { map, rows, cols } = matchManager?.getArena()
   const score = matchManager.getScore()
 
   return (
-    <View style={{ flexDirection: 'column' }}>
+    <View style={{ flexDirection: 'column', flex: 1 }}>
       <View
         style={{
           flexDirection: 'row',
@@ -100,24 +88,9 @@ export const Match: React.FC<Props> = ({ playerTeam, enemyTeam }) => {
             </View>
           )
         })}
-        <View
-          style={{
-            padding: 10,
-            borderWidth: 1,
-            borderColor: 'gray',
-            borderLeftWidth: 0,
-          }}
-        >
-          <Text style={{ fontSize: 20 }}>
-            {minutes}:{seconds}
-          </Text>
-        </View>
       </View>
-      <View style={{ flexDirection: 'row' }}>
-        <View style={{ flex: 1.5 }}>
-          <Arena map={map} rows={rows} cols={cols} />
-        </View>
-        <View style={{ flex: 1 }}></View>
+      <View style={{ flex: 1 }}>
+        <Arena matchManager={matchManager} />
       </View>
     </View>
   )

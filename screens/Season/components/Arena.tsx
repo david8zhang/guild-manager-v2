@@ -1,17 +1,44 @@
 import * as React from 'react'
-import { Dimensions, Text, View } from 'react-native'
+import { Pressable, Text, View } from 'react-native'
+import { MatchManager } from '../../../lib/MatchManager'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
 
 interface Props {
-  map: {
-    [key: string]: HeroInMatch
-  }
-  rows: number
-  cols: number
+  matchManager: MatchManager
 }
 
-export const Arena: React.FC<Props> = ({ map, rows, cols }) => {
+export const Arena: React.FC<Props> = ({ matchManager }) => {
+  const { map, rows, cols } = matchManager?.getArena()
+  const highlightedSquares = matchManager.getHighlightedSquares()
+
   const totalNumCells = rows * cols
+  const [selectedHeroId, setSelectedHeroId] = React.useState<string>('')
+
+  const onSelectHero = (hero: HeroInMatch, coordinates: string) => {
+    matchManager.resetHighlightedSquares()
+    if (hero) {
+      setSelectedHeroId(hero.getHeroRef().heroId)
+    }
+    const [row, col] = coordinates.split(',')
+    matchManager.highlightMoveableSquares(parseInt(row), parseInt(col))
+  }
+
+  const getSquareColor = (coordinates: string) => {
+    const hero: HeroInMatch = map[coordinates]
+    const isSelected = hero && selectedHeroId === hero.getHeroRef().heroId
+    const isHighlighted = highlightedSquares[coordinates]
+    const heroAtPosition = map[coordinates]
+    if (isSelected) {
+      return '#ffe599'
+    }
+    if (heroAtPosition) {
+      return 'white'
+    }
+    if (isHighlighted) {
+      return 'blue'
+    }
+    return 'white'
+  }
 
   const renderGrid = () => {
     const grid = []
@@ -19,15 +46,18 @@ export const Arena: React.FC<Props> = ({ map, rows, cols }) => {
       const coordinates = `${Math.floor(i / cols)},${i % cols}`
       const hero: HeroInMatch = map[coordinates]
       grid.push(
-        <View
+        <Pressable
           key={`hero-${coordinates}`}
+          onPress={() => {
+            onSelectHero(hero, coordinates)
+          }}
           style={{
             width: `${100 / cols}%`,
             borderColor: 'gray',
             borderLeftWidth: 1,
             borderBottomWidth: 1,
-            height: 60,
-            backgroundColor: 'white',
+            height: 50,
+            backgroundColor: getSquareColor(coordinates),
             alignItems: 'center',
             justifyContent: 'center',
             padding: 5,
@@ -38,7 +68,7 @@ export const Arena: React.FC<Props> = ({ map, rows, cols }) => {
           ) : (
             <Text></Text>
           )}
-        </View>
+        </Pressable>
       )
     }
     return grid
@@ -47,6 +77,8 @@ export const Arena: React.FC<Props> = ({ map, rows, cols }) => {
   return (
     <View
       style={{
+        marginLeft: 15,
+        marginRight: 15,
         borderTopWidth: 1,
         borderRightWidth: 1,
         borderColor: 'gray',

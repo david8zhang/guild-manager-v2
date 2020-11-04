@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Pressable, Text, View } from 'react-native'
-import { Button } from '../../../components'
+import { Button } from './Button'
 
 interface Props {
   onShowDetails: Function
@@ -9,9 +9,10 @@ interface Props {
   speed: number
   potential: number
   health: number
-  name: number
-  onPick: Function
-  isPicked: boolean
+  name: string
+  onPick?: Function
+  isPicked?: boolean
+  button?: any
 }
 
 export const StarterHero: React.FC<Props> = ({
@@ -22,6 +23,7 @@ export const StarterHero: React.FC<Props> = ({
   onPick,
   isPicked,
   name,
+  button,
 }) => {
   const overall = Math.round((attack + defense + speed) / 3)
   return (
@@ -66,17 +68,24 @@ export const StarterHero: React.FC<Props> = ({
           </Pressable>
         </View>
       </View>
-      <Button
-        text={isPicked ? 'Unpick' : 'Pick'}
-        onPress={() => onPick()}
-        style={{
-          width: '100%',
-          padding: 5,
-          marginTop: 10,
-          backgroundColor: isPicked ? 'gray' : 'white',
-        }}
-        textStyle={{ color: isPicked ? 'white' : 'black' }}
-      />
+
+      {button || (
+        <Button
+          text={isPicked ? 'Unpick' : 'Pick'}
+          onPress={() => {
+            if (onPick) {
+              onPick()
+            }
+          }}
+          style={{
+            width: '100%',
+            padding: 5,
+            marginTop: 10,
+            backgroundColor: isPicked ? 'gray' : 'white',
+          }}
+          textStyle={{ color: isPicked ? 'white' : 'black' }}
+        />
+      )}
     </View>
   )
 }

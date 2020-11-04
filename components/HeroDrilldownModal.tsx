@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
-import { CustomModal } from '../../../components'
+import { StyleSheet, Text, View } from 'react-native'
+import { CustomModal } from './CustomModal'
 import { FontAwesome } from '@expo/vector-icons'
 
 interface Props {

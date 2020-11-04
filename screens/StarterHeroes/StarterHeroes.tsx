@@ -3,8 +3,8 @@ import { connect } from 'react-redux'
 import { Pressable, Text, View } from 'react-native'
 import { RandomHeroGenerator } from '../../lib/RandomHeroGenerator'
 import * as guildActions from '../../redux/guildWidget'
-import { HeroDrilldownModal, StarterHero } from './components'
 import { FontAwesome } from '@expo/vector-icons'
+import { HeroDrilldownModal, StarterHero } from '../../components'
 
 interface Props {
   navigation: any
