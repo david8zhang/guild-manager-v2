@@ -11,19 +11,58 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
   const { map, rows, cols } = matchManager?.getArena()
   const highlightedSquares = matchManager.getHighlightedSquares()
 
+  const [count, setCount] = React.useState(0)
+
+  const forceUpdate = () => {
+    setCount(count + 1)
+  }
+
   const totalNumCells = rows * cols
-  const [selectedHeroId, setSelectedHeroId] = React.useState<string>('')
+  const [
+    selectedHeroAndCoordinates,
+    setSelectedHeroAndCoordinates,
+  ] = React.useState<any>(null)
+
+  const onSquarePress = (hero: any, coordinates: string) => {
+    if (hero) {
+      onSelectHero(hero, coordinates)
+    } else {
+      if (selectedHeroAndCoordinates && highlightedSquares[coordinates]) {
+        const { selectedHeroCoordinates } = selectedHeroAndCoordinates
+        const [startRow, startCol] = selectedHeroCoordinates.split(',')
+        const [targetRow, targetCol] = coordinates.split(',')
+        matchManager.resetHighlightedSquares()
+        matchManager.moveHero({
+          start: {
+            row: parseInt(startRow, 10),
+            col: parseInt(startCol, 10),
+          },
+          target: {
+            row: parseInt(targetRow, 10),
+            col: parseInt(targetCol, 10),
+          },
+        })
+        forceUpdate()
+      }
+    }
+  }
 
   const onSelectHero = (hero: HeroInMatch, coordinates: string) => {
     matchManager.resetHighlightedSquares()
     if (hero) {
-      setSelectedHeroId(hero.getHeroRef().heroId)
+      setSelectedHeroAndCoordinates({
+        selectedHeroId: hero.getHeroRef().heroId,
+        selectedHeroCoordinates: coordinates,
+      })
     }
     const [row, col] = coordinates.split(',')
     matchManager.highlightMoveableSquares(parseInt(row), parseInt(col))
   }
 
   const getSquareColor = (coordinates: string) => {
+    const selectedHeroId = selectedHeroAndCoordinates
+      ? selectedHeroAndCoordinates.selectedHeroId
+      : ''
     const hero: HeroInMatch = map[coordinates]
     const isSelected = hero && selectedHeroId === hero.getHeroRef().heroId
     const isHighlighted = highlightedSquares[coordinates]
@@ -49,7 +88,7 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
         <Pressable
           key={`hero-${coordinates}`}
           onPress={() => {
-            onSelectHero(hero, coordinates)
+            onSquarePress(hero, coordinates)
           }}
           style={{
             width: `${100 / cols}%`,

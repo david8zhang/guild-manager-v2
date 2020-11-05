@@ -71,5 +71,13 @@ export class MatchManager {
     this.arena.resetSquareHighlight()
   }
 
-  public moveCharacter() {}
+  public moveHero({
+    start,
+    target,
+  }: {
+    start: { row: number; col: number }
+    target: { row: number; col: number }
+  }) {
+    this.arena.moveHero(start, target)
+  }
 }

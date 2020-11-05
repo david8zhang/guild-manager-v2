@@ -103,14 +103,14 @@ export class Arena {
     )
   }
 
-  public moveCharacter(
+  public moveHero(
     start: { row: number; col: number },
     end: { row: number; col: number }
   ) {
     const startKey = this.getCoordinateKey(start.row, start.col)
     const endKey = this.getCoordinateKey(end.row, end.col)
     this.map[endKey] = this.map[startKey]
-    this.map[endKey] = null
+    this.map[startKey] = null
   }
 
   public initializeArena(): void {
