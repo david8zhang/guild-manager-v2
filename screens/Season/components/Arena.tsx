@@ -1,21 +1,20 @@
 import * as React from 'react'
-import { Pressable, Text, View } from 'react-native'
+import { Dimensions, Pressable, Text, View } from 'react-native'
+import { Portal } from 'react-native-paper'
+import { Button, CustomModal } from '../../../components'
 import { MatchManager } from '../../../lib/MatchManager'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
+import { OverlayMenu } from './OverlayMenu'
 
 interface Props {
   matchManager: MatchManager
 }
 
 export const Arena: React.FC<Props> = ({ matchManager }) => {
+  const refs: any = []
   const { map, rows, cols } = matchManager?.getArena()
   const highlightedSquares = matchManager.getHighlightedSquares()
-
-  const [count, setCount] = React.useState(0)
-
-  const forceUpdate = () => {
-    setCount(count + 1)
-  }
+  const [menuToShowCoords, setMenuToShowCoords] = React.useState<any>(null)
 
   const totalNumCells = rows * cols
   const [
@@ -28,7 +27,10 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
       onSelectHero(hero, coordinates)
     } else {
       if (selectedHeroAndCoordinates && highlightedSquares[coordinates]) {
-        const { selectedHeroCoordinates } = selectedHeroAndCoordinates
+        const {
+          selectedHeroId,
+          selectedHeroCoordinates,
+        } = selectedHeroAndCoordinates
         const [startRow, startCol] = selectedHeroCoordinates.split(',')
         const [targetRow, targetCol] = coordinates.split(',')
         matchManager.resetHighlightedSquares()
@@ -42,7 +44,10 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
             col: parseInt(targetCol, 10),
           },
         })
-        forceUpdate()
+        setMenuToShowCoords({
+          row: targetRow,
+          col: targetCol,
+        })
       }
     }
   }
@@ -91,6 +96,7 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
             onSquarePress(hero, coordinates)
           }}
           style={{
+            overflow: 'visible',
             width: `${100 / cols}%`,
             borderColor: 'gray',
             borderLeftWidth: 1,
@@ -99,6 +105,8 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
             backgroundColor: getSquareColor(coordinates),
             alignItems: 'center',
             justifyContent: 'center',
+            position: 'relative',
+            zIndex: 1,
             padding: 5,
           }}
         >
@@ -112,23 +120,42 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
     }
     return grid
   }
-
+  const row = 7
+  const col = 5
   return (
-    <View
-      style={{
-        marginLeft: 15,
-        marginRight: 15,
-        borderTopWidth: 1,
-        borderRightWidth: 1,
-        borderColor: 'gray',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        backgroundColor: '#ddd',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      {renderGrid()}
+    <View style={{ width: '100%' }}>
+      <View
+        style={{
+          marginLeft: 15,
+          marginRight: 15,
+          borderTopWidth: 1,
+          borderRightWidth: 1,
+          borderColor: 'gray',
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          backgroundColor: '#ddd',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {renderGrid()}
+        {menuToShowCoords && (
+          <OverlayMenu
+            rows={rows}
+            cols={cols}
+            menuToShowCoords={menuToShowCoords}
+            onAttack={() => {
+              setMenuToShowCoords(null)
+            }}
+            onCancel={() => {
+              setMenuToShowCoords(null)
+            }}
+            onWait={() => {
+              setMenuToShowCoords(null)
+            }}
+          />
+        )}
+      </View>
     </View>
   )
 }

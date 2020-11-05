@@ -4,6 +4,7 @@ import { MatchManager } from '../../../lib/MatchManager'
 import { Team } from '../../../lib/model/Team'
 import { Arena } from './Arena'
 import { LineupConfirm } from './LineupConfirm'
+import { Portal } from 'react-native-paper'
 
 interface Props {
   playerTeam: Team
@@ -57,41 +58,43 @@ export const Match: React.FC<Props> = ({ playerTeam, enemyTeam }) => {
   const score = matchManager.getScore()
 
   return (
-    <View style={{ flexDirection: 'column', flex: 1 }}>
-      <View
-        style={{
-          flexDirection: 'row',
-          width: 450,
-          alignSelf: 'center',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        {Object.keys(score).map((key: string) => {
-          return (
-            <View
-              key={key}
-              style={{
-                flex: 1,
-                flexDirection: 'row',
-                borderWidth: 1,
-                borderColor: 'gray',
-                marginTop: 10,
-                marginBottom: 10,
-              }}
-            >
-              <View style={{ backgroundColor: 'gray', flex: 1 }}></View>
-              <View style={{ flexDirection: 'row', padding: 10, flex: 3 }}>
-                <Text style={{ fontSize: 20, flex: 1 }}>{key}</Text>
-                <Text style={{ fontSize: 20 }}>{score[key]}</Text>
+    <Portal.Host>
+      <View style={{ flexDirection: 'column', flex: 1 }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            width: 450,
+            alignSelf: 'center',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {Object.keys(score).map((key: string) => {
+            return (
+              <View
+                key={key}
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  borderWidth: 1,
+                  borderColor: 'gray',
+                  marginTop: 10,
+                  marginBottom: 10,
+                }}
+              >
+                <View style={{ backgroundColor: 'gray', flex: 1 }}></View>
+                <View style={{ flexDirection: 'row', padding: 10, flex: 3 }}>
+                  <Text style={{ fontSize: 20, flex: 1 }}>{key}</Text>
+                  <Text style={{ fontSize: 20 }}>{score[key]}</Text>
+                </View>
               </View>
-            </View>
-          )
-        })}
+            )
+          })}
+        </View>
+        <View style={{ flex: 1 }}>
+          <Arena matchManager={matchManager} />
+        </View>
       </View>
-      <View style={{ flex: 1 }}>
-        <Arena matchManager={matchManager} />
-      </View>
-    </View>
+    </Portal.Host>
   )
 }
