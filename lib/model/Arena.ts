@@ -133,4 +133,46 @@ export class Arena {
       }
     }
   }
+
+  public getEnemyHeroPositions(): number[][] {
+    const enemyHeroIds: string[] = this.enemyHeroes.map(
+      (h: HeroInMatch) => h.getHeroRef().heroId
+    )
+    const coordinates: number[][] = []
+    Object.keys(this.map).forEach((coordinate: string) => {
+      const [row, col] = coordinate.split(',')
+      if (
+        this.map[coordinate] &&
+        enemyHeroIds.includes(
+          this.map[coordinate]?.getHeroRef().heroId as string
+        )
+      ) {
+        coordinates.push([parseInt(row, 10), parseInt(col, 10)])
+      }
+    })
+    return coordinates
+  }
+
+  public getPlayerHeroPositions(): number[][] {
+    const playerHeroIds: string[] = this.playerHeroes.map(
+      (h: HeroInMatch) => h.getHeroRef().heroId
+    )
+    const coordinates: number[][] = []
+    Object.keys(this.map).forEach((coordinate: string) => {
+      const [row, col] = coordinate.split(',')
+      if (
+        this.map[coordinate] &&
+        playerHeroIds.includes(
+          this.map[coordinate]?.getHeroRef().heroId as string
+        )
+      ) {
+        coordinates.push([parseInt(row, 10), parseInt(col, 10)])
+      }
+    })
+    return coordinates
+  }
+
+  public getManhattanDistance(start: number[], end: number[]): number {
+    return Math.abs(start[0] - end[0]) + Math.abs(start[1] - end[1])
+  }
 }

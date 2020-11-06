@@ -1,7 +1,5 @@
 import * as React from 'react'
-import { Dimensions, Pressable, Text, View } from 'react-native'
-import { Portal } from 'react-native-paper'
-import { Button, CustomModal } from '../../../components'
+import { Pressable, Text, View } from 'react-native'
 import { MatchManager } from '../../../lib/MatchManager'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
 import { OverlayMenu } from './OverlayMenu'
@@ -11,10 +9,10 @@ interface Props {
 }
 
 export const Arena: React.FC<Props> = ({ matchManager }) => {
-  const refs: any = []
   const { map, rows, cols } = matchManager?.getArena()
   const highlightedSquares = matchManager.getHighlightedSquares()
   const [menuToShowCoords, setMenuToShowCoords] = React.useState<any>(null)
+  const [movedHeroes, setMovedHeroes] = React.useState<string[]>([])
 
   const totalNumCells = rows * cols
   const [
@@ -22,39 +20,94 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
     setSelectedHeroAndCoordinates,
   ] = React.useState<any>(null)
 
-  const onSquarePress = (hero: any, coordinates: string) => {
+  const doEnemyTurn = () => {
+    setTimeout(() => {
+      matchManager.moveEnemyHeroes()
+      setMovedHeroes([])
+    }, 1000)
+  }
+
+  const moveHero = (selectedHeroCoordinates: string, coordinates: string) => {
+    const [startRow, startCol] = selectedHeroCoordinates.split(',')
+    const [targetRow, targetCol] = coordinates.split(',')
+    matchManager.resetHighlightedSquares()
+    matchManager.moveHero({
+      start: {
+        row: parseInt(startRow, 10),
+        col: parseInt(startCol, 10),
+      },
+      target: {
+        row: parseInt(targetRow, 10),
+        col: parseInt(targetCol, 10),
+      },
+    })
+  }
+
+  const showHeroActionMenu = (coordinates: string): void => {
+    const [targetRow, targetCol] = coordinates.split(',')
+    setMenuToShowCoords({
+      row: targetRow,
+      col: targetCol,
+    })
+  }
+
+  const isHeroInPlayerTeam = (heroId: string) => {
+    const playerHeroIds = matchManager
+      .getPlayerHeroesInMatch()
+      .map((hero: HeroInMatch) => hero.getHeroRef().heroId)
+    return playerHeroIds.includes(heroId)
+  }
+
+  const canMoveHero = (coordinates: string): boolean => {
+    return (
+      selectedHeroAndCoordinates &&
+      highlightedSquares[coordinates] &&
+      isHeroInPlayerTeam(selectedHeroAndCoordinates.selectedHeroId)
+    )
+  }
+
+  const didDeselectHero = (hero: HeroInMatch) => {
+    return (
+      selectedHeroAndCoordinates &&
+      selectedHeroAndCoordinates.selectedHeroId === hero.getHeroRef().heroId
+    )
+  }
+
+  const onDeselectHero = (coordinates: string) => {
+    if (selectedHeroAndCoordinates) {
+      const { selectedHeroId } = selectedHeroAndCoordinates
+      matchManager.resetHighlightedSquares()
+      setMovedHeroes(movedHeroes.concat(selectedHeroId))
+      showHeroActionMenu(coordinates)
+    }
+  }
+
+  const onSquarePress = (hero: HeroInMatch, coordinates: string) => {
     if (hero) {
-      onSelectHero(hero, coordinates)
+      if (didDeselectHero(hero)) {
+        onDeselectHero(coordinates)
+      } else {
+        onSelectHero(hero, coordinates)
+      }
     } else {
-      if (selectedHeroAndCoordinates && highlightedSquares[coordinates]) {
+      if (canMoveHero(coordinates)) {
         const {
           selectedHeroId,
           selectedHeroCoordinates,
         } = selectedHeroAndCoordinates
-        const [startRow, startCol] = selectedHeroCoordinates.split(',')
-        const [targetRow, targetCol] = coordinates.split(',')
-        matchManager.resetHighlightedSquares()
-        matchManager.moveHero({
-          start: {
-            row: parseInt(startRow, 10),
-            col: parseInt(startCol, 10),
-          },
-          target: {
-            row: parseInt(targetRow, 10),
-            col: parseInt(targetCol, 10),
-          },
-        })
-        setMenuToShowCoords({
-          row: targetRow,
-          col: targetCol,
-        })
+        if (movedHeroes.includes(selectedHeroId)) {
+          return
+        }
+        moveHero(selectedHeroCoordinates, coordinates)
+        setMovedHeroes(movedHeroes.concat(selectedHeroId))
+        showHeroActionMenu(coordinates)
       }
     }
   }
 
   const onSelectHero = (hero: HeroInMatch, coordinates: string) => {
     matchManager.resetHighlightedSquares()
-    if (hero) {
+    if (hero && isHeroInPlayerTeam(hero.getHeroRef().heroId)) {
       setSelectedHeroAndCoordinates({
         selectedHeroId: hero.getHeroRef().heroId,
         selectedHeroCoordinates: coordinates,
@@ -71,11 +124,14 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
     const hero: HeroInMatch = map[coordinates]
     const isSelected = hero && selectedHeroId === hero.getHeroRef().heroId
     const isHighlighted = highlightedSquares[coordinates]
-    const heroAtPosition = map[coordinates]
+
     if (isSelected) {
       return '#ffe599'
     }
-    if (heroAtPosition) {
+    if (hero && isHeroInPlayerTeam(hero.getHeroRef().heroId)) {
+      return '#b6d7a8'
+    }
+    if (hero) {
       return 'white'
     }
     if (isHighlighted) {
@@ -111,7 +167,16 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
           }}
         >
           {hero ? (
-            <Text style={{ fontSize: 11 }}>{hero.getHeroRef().name}</Text>
+            <Text
+              style={{
+                fontSize: 11,
+                color: movedHeroes.includes(hero.getHeroRef().heroId)
+                  ? 'gray'
+                  : 'black',
+              }}
+            >
+              {hero.getHeroRef().name}
+            </Text>
           ) : (
             <Text></Text>
           )}
@@ -120,8 +185,15 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
     }
     return grid
   }
-  const row = 7
-  const col = 5
+
+  const onPostAction = () => {
+    setMenuToShowCoords(null)
+    setSelectedHeroAndCoordinates(null)
+    if (movedHeroes.length === matchManager.getPlayerHeroesInMatch().length) {
+      doEnemyTurn()
+    }
+  }
+
   return (
     <View style={{ width: '100%' }}>
       <View
@@ -145,13 +217,13 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
             cols={cols}
             menuToShowCoords={menuToShowCoords}
             onAttack={() => {
-              setMenuToShowCoords(null)
+              onPostAction()
             }}
             onCancel={() => {
-              setMenuToShowCoords(null)
+              onPostAction()
             }}
             onWait={() => {
-              setMenuToShowCoords(null)
+              onPostAction()
             }}
           />
         )}

@@ -80,4 +80,62 @@ export class MatchManager {
   }) {
     this.arena.moveHero(start, target)
   }
+
+  public getPlayerHeroesInMatch(): HeroInMatch[] {
+    return this.playerHeroes
+  }
+
+  public getEnemyHeroesInMatch(): HeroInMatch[] {
+    return this.enemyHeroes
+  }
+
+  public moveEnemyHeroes(): void {
+    const enemyHeroPositions: number[][] = this.arena.getEnemyHeroPositions()
+    const playerHeroPositions: number[][] = this.arena.getPlayerHeroPositions()
+    enemyHeroPositions.forEach((position) => {
+      const hero: HeroInMatch = this.arena.getHeroAtLocation(
+        position[0],
+        position[1]
+      )
+      const range = hero.getMoveRange()
+      const moveableSquares = this.arena.getSquaresInRange(
+        range,
+        position[0],
+        position[1]
+      )
+
+      // Target a random player and get the closest square within move range to the player's position
+      const randomPlayerToTarget =
+        playerHeroPositions[
+          Math.floor(Math.random() * playerHeroPositions.length)
+        ]
+      let closestSquareToTarget: number[] = []
+      let runningDistance = Number.MAX_SAFE_INTEGER
+      const emptyMoveableSquares = moveableSquares.filter(
+        (coordinate: number[]) => {
+          return !this.arena.getHeroAtLocation(coordinate[0], coordinate[1])
+        }
+      )
+      emptyMoveableSquares.forEach((coordinate: number[]) => {
+        const currDistance = this.arena.getManhattanDistance(
+          coordinate,
+          randomPlayerToTarget
+        )
+        if (currDistance < runningDistance) {
+          runningDistance = currDistance
+          closestSquareToTarget = coordinate
+        }
+      })
+      this.arena.moveHero(
+        {
+          row: position[0],
+          col: position[1],
+        },
+        {
+          row: closestSquareToTarget[0],
+          col: closestSquareToTarget[1],
+        }
+      )
+    })
+  }
 }
