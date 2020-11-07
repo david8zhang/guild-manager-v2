@@ -3,6 +3,7 @@ import { Pressable, Text, View } from 'react-native'
 import { MatchManager } from '../../../lib/MatchManager'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
 import { OverlayMenu } from './OverlayMenu'
+import { TargetSelectionOverlay } from './TargetSelectionOverlay'
 
 interface Props {
   matchManager: MatchManager
@@ -13,6 +14,9 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
   const highlightedSquares = matchManager.getHighlightedSquares()
   const [menuToShowCoords, setMenuToShowCoords] = React.useState<any>(null)
   const [movedHeroes, setMovedHeroes] = React.useState<string[]>([])
+  const [showAttackButton, setShowAttackButton] = React.useState(false)
+  const [targetableHeroesMap, setTargetHeroesMap] = React.useState(null)
+  const [attackerHero, setAttackerHero] = React.useState<any>(null)
 
   const totalNumCells = rows * cols
   const [
@@ -43,11 +47,30 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
     })
   }
 
+  const getEnemiesInAttackRange = (row: number, col: number) => {
+    return matchManager
+      .getHeroesInAttackRange(row, col)
+      .filter((item: { hero: HeroInMatch; coordinates: number[] }) => {
+        const { hero } = item
+        return !isHeroInPlayerTeam(hero.getHeroRef().heroId)
+      })
+  }
+
   const showHeroActionMenu = (coordinates: string): void => {
     const [targetRow, targetCol] = coordinates.split(',')
+    const targetRowNum = parseInt(targetRow)
+    const targetColNum = parseInt(targetCol)
+
+    const enemiesInAttackRange = getEnemiesInAttackRange(
+      targetRowNum,
+      targetColNum
+    )
+    if (enemiesInAttackRange.length > 0) {
+      setShowAttackButton(true)
+    }
     setMenuToShowCoords({
-      row: targetRow,
-      col: targetCol,
+      row: targetRowNum,
+      col: targetColNum,
     })
   }
 
@@ -61,7 +84,7 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
   const canMoveHero = (coordinates: string): boolean => {
     return (
       selectedHeroAndCoordinates &&
-      highlightedSquares[coordinates] &&
+      highlightedSquares[coordinates] !== undefined &&
       isHeroInPlayerTeam(selectedHeroAndCoordinates.selectedHeroId)
     )
   }
@@ -123,7 +146,7 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
       : ''
     const hero: HeroInMatch = map[coordinates]
     const isSelected = hero && selectedHeroId === hero.getHeroRef().heroId
-    const isHighlighted = highlightedSquares[coordinates]
+    const highlightColor = highlightedSquares[coordinates]
 
     if (isSelected) {
       return '#ffe599'
@@ -131,11 +154,11 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
     if (hero && isHeroInPlayerTeam(hero.getHeroRef().heroId)) {
       return '#b6d7a8'
     }
+    if (highlightColor) {
+      return highlightColor
+    }
     if (hero) {
       return 'white'
-    }
-    if (isHighlighted) {
-      return 'blue'
     }
     return 'white'
   }
@@ -189,9 +212,39 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
   const onPostAction = () => {
     setMenuToShowCoords(null)
     setSelectedHeroAndCoordinates(null)
+    setShowAttackButton(false)
+    setTargetHeroesMap(null)
+  }
+
+  const endTurn = () => {
     if (movedHeroes.length === matchManager.getPlayerHeroesInMatch().length) {
       doEnemyTurn()
     }
+  }
+
+  const onChooseAttackTarget = () => {
+    const { row, col } = menuToShowCoords
+    matchManager.highlightAttackableSquares(row, col)
+    setAttackerHero(
+      matchManager.getHeroByHeroId(selectedHeroAndCoordinates.selectedHeroId)
+    )
+    onPostAction()
+    const attackableEnemies = getEnemiesInAttackRange(row, col).reduce(
+      (acc, curr) => {
+        const { coordinates, hero } = curr
+        const key = `${coordinates[0]},${coordinates[1]}`
+        acc[key] = hero
+        return acc
+      },
+      {}
+    )
+    setTargetHeroesMap(attackableEnemies)
+  }
+
+  const onUndoMove = () => {
+    // TODO: Implement undo move logic
+    onPostAction()
+    endTurn()
   }
 
   return (
@@ -211,19 +264,30 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
         }}
       >
         {renderGrid()}
+        {targetableHeroesMap && (
+          <TargetSelectionOverlay
+            attackableTargetCoords={targetableHeroesMap}
+            rows={rows}
+            cols={cols}
+            playerHero={attackerHero}
+            onConfirmAttack={() => {}}
+          />
+        )}
         {menuToShowCoords && (
           <OverlayMenu
             rows={rows}
             cols={cols}
             menuToShowCoords={menuToShowCoords}
+            canAttack={showAttackButton}
             onAttack={() => {
-              onPostAction()
+              onChooseAttackTarget()
             }}
             onCancel={() => {
-              onPostAction()
+              onUndoMove()
             }}
             onWait={() => {
               onPostAction()
+              endTurn()
             }}
           />
         )}

@@ -12,6 +12,7 @@ interface Props {
   onAttack: Function
   onWait: Function
   onCancel: Function
+  canAttack: boolean
 }
 
 export const OverlayMenu: React.FC<Props> = ({
@@ -21,6 +22,7 @@ export const OverlayMenu: React.FC<Props> = ({
   onAttack,
   onWait,
   onCancel,
+  canAttack,
 }) => {
   const renderGrid = () => {
     const grid = []
@@ -43,14 +45,16 @@ export const OverlayMenu: React.FC<Props> = ({
         >
           {shouldShowMenu && (
             <View>
-              <Button
-                style={{ width: 90, marginBottom: 5, padding: 2 }}
-                textStyle={{ fontSize: 10 }}
-                text='Attack'
-                onPress={() => {
-                  onAttack()
-                }}
-              />
+              {canAttack && (
+                <Button
+                  style={{ width: 90, marginBottom: 5, padding: 2 }}
+                  textStyle={{ fontSize: 10 }}
+                  text='Attack'
+                  onPress={() => {
+                    onAttack()
+                  }}
+                />
+              )}
               <Button
                 style={{ width: 90, marginBottom: 5, padding: 2 }}
                 textStyle={{ fontSize: 10 }}

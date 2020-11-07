@@ -10,7 +10,7 @@ export class Arena {
   private enemyHeroes: HeroInMatch[]
   private playerHeroes: HeroInMatch[]
   public highlightedSquares: {
-    [key: string]: boolean
+    [key: string]: string
   }
 
   constructor(playerHeroes: HeroInMatch[], enemyHeroes: HeroInMatch[]) {
@@ -29,11 +29,11 @@ export class Arena {
     return this.map[key] as HeroInMatch
   }
 
-  public highlightSquares(squares: number[][]) {
+  public highlightSquares(squares: number[][], color: string) {
     squares.forEach((coord) => {
       const [row, col] = coord
       const key = this.getCoordinateKey(row, col)
-      this.highlightedSquares[key] = true
+      this.highlightedSquares[key] = color
     })
   }
 
@@ -41,7 +41,7 @@ export class Arena {
     squares.forEach((coord) => {
       const [row, col] = coord
       const key = this.getCoordinateKey(row, col)
-      this.highlightedSquares[key] = false
+      delete this.highlightedSquares[key]
     })
   }
 
@@ -51,7 +51,7 @@ export class Arena {
 
   public resetSquareHighlight() {
     Object.keys(this.highlightedSquares).forEach((key) => {
-      this.highlightedSquares[key] = false
+      delete this.highlightedSquares[key]
     })
   }
 
