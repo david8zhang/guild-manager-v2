@@ -17,6 +17,7 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
   const [showAttackButton, setShowAttackButton] = React.useState(false)
   const [targetableHeroesMap, setTargetHeroesMap] = React.useState(null)
   const [attackerHero, setAttackerHero] = React.useState<any>(null)
+  const [counter, setCounter] = React.useState(0)
 
   const totalNumCells = rows * cols
   const [
@@ -241,6 +242,12 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
     setTargetHeroesMap(attackableEnemies)
   }
 
+  const dehighlightAttackSquares = () => {
+    console.log('Reset highlight squares...')
+    matchManager.resetHighlightedSquares()
+    setCounter(counter + 1)
+  }
+
   const onUndoMove = () => {
     // TODO: Implement undo move logic
     onPostAction()
@@ -270,7 +277,9 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
             rows={rows}
             cols={cols}
             playerHero={attackerHero}
-            onConfirmAttack={() => {}}
+            onConfirmAttack={() => {
+              dehighlightAttackSquares()
+            }}
           />
         )}
         {menuToShowCoords && (

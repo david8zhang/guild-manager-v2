@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Pressable, View } from 'react-native'
 import { Portal } from 'react-native-paper'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
+import { AttackCutsceneModal } from './AttackCutsceneModal'
 import { AttackMatchupModal } from './AttackMatchupModal'
 
 interface Props {
@@ -17,8 +18,10 @@ export const TargetSelectionOverlay: React.FC<Props> = ({
   cols,
   attackableTargetCoords,
   playerHero,
+  onConfirmAttack,
 }) => {
   const [targetToAttack, setTargetToAttack] = React.useState<any>(null)
+  const [isAttacking, setIsAttacking] = React.useState(false)
   const renderGrid = () => {
     const grid = []
     const totalNumCells = rows * cols
@@ -65,6 +68,19 @@ export const TargetSelectionOverlay: React.FC<Props> = ({
           isOpen={targetToAttack !== null}
           onClose={() => setTargetToAttack(null)}
           targetToAttack={targetToAttack}
+          playerHero={playerHero}
+          onAttack={() => {
+            setIsAttacking(true)
+          }}
+        />
+        <AttackCutsceneModal
+          isOpen={isAttacking}
+          onClose={() => {
+            onConfirmAttack()
+            setIsAttacking(false)
+            setTargetToAttack(null)
+          }}
+          targetHero={targetToAttack}
           playerHero={playerHero}
         />
       </Portal>

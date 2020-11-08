@@ -18,6 +18,10 @@ export class HeroInMatch {
     return this.hero
   }
 
+  public getCurrHealth(): number {
+    return this.currHealth
+  }
+
   public getAttackRange(): number {
     let attackPlusSpeedAvg = Math.floor(
       (this.hero.speed + this.hero.attack) / 2
@@ -36,7 +40,6 @@ export class HeroInMatch {
         range = sumToRangeMap[key]
       }
     })
-    console.log()
     return range
   }
 
@@ -58,5 +61,14 @@ export class HeroInMatch {
       }
     })
     return range
+  }
+
+  public calculateDamage(targetHero: HeroInMatch) {
+    if (!targetHero) {
+      return 0
+    }
+    const targetDefense = targetHero.getHeroRef().defense
+    const diff = this.hero.attack - targetDefense
+    return (37 * Math.max(diff, 0)) / 8 + 15
   }
 }
