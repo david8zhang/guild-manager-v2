@@ -4,7 +4,7 @@ import { Hero } from './Hero'
 export class HeroInMatch {
   private hero: Hero
   private currHealth: number
-  private isDead: boolean
+  public isDead: boolean
   private heroStats: HeroStats
 
   constructor(hero: Hero) {

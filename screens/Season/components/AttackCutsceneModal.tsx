@@ -22,15 +22,81 @@ export const AttackCutsceneModal: React.FC<Props> = ({
   if (!isOpen) {
     return <View />
   }
-  const playerHeroRef: Hero = playerHero.getHeroRef()
-  const targetHeroRef: Hero = targetHero.getHeroRef()
   const [attackerPos, setAttackerPos] = React.useState(new Animated.Value(0))
+  const [attackerRot, setAttackerRot] = React.useState(new Animated.Value(0))
+  const [attackerDamage, setAttackerDamage] = React.useState(-1)
+
   const [defenderPos, setDefenderPos] = React.useState(new Animated.Value(0))
-  const [counter, setCounter] = React.useState(0)
+  const [defenderRot, setDefenderRot] = React.useState(new Animated.Value(0))
   const [defenderDamage, setDefenderDamage] = React.useState(-1)
 
   React.useEffect(() => {
     // Attacker wind up and lunge animations
+    startAttackerAnimation()
+    setTimeout(() => {
+      const damage = playerHero.calculateDamage(targetHero)
+      playerHero.attack(targetHero)
+      setDefenderDamage(Math.floor(damage))
+      if (targetHero.isDead) {
+        // Show scoring animation
+      }
+    }, 1000)
+    setTimeout(() => {
+      if (!targetHero.isDead) {
+        startDefenderAnimation()
+      }
+    }, 2500)
+    setTimeout(() => {
+      if (!targetHero.isDead) {
+        const damage = targetHero.calculateDamage(playerHero)
+        targetHero.attack(playerHero)
+        setAttackerDamage(Math.floor(damage))
+        if (playerHero.isDead) {
+          // Show scoring animation
+        }
+      }
+    }, 3500)
+  }, [])
+
+  const startDefenderAnimation = () => {
+    Animated.sequence([
+      Animated.timing(defenderPos, {
+        toValue: -100,
+        duration: 1000,
+        easing: Easing.back(5),
+        useNativeDriver: true,
+      }),
+      Animated.parallel([
+        Animated.timing(defenderPos, {
+          toValue: 0,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.sequence([
+          Animated.timing(attackerRot, {
+            toValue: 1.0,
+            duration: 150,
+            easing: Easing.linear,
+            useNativeDriver: true,
+          }),
+          Animated.timing(attackerRot, {
+            toValue: -1.0,
+            duration: 300,
+            easing: Easing.linear,
+            useNativeDriver: true,
+          }),
+          Animated.timing(attackerRot, {
+            toValue: 0.0,
+            duration: 150,
+            easing: Easing.linear,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]),
+    ]).start()
+  }
+
+  const startAttackerAnimation = () => {
     Animated.sequence([
       Animated.timing(attackerPos, {
         toValue: 100,
@@ -45,19 +111,19 @@ export const AttackCutsceneModal: React.FC<Props> = ({
           useNativeDriver: true,
         }),
         Animated.sequence([
-          Animated.timing(defenderPos, {
+          Animated.timing(defenderRot, {
             toValue: 1.0,
             duration: 150,
             easing: Easing.linear,
             useNativeDriver: true,
           }),
-          Animated.timing(defenderPos, {
+          Animated.timing(defenderRot, {
             toValue: -1.0,
             duration: 300,
             easing: Easing.linear,
             useNativeDriver: true,
           }),
-          Animated.timing(defenderPos, {
+          Animated.timing(defenderRot, {
             toValue: 0.0,
             duration: 150,
             easing: Easing.linear,
@@ -66,19 +132,13 @@ export const AttackCutsceneModal: React.FC<Props> = ({
         ]),
       ]),
     ]).start()
+  }
 
+  React.useEffect(() => {
     setTimeout(() => {
-      const damage = playerHero.calculateDamage(targetHero)
-      playerHero.attack(targetHero)
-      setDefenderDamage(Math.floor(damage))
-    }, 1000)
+      onClose()
+    }, 6000)
   }, [])
-
-  // React.useEffect(() => {
-  //   setTimeout(() => {
-  //     onClose()
-  //   }, 5000)
-  // }, [])
 
   return (
     <CustomModal
@@ -95,8 +155,22 @@ export const AttackCutsceneModal: React.FC<Props> = ({
         }}
       >
         <Animated.View
-          style={{ flex: 1, transform: [{ translateX: attackerPos }] }}
+          style={{
+            flex: 1,
+            transform: [
+              {
+                rotate: attackerRot.interpolate({
+                  inputRange: [-1, 1],
+                  outputRange: ['-0.1rad', '0.1rad'],
+                }),
+              },
+              {
+                translateX: attackerPos,
+              },
+            ],
+          }}
         >
+          <DamageText isOpen={attackerDamage !== -1} damage={attackerDamage} />
           <AttackCutsceneHero hero={playerHero} />
         </Animated.View>
         <Animated.View
@@ -104,10 +178,13 @@ export const AttackCutsceneModal: React.FC<Props> = ({
             flex: 1,
             transform: [
               {
-                rotate: defenderPos.interpolate({
+                rotate: defenderRot.interpolate({
                   inputRange: [-1, 1],
                   outputRange: ['-0.1rad', '0.1rad'],
                 }),
+              },
+              {
+                translateX: defenderPos,
               },
             ],
           }}
