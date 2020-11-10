@@ -71,4 +71,17 @@ export class HeroInMatch {
     const diff = this.hero.attack - targetDefense
     return (37 * Math.max(diff, 0)) / 8 + 15
   }
+
+  public takeDamage(damage: number) {
+    this.currHealth -= damage
+    this.currHealth = Math.max(this.currHealth, 0)
+    if (this.currHealth === 0) {
+      this.isDead = true
+    }
+  }
+
+  public attack(target: HeroInMatch) {
+    const damage = this.calculateDamage(target)
+    target.takeDamage(damage)
+  }
 }

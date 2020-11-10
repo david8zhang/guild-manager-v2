@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Text, View } from 'react-native'
 import { ProgressBar } from 'react-native-paper'
-import { HealthBar } from './HealthBar'
+import { AttackMatchupHealthBar } from './AttackMatchupHealthBar'
 
 interface Props {
   name: string
@@ -42,7 +42,7 @@ export const AttackMatchupHero: React.FC<Props> = ({
           marginBottom: 10,
         }}
       ></View>
-      <HealthBar
+      <AttackMatchupHealthBar
         predictedDmg={predictedDamageTaken}
         currHealth={currHealth}
         health={health}

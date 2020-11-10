@@ -76,9 +76,9 @@ export const TargetSelectionOverlay: React.FC<Props> = ({
         <AttackCutsceneModal
           isOpen={isAttacking}
           onClose={() => {
-            onConfirmAttack()
             setIsAttacking(false)
             setTargetToAttack(null)
+            onConfirmAttack()
           }}
           targetHero={targetToAttack}
           playerHero={playerHero}

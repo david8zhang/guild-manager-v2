@@ -8,7 +8,7 @@ interface Props {
   style?: any
 }
 
-export const HealthBar: React.FC<Props> = ({
+export const AttackMatchupHealthBar: React.FC<Props> = ({
   currHealth,
   health,
   style,

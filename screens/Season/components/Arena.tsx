@@ -242,10 +242,10 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
     setTargetHeroesMap(attackableEnemies)
   }
 
-  const dehighlightAttackSquares = () => {
-    console.log('Reset highlight squares...')
+  const onFinishedAttacking = () => {
     matchManager.resetHighlightedSquares()
-    setCounter(counter + 1)
+    setTargetHeroesMap(null)
+    endTurn()
   }
 
   const onUndoMove = () => {
@@ -278,7 +278,7 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
             cols={cols}
             playerHero={attackerHero}
             onConfirmAttack={() => {
-              dehighlightAttackSquares()
+              onFinishedAttacking()
             }}
           />
         )}
