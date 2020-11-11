@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Pressable, View } from 'react-native'
 import { Portal } from 'react-native-paper'
+import { MatchManager } from '../../../lib/MatchManager'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
 import { AttackCutsceneModal } from './AttackCutsceneModal'
 import { AttackMatchupModal } from './AttackMatchupModal'
@@ -11,6 +12,7 @@ interface Props {
   attackableTargetCoords: any
   onConfirmAttack: Function
   playerHero: HeroInMatch
+  matchManager: MatchManager
 }
 
 export const TargetSelectionOverlay: React.FC<Props> = ({
@@ -19,6 +21,7 @@ export const TargetSelectionOverlay: React.FC<Props> = ({
   attackableTargetCoords,
   playerHero,
   onConfirmAttack,
+  matchManager,
 }) => {
   const [targetToAttack, setTargetToAttack] = React.useState<any>(null)
   const [isAttacking, setIsAttacking] = React.useState(false)
@@ -74,6 +77,7 @@ export const TargetSelectionOverlay: React.FC<Props> = ({
           }}
         />
         <AttackCutsceneModal
+          matchManager={matchManager}
           isOpen={isAttacking}
           onClose={() => {
             setIsAttacking(false)

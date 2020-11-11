@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Text, View } from 'react-native'
-import { CustomModal } from '../../../components'
+import { Button, CustomModal } from '../../../components'
 
 interface Props {
   message: string
@@ -8,6 +8,7 @@ interface Props {
   teamName: string
   onClose: Function
   isOpen: boolean
+  onContinue: Function
 }
 
 export const ScoreModal: React.FC<Props> = ({
@@ -16,6 +17,7 @@ export const ScoreModal: React.FC<Props> = ({
   onClose,
   teamName,
   isOpen,
+  onContinue,
 }) => {
   if (!isOpen) {
     return <View />
@@ -25,20 +27,31 @@ export const ScoreModal: React.FC<Props> = ({
       onClose={() => {
         onClose()
       }}
+      hideCloseButton
       isOpen={isOpen}
-      customWidth={200}
-      customHeight={200}
+      customWidth={400}
+      customHeight={250}
     >
       <View
         style={{
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
+          height: '100%',
         }}
       >
-        <Text style={{ fontSize: 18, marginBottom: 10 }}>{teamName}</Text>
+        <Text style={{ fontSize: 18, marginBottom: 10, fontWeight: 'bold' }}>
+          {teamName}
+        </Text>
         <Text style={{ fontSize: 24, marginBottom: 10 }}>{score}</Text>
-        <Text style={{ fontSize: 16 }}>{message}</Text>
+        <Text style={{ fontSize: 16, textAlign: 'center' }}>{message}</Text>
+        <Button
+          style={{ marginTop: 20 }}
+          text='Continue'
+          onPress={() => {
+            onContinue()
+          }}
+        />
       </View>
     </CustomModal>
   )

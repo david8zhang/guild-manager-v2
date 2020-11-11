@@ -118,6 +118,30 @@ export class MatchManager {
     return this.enemyHeroes
   }
 
+  public playerScoreKill(): void {
+    this.score[this.playerTeamInfo.abbrev] += 2
+  }
+
+  public getPlayerScore() {
+    return this.score[this.playerTeamInfo.abbrev]
+  }
+
+  public getPlayerTeamInfo(): TeamInfo {
+    return this.playerTeamInfo
+  }
+
+  public enemyScoreKill(): void {
+    this.score[this.enemyTeamInfo.abbrev] += 2
+  }
+
+  public getEnemyScore() {
+    return this.score[this.enemyTeamInfo.abbrev]
+  }
+
+  public getEnemyTeamInfo(): TeamInfo {
+    return this.enemyTeamInfo
+  }
+
   public moveEnemyHeroes(): void {
     const enemyHeroPositions: number[][] = this.arena.getEnemyHeroPositions()
     const playerHeroPositions: number[][] = this.arena.getPlayerHeroPositions()

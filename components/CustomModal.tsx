@@ -8,6 +8,7 @@ interface Props {
   customWidth?: number
   customHeight?: number
   style?: any
+  hideCloseButton?: boolean
 }
 
 export const CustomModal: React.FC<Props> = ({
@@ -17,6 +18,7 @@ export const CustomModal: React.FC<Props> = ({
   customWidth,
   customHeight,
   style,
+  hideCloseButton,
 }) => {
   if (!isOpen) {
     return <View />
@@ -40,11 +42,13 @@ export const CustomModal: React.FC<Props> = ({
         ...style,
       }}
     >
-      <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-        <Pressable onPress={() => onClose()}>
-          <Text>Close</Text>
-        </Pressable>
-      </View>
+      {!hideCloseButton && (
+        <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+          <Pressable onPress={() => onClose()}>
+            <Text>Close</Text>
+          </Pressable>
+        </View>
+      )}
       {children}
     </View>
   )

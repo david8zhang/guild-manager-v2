@@ -273,6 +273,7 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
         {renderGrid()}
         {targetableHeroesMap && (
           <TargetSelectionOverlay
+            matchManager={matchManager}
             attackableTargetCoords={targetableHeroesMap}
             rows={rows}
             cols={cols}

@@ -1,16 +1,19 @@
 import * as React from 'react'
-import { Text, View, Animated, Easing } from 'react-native'
-import { CustomModal } from '../../../components'
-import { Hero } from '../../../lib/model/Hero'
-import { HeroInMatch } from '../../../lib/model/HeroInMatch'
+import { View, Animated, Easing } from 'react-native'
+import { Portal } from 'react-native-paper'
+import { Button, CustomModal } from '../../../components'
+import { MatchManager } from '../../../lib/MatchManager'
+import { HeroInMatch, AttackResult } from '../../../lib/model/HeroInMatch'
 import { AttackCutsceneHero } from './AttackCutsceneHero'
 import { DamageText } from './DamageText'
+import { ScoreModal } from './ScoreModal'
 
 interface Props {
   isOpen: boolean
   onClose: Function
   targetHero: HeroInMatch
   playerHero: HeroInMatch
+  matchManager: MatchManager
 }
 
 export const AttackCutsceneModal: React.FC<Props> = ({
@@ -18,6 +21,7 @@ export const AttackCutsceneModal: React.FC<Props> = ({
   onClose,
   targetHero,
   playerHero,
+  matchManager,
 }) => {
   if (!isOpen) {
     return <View />
@@ -30,15 +34,24 @@ export const AttackCutsceneModal: React.FC<Props> = ({
   const [defenderRot, setDefenderRot] = React.useState(new Animated.Value(0))
   const [defenderDamage, setDefenderDamage] = React.useState(-1)
 
+  const [scorePayload, setScorePayload] = React.useState<any>(null)
+  const [attacksFinished, setAttacksFinished] = React.useState(false)
+
   React.useEffect(() => {
     // Attacker wind up and lunge animations
     startAttackerAnimation()
     setTimeout(() => {
-      const damage = playerHero.calculateDamage(targetHero)
-      playerHero.attack(targetHero)
-      setDefenderDamage(Math.floor(damage))
+      const attackResult: AttackResult = playerHero.attack(targetHero, 1.0)
+      setDefenderDamage(attackResult.damageDealt)
       if (targetHero.isDead) {
-        // Show scoring animation
+        matchManager.playerScoreKill()
+        setScorePayload({
+          message: `${playerHero.getHeroRef().name} killed ${
+            targetHero.getHeroRef().name
+          } and scored 2 points!`,
+          score: matchManager.getPlayerScore(),
+          teamName: matchManager.getPlayerTeamInfo().name,
+        })
       }
     }, 1000)
     setTimeout(() => {
@@ -48,13 +61,20 @@ export const AttackCutsceneModal: React.FC<Props> = ({
     }, 2500)
     setTimeout(() => {
       if (!targetHero.isDead) {
-        const damage = targetHero.calculateDamage(playerHero)
-        targetHero.attack(playerHero)
-        setAttackerDamage(Math.floor(damage))
+        const attackResult: AttackResult = targetHero.attack(playerHero)
+        setAttackerDamage(Math.floor(attackResult.damageDealt))
         if (playerHero.isDead) {
-          // Show scoring animation
+          matchManager.enemyScoreKill()
+          setScorePayload({
+            message: `${targetHero.getHeroRef().name} killed ${
+              playerHero.getHeroRef().name
+            } and scored 2 points!`,
+            score: matchManager.getEnemyScore(),
+            teamName: matchManager.getEnemyTeamInfo().name,
+          })
         }
       }
+      setAttacksFinished(true)
     }, 3500)
   }, [])
 
@@ -134,12 +154,6 @@ export const AttackCutsceneModal: React.FC<Props> = ({
     ]).start()
   }
 
-  React.useEffect(() => {
-    setTimeout(() => {
-      onClose()
-    }, 6000)
-  }, [])
-
   return (
     <CustomModal
       customHeight={300}
@@ -147,51 +161,85 @@ export const AttackCutsceneModal: React.FC<Props> = ({
       onClose={() => {
         onClose()
       }}
+      hideCloseButton
       isOpen={isOpen}
     >
+      <Portal>
+        {scorePayload && (
+          <ScoreModal
+            isOpen={scorePayload !== null}
+            onClose={() => setScorePayload(null)}
+            score={scorePayload.score}
+            teamName={scorePayload.teamName}
+            message={scorePayload.message}
+            onContinue={() => onClose()}
+          />
+        )}
+      </Portal>
       <View
         style={{
-          flexDirection: 'row',
+          flexDirection: 'column',
         }}
       >
-        <Animated.View
+        <View
           style={{
-            flex: 1,
-            transform: [
-              {
-                rotate: attackerRot.interpolate({
-                  inputRange: [-1, 1],
-                  outputRange: ['-0.1rad', '0.1rad'],
-                }),
-              },
-              {
-                translateX: attackerPos,
-              },
-            ],
+            flexDirection: 'row',
           }}
         >
-          <DamageText isOpen={attackerDamage !== -1} damage={attackerDamage} />
-          <AttackCutsceneHero hero={playerHero} />
-        </Animated.View>
-        <Animated.View
-          style={{
-            flex: 1,
-            transform: [
-              {
-                rotate: defenderRot.interpolate({
-                  inputRange: [-1, 1],
-                  outputRange: ['-0.1rad', '0.1rad'],
-                }),
-              },
-              {
-                translateX: defenderPos,
-              },
-            ],
-          }}
-        >
-          <DamageText isOpen={defenderDamage !== -1} damage={defenderDamage} />
-          <AttackCutsceneHero hero={targetHero} />
-        </Animated.View>
+          <Animated.View
+            style={{
+              flex: 1,
+              transform: [
+                {
+                  rotate: attackerRot.interpolate({
+                    inputRange: [-1, 1],
+                    outputRange: ['-0.1rad', '0.1rad'],
+                  }),
+                },
+                {
+                  translateX: attackerPos,
+                },
+              ],
+            }}
+          >
+            <DamageText
+              isOpen={attackerDamage !== -1}
+              damage={attackerDamage}
+            />
+            <AttackCutsceneHero hero={playerHero} />
+          </Animated.View>
+          <Animated.View
+            style={{
+              flex: 1,
+              transform: [
+                {
+                  rotate: defenderRot.interpolate({
+                    inputRange: [-1, 1],
+                    outputRange: ['-0.1rad', '0.1rad'],
+                  }),
+                },
+                {
+                  translateX: defenderPos,
+                },
+              ],
+            }}
+          >
+            <DamageText
+              isOpen={defenderDamage !== -1}
+              damage={defenderDamage}
+            />
+            <AttackCutsceneHero hero={targetHero} />
+          </Animated.View>
+        </View>
+        {
+          <Button
+            style={{ position: 'absolute', bottom: -20, right: 200 }}
+            text='Continue'
+            onPress={() => {
+              onClose()
+            }}
+          />
+        }
       </View>
     </CustomModal>
   )

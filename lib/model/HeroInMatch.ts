@@ -1,6 +1,13 @@
 import { HeroStats } from '../constants/HeroStats'
 import { Hero } from './Hero'
 
+export interface AttackResult {
+  damageDealt: number
+  attacker: HeroInMatch
+  target: HeroInMatch
+  isCrit: boolean
+}
+
 export class HeroInMatch {
   private hero: Hero
   private currHealth: number
@@ -80,8 +87,20 @@ export class HeroInMatch {
     }
   }
 
-  public attack(target: HeroInMatch) {
-    const damage = this.calculateDamage(target)
+  public attack(target: HeroInMatch, critRate: number = 0.2): AttackResult {
+    const didCrit =
+      Math.floor(Math.random() * 100) <= Math.floor(critRate * 100)
+    let damage = this.calculateDamage(target)
+    if (didCrit) {
+      damage *= 3
+    }
+    damage = Math.floor(damage)
     target.takeDamage(damage)
+    return {
+      damageDealt: damage,
+      attacker: this,
+      target: target,
+      isCrit: didCrit,
+    }
   }
 }
