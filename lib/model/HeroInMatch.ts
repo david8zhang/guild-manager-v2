@@ -8,17 +8,21 @@ export interface AttackResult {
   isCrit: boolean
 }
 
+const RESPAWN_TIME = 3
+
 export class HeroInMatch {
   private hero: Hero
   private currHealth: number
   public isDead: boolean
   private heroStats: HeroStats
+  private respawnTimer: number
 
   constructor(hero: Hero) {
     this.hero = hero
     this.currHealth = hero.health
     this.isDead = false
     this.heroStats = new HeroStats()
+    this.respawnTimer = 0
   }
 
   public getHeroRef(): Hero {
@@ -101,6 +105,22 @@ export class HeroInMatch {
       attacker: this,
       target: target,
       isCrit: didCrit,
+    }
+  }
+
+  public setRespawnTimer() {
+    this.respawnTimer = RESPAWN_TIME
+  }
+
+  public respawn() {
+    this.currHealth = this.hero.health
+    this.isDead = false
+  }
+
+  public countdownRespawnTimer() {
+    this.respawnTimer--
+    if (this.respawnTimer == 0) {
+      this.respawn()
     }
   }
 }

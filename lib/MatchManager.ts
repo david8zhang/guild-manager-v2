@@ -26,6 +26,9 @@ export class MatchManager {
   private eventLog: MatchEvent[]
   private score: any = {}
 
+  private playerSpawnLocations: number[][] = []
+  private enemySpawnLocations: number[][] = []
+
   constructor(config: MatchManagerConfig) {
     this.playerHeroes = config.playerHeroes.map((h) => new HeroInMatch(h))
     this.enemyHeroes = config.enemyHeroes.map((h) => new HeroInMatch(h))
@@ -38,6 +41,8 @@ export class MatchManager {
   // Do all initialization logic here
   public startMatch(): void {
     this.arena.initializeArena()
+    this.playerSpawnLocations = this.arena.getPlayerHeroPositions()
+    this.enemySpawnLocations = this.arena.getEnemyHeroPositions()
     this.score = {
       [this.playerTeamInfo.abbrev]: 0,
       [this.enemyTeamInfo.abbrev]: 0,
@@ -70,7 +75,7 @@ export class MatchManager {
     const squaresInRange = this.arena.getSquaresInRange(range, rows, cols)
     squaresInRange.forEach((coord: number[]) => {
       const h = this.arena.getHeroAtLocation(coord[0], coord[1])
-      if (h) {
+      if (h && !h.isDead) {
         heroesInAttackRange.push({
           coordinates: coord,
           hero: h,
@@ -145,7 +150,21 @@ export class MatchManager {
   public moveEnemyHeroes(): void {
     const enemyHeroPositions: number[][] = this.arena.getEnemyHeroPositions()
     const playerHeroPositions: number[][] = this.arena.getPlayerHeroPositions()
-    enemyHeroPositions.forEach((position) => {
+
+    const liveHeroFilterFn = (position: number[]): boolean => {
+      const hero: HeroInMatch = this.arena.getHeroAtLocation(
+        position[0],
+        position[1]
+      )
+      return hero && !hero.isDead
+    }
+
+    const livingEnemyHeroPositions = enemyHeroPositions.filter(liveHeroFilterFn)
+    const livingPlayerHeroPositions = playerHeroPositions.filter(
+      liveHeroFilterFn
+    )
+
+    livingEnemyHeroPositions.forEach((position) => {
       const hero: HeroInMatch = this.arena.getHeroAtLocation(
         position[0],
         position[1]
@@ -159,8 +178,8 @@ export class MatchManager {
 
       // Target a random player and get the closest square within move range to the player's position
       const randomPlayerToTarget =
-        playerHeroPositions[
-          Math.floor(Math.random() * playerHeroPositions.length)
+        livingPlayerHeroPositions[
+          Math.floor(Math.random() * livingPlayerHeroPositions.length)
         ]
       let closestSquareToTarget: number[] = []
       let runningDistance = Number.MAX_SAFE_INTEGER
@@ -190,5 +209,81 @@ export class MatchManager {
         }
       )
     })
+  }
+
+  public tickRespawnTimer(side: string) {
+    const heroes: HeroInMatch[] =
+      side === 'enemy'
+        ? this.getEnemyHeroesInMatch()
+        : this.getPlayerHeroesInMatch()
+    heroes.forEach((hero: HeroInMatch) => {
+      if (hero.isDead) {
+        hero.countdownRespawnTimer()
+      }
+    })
+  }
+
+  public isSpawnLocation(coordinates: string): boolean {
+    const allSpawnLocations = this.playerSpawnLocations.concat(
+      this.enemySpawnLocations
+    )
+    for (let i = 0; i < allSpawnLocations.length; i++) {
+      const coord = allSpawnLocations[i]
+      const stringified = `${coord[0]},${coord[1]}`
+      if (stringified === coordinates) {
+        return true
+      }
+    }
+    return false
+  }
+
+  public getEmptySpawnLocation(
+    spawnLocations: number[][],
+    currLoc: number[]
+  ): number[] {
+    for (let i = 0; i < spawnLocations.length; i++) {
+      const coord = spawnLocations[i]
+      const hero: HeroInMatch | null = this.arena.getHeroAtLocation(
+        coord[0],
+        coord[1]
+      )
+
+      // If the hero was spawn killed, keep them at the current location
+      if (!hero || (currLoc[0] === coord[0] && currLoc[1] === coord[1])) {
+        return coord
+      }
+    }
+    console.error('No empty spawn location found!')
+    return [0, 0]
+  }
+
+  public respawnHero(hero: HeroInMatch, side: string) {
+    // Set a respawn timer that ticks down every turn
+    hero.setRespawnTimer()
+
+    // Teleport the dead hero back to the starting squares
+    const currHeroLocation = this.arena.getHeroLocation(
+      hero.getHeroRef().heroId
+    )
+    const emptySpawnLocation =
+      side === 'player'
+        ? this.getEmptySpawnLocation(
+            this.playerSpawnLocations,
+            currHeroLocation
+          )
+        : this.getEmptySpawnLocation(this.enemySpawnLocations, currHeroLocation)
+    const heroLocation: number[] = this.arena.getHeroLocation(
+      hero.getHeroRef().heroId
+    )
+    this.arena.moveHero(
+      {
+        row: heroLocation[0],
+        col: heroLocation[1],
+      },
+      {
+        row: emptySpawnLocation[0],
+        col: emptySpawnLocation[1],
+      }
+    )
   }
 }

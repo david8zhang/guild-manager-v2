@@ -107,10 +107,25 @@ export class Arena {
     start: { row: number; col: number },
     end: { row: number; col: number }
   ) {
+    // If moving the hero to the same place, do nothing
+    if (start.row === end.row && start.col === end.col) {
+      return
+    }
     const startKey = this.getCoordinateKey(start.row, start.col)
     const endKey = this.getCoordinateKey(end.row, end.col)
     this.map[endKey] = this.map[startKey]
     this.map[startKey] = null
+  }
+
+  public getHeroLocation(heroId: string): number[] {
+    let coord: number[] = []
+    Object.keys(this.map).forEach((key: string) => {
+      if (this.map[key] && this.map[key]?.getHeroRef().heroId === heroId) {
+        const [row, col] = key.split(',')
+        coord = [parseInt(row), parseInt(col)]
+      }
+    })
+    return coord
   }
 
   public initializeArena(): void {

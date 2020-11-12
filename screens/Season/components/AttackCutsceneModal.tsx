@@ -26,20 +26,17 @@ export const AttackCutsceneModal: React.FC<Props> = ({
   if (!isOpen) {
     return <View />
   }
-  const [attackerPos, setAttackerPos] = React.useState(new Animated.Value(0))
-  const [attackerRot, setAttackerRot] = React.useState(new Animated.Value(0))
+  const [attackerPos] = React.useState(new Animated.Value(0))
+  const [attackerRot] = React.useState(new Animated.Value(0))
   const [attackerDamage, setAttackerDamage] = React.useState(-1)
 
-  const [defenderPos, setDefenderPos] = React.useState(new Animated.Value(0))
-  const [defenderRot, setDefenderRot] = React.useState(new Animated.Value(0))
+  const [defenderPos] = React.useState(new Animated.Value(0))
+  const [defenderRot] = React.useState(new Animated.Value(0))
   const [defenderDamage, setDefenderDamage] = React.useState(-1)
 
   const [scorePayload, setScorePayload] = React.useState<any>(null)
-  const [attacksFinished, setAttacksFinished] = React.useState(false)
 
-  React.useEffect(() => {
-    // Attacker wind up and lunge animations
-    startAttackerAnimation()
+  const processPlayerHeroAttack = () => {
     setTimeout(() => {
       const attackResult: AttackResult = playerHero.attack(targetHero, 1.0)
       setDefenderDamage(attackResult.damageDealt)
@@ -52,13 +49,12 @@ export const AttackCutsceneModal: React.FC<Props> = ({
           score: matchManager.getPlayerScore(),
           teamName: matchManager.getPlayerTeamInfo().name,
         })
+        matchManager.respawnHero(targetHero, 'enemy')
       }
     }, 1000)
-    setTimeout(() => {
-      if (!targetHero.isDead) {
-        startDefenderAnimation()
-      }
-    }, 2500)
+  }
+
+  const processDefenderHeroAttack = () => {
     setTimeout(() => {
       if (!targetHero.isDead) {
         const attackResult: AttackResult = targetHero.attack(playerHero)
@@ -72,10 +68,23 @@ export const AttackCutsceneModal: React.FC<Props> = ({
             score: matchManager.getEnemyScore(),
             teamName: matchManager.getEnemyTeamInfo().name,
           })
+          matchManager.respawnHero(playerHero, 'player')
         }
       }
-      setAttacksFinished(true)
     }, 3500)
+  }
+
+  React.useEffect(() => {
+    // Attacker wind up and lunge animations
+    startAttackerAnimation()
+    processPlayerHeroAttack()
+    // Start the defender attack animation after the attacker animation has finished
+    setTimeout(() => {
+      if (!targetHero.isDead) {
+        startDefenderAnimation()
+      }
+    }, 2500)
+    processDefenderHeroAttack()
   }, [])
 
   const startDefenderAnimation = () => {

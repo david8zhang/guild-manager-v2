@@ -7,8 +7,8 @@ interface Props {
 }
 
 export const DamageText: React.FC<Props> = ({ isOpen, damage }) => {
-  const opacity = new Animated.Value(1)
-  const yPos = new Animated.Value(60)
+  const [opacity] = React.useState(new Animated.Value(1))
+  const [yPos] = React.useState(new Animated.Value(60))
   React.useEffect(() => {
     if (isOpen) {
       Animated.parallel([

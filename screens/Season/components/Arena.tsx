@@ -2,14 +2,16 @@ import * as React from 'react'
 import { Pressable, Text, View } from 'react-native'
 import { MatchManager } from '../../../lib/MatchManager'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
+import { HeroInArena } from './HeroInArena'
 import { OverlayMenu } from './OverlayMenu'
 import { TargetSelectionOverlay } from './TargetSelectionOverlay'
 
 interface Props {
   matchManager: MatchManager
+  refreshScore: Function
 }
 
-export const Arena: React.FC<Props> = ({ matchManager }) => {
+export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
   const { map, rows, cols } = matchManager?.getArena()
   const highlightedSquares = matchManager.getHighlightedSquares()
   const [menuToShowCoords, setMenuToShowCoords] = React.useState<any>(null)
@@ -17,7 +19,6 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
   const [showAttackButton, setShowAttackButton] = React.useState(false)
   const [targetableHeroesMap, setTargetHeroesMap] = React.useState(null)
   const [attackerHero, setAttackerHero] = React.useState<any>(null)
-  const [counter, setCounter] = React.useState(0)
 
   const totalNumCells = rows * cols
   const [
@@ -28,6 +29,7 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
   const doEnemyTurn = () => {
     setTimeout(() => {
       matchManager.moveEnemyHeroes()
+      matchManager.tickRespawnTimer('enemy')
       setMovedHeroes([])
     }, 1000)
   }
@@ -108,6 +110,9 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
 
   const onSquarePress = (hero: HeroInMatch, coordinates: string) => {
     if (hero) {
+      if (hero.isDead) {
+        return
+      }
       if (didDeselectHero(hero)) {
         onDeselectHero(coordinates)
       } else {
@@ -148,6 +153,7 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
     const hero: HeroInMatch = map[coordinates]
     const isSelected = hero && selectedHeroId === hero.getHeroRef().heroId
     const highlightColor = highlightedSquares[coordinates]
+    const isSpawnLocation = matchManager.isSpawnLocation(coordinates)
 
     if (isSelected) {
       return '#ffe599'
@@ -157,6 +163,9 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
     }
     if (highlightColor) {
       return highlightColor
+    }
+    if (isSpawnLocation) {
+      return '#ddd'
     }
     if (hero) {
       return 'white'
@@ -190,20 +199,7 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
             padding: 5,
           }}
         >
-          {hero ? (
-            <Text
-              style={{
-                fontSize: 11,
-                color: movedHeroes.includes(hero.getHeroRef().heroId)
-                  ? 'gray'
-                  : 'black',
-              }}
-            >
-              {hero.getHeroRef().name}
-            </Text>
-          ) : (
-            <Text></Text>
-          )}
+          <HeroInArena hero={hero} movedHeroes={movedHeroes} />
         </Pressable>
       )
     }
@@ -218,9 +214,14 @@ export const Arena: React.FC<Props> = ({ matchManager }) => {
   }
 
   const endTurn = () => {
-    if (movedHeroes.length === matchManager.getPlayerHeroesInMatch().length) {
+    const livingHeroes = matchManager
+      .getPlayerHeroesInMatch()
+      .filter((h: HeroInMatch) => !h.isDead)
+    matchManager.tickRespawnTimer('player')
+    if (movedHeroes.length === livingHeroes.length) {
       doEnemyTurn()
     }
+    refreshScore()
   }
 
   const onChooseAttackTarget = () => {

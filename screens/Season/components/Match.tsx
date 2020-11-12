@@ -16,6 +16,8 @@ export const Match: React.FC<Props> = ({ playerTeam, enemyTeam }) => {
     null
   )
   const [lineupConfirmed, setLineupConfirmed] = React.useState(false)
+  const [score, setScore] = React.useState<any>({})
+
   React.useEffect(() => {
     const playerHeroes = playerTeam.roster.filter((h) =>
       playerTeam.starterIds.includes(h.heroId)
@@ -50,12 +52,12 @@ export const Match: React.FC<Props> = ({ playerTeam, enemyTeam }) => {
         playerTeam={playerTeam}
         onConfirm={() => {
           matchManager.startMatch()
+          setScore(matchManager.getScore())
           setLineupConfirmed(true)
         }}
       />
     )
   }
-  const score = matchManager.getScore()
 
   return (
     <Portal.Host>
@@ -92,7 +94,12 @@ export const Match: React.FC<Props> = ({ playerTeam, enemyTeam }) => {
           })}
         </View>
         <View style={{ flex: 1 }}>
-          <Arena matchManager={matchManager} />
+          <Arena
+            matchManager={matchManager}
+            refreshScore={() => {
+              setScore({ ...matchManager.getScore() })
+            }}
+          />
         </View>
       </View>
     </Portal.Host>
