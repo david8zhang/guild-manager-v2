@@ -211,6 +211,54 @@ export class MatchManager {
     })
   }
 
+  public doEnemyHeroAttacks(): any[] {
+    const attackActions: any[] = []
+    const enemyHeroPositions: number[][] = this.arena.getEnemyHeroPositions()
+    const playerHeroIds: string[] = this.playerHeroes.map(
+      (hero: HeroInMatch) => hero.getHeroRef().heroId
+    )
+    const livingEnemyHeroPositions = enemyHeroPositions.filter(
+      (position: number[]) => {
+        const hero = this.arena.getHeroAtLocation(position[0], position[1])
+        return hero && !hero.isDead
+      }
+    )
+    livingEnemyHeroPositions.forEach((position: number[]) => {
+      const hero: HeroInMatch = this.arena.getHeroAtLocation(
+        position[0],
+        position[1]
+      )
+      const range = hero.getAttackRange()
+      const attackableSquares = this.arena.getSquaresInRange(
+        range,
+        position[0],
+        position[1]
+      )
+      let heroToAttack: any = null
+      attackableSquares.forEach((square: number[]) => {
+        const target: HeroInMatch = this.arena.getHeroAtLocation(
+          square[0],
+          square[1]
+        )
+        if (target && playerHeroIds.includes(target.getHeroRef().heroId)) {
+          if (
+            !heroToAttack ||
+            target.getCurrHealth() < heroToAttack.getCurrHealth()
+          ) {
+            heroToAttack = target
+          }
+        }
+      })
+      if (heroToAttack) {
+        attackActions.push({
+          target: heroToAttack,
+          attacker: hero,
+        })
+      }
+    })
+    return attackActions
+  }
+
   public tickRespawnTimer(side: string) {
     const heroes: HeroInMatch[] =
       side === 'enemy'

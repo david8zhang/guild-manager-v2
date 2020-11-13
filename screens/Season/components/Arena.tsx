@@ -1,7 +1,9 @@
 import * as React from 'react'
 import { Pressable, Text, View } from 'react-native'
+import { Portal } from 'react-native-paper'
 import { MatchManager } from '../../../lib/MatchManager'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
+import { EnemyAttackCutsceneModal } from './EnemyAttackCutsceneModal'
 import { HeroInArena } from './HeroInArena'
 import { OverlayMenu } from './OverlayMenu'
 import { TargetSelectionOverlay } from './TargetSelectionOverlay'
@@ -20,17 +22,38 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
   const [targetableHeroesMap, setTargetHeroesMap] = React.useState(null)
   const [attackerHero, setAttackerHero] = React.useState<any>(null)
 
+  // Enemy Attack cutscenes
+  const [enemyAttackActions, setEnemyAttackActions] = React.useState<any[]>([])
+  const [enemyAttackActionIndex, setEnemyAttackActionIndex] = React.useState<
+    any
+  >(0)
+
+  // general purpose counter to force a component rerender
+  const [updateCounter, setUpdateCounter] = React.useState(0)
+
   const totalNumCells = rows * cols
   const [
     selectedHeroAndCoordinates,
     setSelectedHeroAndCoordinates,
   ] = React.useState<any>(null)
 
+  const finishEnemyTurn = () => {
+    matchManager.tickRespawnTimer('enemy')
+    setMovedHeroes([])
+  }
+
   const doEnemyTurn = () => {
     setTimeout(() => {
       matchManager.moveEnemyHeroes()
-      matchManager.tickRespawnTimer('enemy')
-      setMovedHeroes([])
+      setUpdateCounter(updateCounter + 1) // Force an update so the enemies move, wait, then attack
+      const attackActions = matchManager.doEnemyHeroAttacks()
+      if (attackActions.length > 0) {
+        setTimeout(() => {
+          setEnemyAttackActions(attackActions)
+        }, 1000)
+      } else {
+        finishEnemyTurn()
+      }
     }, 1000)
   }
 
@@ -110,7 +133,7 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
 
   const onSquarePress = (hero: HeroInMatch, coordinates: string) => {
     if (hero) {
-      if (hero.isDead) {
+      if (hero.isDead || movedHeroes.includes(hero.getHeroRef().heroId)) {
         return
       }
       if (didDeselectHero(hero)) {
@@ -213,14 +236,17 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
     setTargetHeroesMap(null)
   }
 
-  const endTurn = () => {
+  const finishHeroAction = () => {
+    // If all the heroes in the player's team have been moved, do the enemy's turn
     const livingHeroes = matchManager
       .getPlayerHeroesInMatch()
       .filter((h: HeroInMatch) => !h.isDead)
-    matchManager.tickRespawnTimer('player')
     if (movedHeroes.length === livingHeroes.length) {
       doEnemyTurn()
+      matchManager.tickRespawnTimer('player')
     }
+
+    // Refresh the score after each turn so that the UI updates the score if any points were scored
     refreshScore()
   }
 
@@ -246,13 +272,13 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
   const onFinishedAttacking = () => {
     matchManager.resetHighlightedSquares()
     setTargetHeroesMap(null)
-    endTurn()
+    finishHeroAction()
   }
 
   const onUndoMove = () => {
     // TODO: Implement undo move logic
     onPostAction()
-    endTurn()
+    finishHeroAction()
   }
 
   return (
@@ -272,6 +298,28 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
         }}
       >
         {renderGrid()}
+
+        {/* When enemy finds a player hero within range, attack it and play a series of little cutscenes */}
+        <Portal>
+          <EnemyAttackCutsceneModal
+            matchManager={matchManager}
+            isOpen={enemyAttackActions.length > 0}
+            attackAction={
+              enemyAttackActions && enemyAttackActions[enemyAttackActionIndex]
+            }
+            onContinue={() => {
+              if (enemyAttackActionIndex === enemyAttackActions.length - 1) {
+                setEnemyAttackActions([])
+                setEnemyAttackActionIndex(0)
+                finishEnemyTurn()
+              } else {
+                setEnemyAttackActionIndex(enemyAttackActionIndex + 1)
+              }
+              refreshScore()
+            }}
+          />
+        </Portal>
+
         {targetableHeroesMap && (
           <TargetSelectionOverlay
             matchManager={matchManager}
@@ -298,7 +346,7 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
             }}
             onWait={() => {
               onPostAction()
-              endTurn()
+              finishHeroAction()
             }}
           />
         )}

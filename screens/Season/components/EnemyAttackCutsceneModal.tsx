@@ -1,122 +1,130 @@
 import * as React from 'react'
-import { View, Animated, Easing } from 'react-native'
+import { Animated, Easing, View } from 'react-native'
 import { Portal } from 'react-native-paper'
 import { Button, CustomModal } from '../../../components'
 import { MatchManager } from '../../../lib/MatchManager'
-import { HeroInMatch, AttackResult } from '../../../lib/model/HeroInMatch'
+import { AttackResult, HeroInMatch } from '../../../lib/model/HeroInMatch'
 import { AttackCutsceneHero } from './AttackCutsceneHero'
 import { DamageText } from './DamageText'
 import { ScoreModal } from './ScoreModal'
 
 interface Props {
   isOpen: boolean
-  onClose: Function
-  targetHero: HeroInMatch
-  playerHero: HeroInMatch
+  onContinue: Function
+  attackAction: {
+    attacker: HeroInMatch
+    target: HeroInMatch
+  }
   matchManager: MatchManager
 }
 
-export const AttackCutsceneModal: React.FC<Props> = ({
+export const EnemyAttackCutsceneModal: React.FC<Props> = ({
   isOpen,
-  onClose,
-  targetHero,
-  playerHero,
+  onContinue,
+  attackAction,
   matchManager,
 }) => {
-  if (!isOpen) {
-    return <View />
-  }
-  const [attackerPos] = React.useState(new Animated.Value(0))
-  const [attackerRot] = React.useState(new Animated.Value(0))
-  const [attackerDamage, setAttackerDamage] = React.useState(-1)
+  const [playerHeroPos] = React.useState(new Animated.Value(0))
+  const [playerHeroRot] = React.useState(new Animated.Value(0))
+  const [playerHeroDamage, setPlayerHeroDamage] = React.useState(-1)
 
-  const [defenderPos] = React.useState(new Animated.Value(0))
-  const [defenderRot] = React.useState(new Animated.Value(0))
-  const [defenderDamage, setDefenderDamage] = React.useState(-1)
+  const [enemyHeroPos] = React.useState(new Animated.Value(0))
+  const [enemyHeroRot] = React.useState(new Animated.Value(0))
+  const [enemyHeroDamage, setEnemyHeroDamage] = React.useState(-1)
 
   const [scorePayload, setScorePayload] = React.useState<any>(null)
   const [isFinishedAttacking, setIsFinishedAttacking] = React.useState(false)
 
-  const processPlayerHeroAttack = () => {
+  React.useEffect(() => {
+    if (isOpen && attackAction) {
+      if (attackAction.target.isDead || attackAction.attacker.isDead) {
+        onContinue()
+      } else {
+        startAttackerAnimation()
+        processAttackerHeroAttack()
+        setTimeout(() => {
+          if (!target.isDead) {
+            startDefenderAnimation()
+          }
+        }, 2500)
+        processDefenderHeroAttack()
+      }
+    }
+  }, [attackAction])
+
+  if (!isOpen || !attackAction) {
+    return <View />
+  }
+
+  const { attacker, target } = attackAction
+
+  const processAttackerHeroAttack = () => {
     setTimeout(() => {
-      const attackResult: AttackResult = playerHero.attack(targetHero, 1.0)
-      setDefenderDamage(attackResult.damageDealt)
-      if (targetHero.isDead) {
-        matchManager.playerScoreKill()
+      const attackResult: AttackResult = attacker.attack(target, 1.0)
+      setPlayerHeroDamage(attackResult.damageDealt)
+      if (target.isDead) {
+        matchManager.enemyScoreKill()
         setScorePayload({
-          message: `${playerHero.getHeroRef().name} killed ${
-            targetHero.getHeroRef().name
+          message: `${attacker.getHeroRef().name} killed ${
+            target.getHeroRef().name
           } and scored 2 points!`,
-          score: matchManager.getPlayerScore(),
-          teamName: matchManager.getPlayerTeamInfo().name,
+          score: matchManager.getEnemyScore(),
+          teamName: matchManager.getEnemyTeamInfo().name,
         })
-        matchManager.respawnHero(targetHero, 'enemy')
+        matchManager.respawnHero(target, 'player')
       }
     }, 1000)
   }
 
   const processDefenderHeroAttack = () => {
     setTimeout(() => {
-      if (!targetHero.isDead) {
-        const attackResult: AttackResult = targetHero.attack(playerHero)
-        setAttackerDamage(Math.floor(attackResult.damageDealt))
-        if (playerHero.isDead) {
-          matchManager.enemyScoreKill()
+      if (!target.isDead) {
+        const attackResult: AttackResult = target.attack(attacker)
+        setEnemyHeroDamage(Math.floor(attackResult.damageDealt))
+        if (attacker.isDead) {
+          matchManager.playerScoreKill()
           setScorePayload({
-            message: `${targetHero.getHeroRef().name} killed ${
-              playerHero.getHeroRef().name
+            message: `${target.getHeroRef().name} killed ${
+              attacker.getHeroRef().name
             } and scored 2 points!`,
-            score: matchManager.getEnemyScore(),
-            teamName: matchManager.getEnemyTeamInfo().name,
+            score: matchManager.getPlayerScore(),
+            teamName: matchManager.getPlayerTeamInfo().name,
           })
-          matchManager.respawnHero(playerHero, 'player')
+          matchManager.respawnHero(attacker, 'enemy')
         }
       }
       setIsFinishedAttacking(true)
     }, 3500)
   }
 
-  React.useEffect(() => {
-    // Attacker wind up and lunge animations
-    startAttackerAnimation()
-    processPlayerHeroAttack()
-    // Start the defender attack animation after the attacker animation has finished
-    setTimeout(() => {
-      if (!targetHero.isDead) {
-        startDefenderAnimation()
-      }
-    }, 2500)
-    processDefenderHeroAttack()
-  }, [])
-
-  const startDefenderAnimation = () => {
+  const startAttackerAnimation = () => {
     Animated.sequence([
-      Animated.timing(defenderPos, {
+      Animated.timing(enemyHeroPos, {
         toValue: -100,
         duration: 1000,
         easing: Easing.back(5),
         useNativeDriver: true,
       }),
       Animated.parallel([
-        Animated.timing(defenderPos, {
+        Animated.timing(enemyHeroPos, {
           toValue: 0,
           duration: 1000,
           useNativeDriver: true,
         }),
         Animated.sequence([
-          Animated.timing(attackerRot, {
+          Animated.timing(playerHeroRot, {
             toValue: 1.0,
             duration: 150,
             easing: Easing.linear,
             useNativeDriver: true,
           }),
-          Animated.timing(attackerRot, {
+          Animated.timing(playerHeroRot, {
             toValue: -1.0,
             duration: 300,
             easing: Easing.linear,
             useNativeDriver: true,
           }),
-          Animated.timing(attackerRot, {
+          Animated.timing(playerHeroRot, {
             toValue: 0.0,
             duration: 150,
             easing: Easing.linear,
@@ -127,34 +135,34 @@ export const AttackCutsceneModal: React.FC<Props> = ({
     ]).start()
   }
 
-  const startAttackerAnimation = () => {
+  const startDefenderAnimation = () => {
     Animated.sequence([
-      Animated.timing(attackerPos, {
+      Animated.timing(playerHeroPos, {
         toValue: 100,
         duration: 1000,
         easing: Easing.back(5),
         useNativeDriver: true,
       }),
       Animated.parallel([
-        Animated.timing(attackerPos, {
+        Animated.timing(playerHeroPos, {
           toValue: 0,
           duration: 1000,
           useNativeDriver: true,
         }),
         Animated.sequence([
-          Animated.timing(defenderRot, {
+          Animated.timing(enemyHeroRot, {
             toValue: 1.0,
             duration: 150,
             easing: Easing.linear,
             useNativeDriver: true,
           }),
-          Animated.timing(defenderRot, {
+          Animated.timing(enemyHeroRot, {
             toValue: -1.0,
             duration: 300,
             easing: Easing.linear,
             useNativeDriver: true,
           }),
-          Animated.timing(defenderRot, {
+          Animated.timing(enemyHeroRot, {
             toValue: 0.0,
             duration: 150,
             easing: Easing.linear,
@@ -166,17 +174,20 @@ export const AttackCutsceneModal: React.FC<Props> = ({
   }
 
   const onAttackFinished = () => {
+    setScorePayload(null)
+    setEnemyHeroDamage(-1)
+    setPlayerHeroDamage(-1)
     setIsFinishedAttacking(false)
-    onClose()
+    onContinue()
   }
 
   return (
     <CustomModal
       customHeight={300}
       customWidth={500}
+      isOpen={isOpen}
       onClose={() => {}}
       hideCloseButton
-      isOpen={isOpen}
     >
       <Portal>
         {scorePayload && (
@@ -185,7 +196,9 @@ export const AttackCutsceneModal: React.FC<Props> = ({
             score={scorePayload.score}
             teamName={scorePayload.teamName}
             message={scorePayload.message}
-            onContinue={() => onAttackFinished()}
+            onContinue={() => {
+              onAttackFinished()
+            }}
           />
         )}
       </Portal>
@@ -204,44 +217,44 @@ export const AttackCutsceneModal: React.FC<Props> = ({
               flex: 1,
               transform: [
                 {
-                  rotate: attackerRot.interpolate({
+                  rotate: playerHeroRot.interpolate({
                     inputRange: [-1, 1],
                     outputRange: ['-0.1rad', '0.1rad'],
                   }),
                 },
                 {
-                  translateX: attackerPos,
+                  translateX: playerHeroPos,
                 },
               ],
             }}
           >
             <DamageText
-              isOpen={attackerDamage !== -1}
-              damage={attackerDamage}
+              isOpen={playerHeroDamage !== -1}
+              damage={playerHeroDamage}
             />
-            <AttackCutsceneHero hero={playerHero} />
+            <AttackCutsceneHero hero={target} />
           </Animated.View>
           <Animated.View
             style={{
               flex: 1,
               transform: [
                 {
-                  rotate: defenderRot.interpolate({
+                  rotate: enemyHeroRot.interpolate({
                     inputRange: [-1, 1],
                     outputRange: ['-0.1rad', '0.1rad'],
                   }),
                 },
                 {
-                  translateX: defenderPos,
+                  translateX: enemyHeroPos,
                 },
               ],
             }}
           >
             <DamageText
-              isOpen={defenderDamage !== -1}
-              damage={defenderDamage}
+              isOpen={enemyHeroDamage !== -1}
+              damage={enemyHeroDamage}
             />
-            <AttackCutsceneHero hero={targetHero} />
+            <AttackCutsceneHero hero={attacker} />
           </Animated.View>
         </View>
         {isFinishedAttacking && (

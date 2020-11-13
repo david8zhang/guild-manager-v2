@@ -6,7 +6,6 @@ interface Props {
   message: string
   score: string
   teamName: string
-  onClose: Function
   isOpen: boolean
   onContinue: Function
 }
@@ -14,7 +13,6 @@ interface Props {
 export const ScoreModal: React.FC<Props> = ({
   message,
   score,
-  onClose,
   teamName,
   isOpen,
   onContinue,
@@ -24,9 +22,7 @@ export const ScoreModal: React.FC<Props> = ({
   }
   return (
     <CustomModal
-      onClose={() => {
-        onClose()
-      }}
+      onClose={() => {}}
       hideCloseButton
       isOpen={isOpen}
       customWidth={400}

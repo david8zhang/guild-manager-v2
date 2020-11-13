@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Text, View } from 'react-native'
-import { ProgressBar } from 'react-native-paper'
 import { AttackMatchupHealthBar } from './AttackMatchupHealthBar'
 
 interface Props {
