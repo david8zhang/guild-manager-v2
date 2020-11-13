@@ -164,6 +164,11 @@ export class MatchManager {
       liveHeroFilterFn
     )
 
+    // If all players are dead, then just stay where you are
+    if (livingPlayerHeroPositions.length === 0) {
+      return
+    }
+
     livingEnemyHeroPositions.forEach((position) => {
       const hero: HeroInMatch = this.arena.getHeroAtLocation(
         position[0],

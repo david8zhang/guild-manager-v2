@@ -6,6 +6,7 @@ export interface AttackResult {
   attacker: HeroInMatch
   target: HeroInMatch
   isCrit: boolean
+  isOneShot: boolean
 }
 
 const RESPAWN_TIME = 3
@@ -91,13 +92,28 @@ export class HeroInMatch {
     }
   }
 
-  public attack(target: HeroInMatch, critRate: number = 0.2): AttackResult {
-    const didCrit =
-      Math.floor(Math.random() * 100) <= Math.floor(critRate * 100)
+  public attack(
+    target: HeroInMatch,
+    critRate: number = 0.2,
+    oneShotRate: number = 0.05
+  ): AttackResult {
     let damage = this.calculateDamage(target)
-    if (didCrit) {
-      damage *= 3
+    let didOneShot = false
+    let didCrit = false
+
+    // Calculate the chance that the hero performs an attack that kills the enemy in one shot
+    didOneShot =
+      Math.floor(Math.random() * 100) <= Math.floor(oneShotRate * 100)
+    if (didOneShot) {
+      damage = target.currHealth
+    } else {
+      // Calculate the chance that the hero performs a critical strike which deals some multiplier of dmg
+      didCrit = Math.floor(Math.random() * 100) <= Math.floor(critRate * 100)
+      if (didCrit) {
+        damage *= 3
+      }
     }
+
     damage = Math.floor(damage)
     target.takeDamage(damage)
     return {
@@ -105,6 +121,7 @@ export class HeroInMatch {
       attacker: this,
       target: target,
       isCrit: didCrit,
+      isOneShot: didOneShot,
     }
   }
 

@@ -6,6 +6,7 @@ import { HeroInMatch } from '../../../lib/model/HeroInMatch'
 import { EnemyAttackCutsceneModal } from './EnemyAttackCutsceneModal'
 import { HeroInArena } from './HeroInArena'
 import { OverlayMenu } from './OverlayMenu'
+import { SkipTurnModal } from './SkipTurnModal'
 import { TargetSelectionOverlay } from './TargetSelectionOverlay'
 
 interface Props {
@@ -16,17 +17,22 @@ interface Props {
 export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
   const { map, rows, cols } = matchManager?.getArena()
   const highlightedSquares = matchManager.getHighlightedSquares()
+
+  // Where to show the overlay menu with 'wait', 'cancel move', and 'attack'
   const [menuToShowCoords, setMenuToShowCoords] = React.useState<any>(null)
+
+  // Check if it's the player's turn, and which heroes have already moved
   const [movedHeroes, setMovedHeroes] = React.useState<string[]>([])
+  const [isPlayerTurn, setIsPlayerTurn] = React.useState(true)
+
+  // Manage attack actions for player
   const [showAttackButton, setShowAttackButton] = React.useState(false)
   const [targetableHeroesMap, setTargetHeroesMap] = React.useState(null)
   const [attackerHero, setAttackerHero] = React.useState<any>(null)
 
   // Enemy Attack cutscenes
   const [enemyAttackActions, setEnemyAttackActions] = React.useState<any[]>([])
-  const [enemyAttackActionIndex, setEnemyAttackActionIndex] = React.useState<
-    any
-  >(0)
+  const [enemyAttackActionIndex, setEnemyAttackActionIndex] = React.useState(0)
 
   // general purpose counter to force a component rerender
   const [updateCounter, setUpdateCounter] = React.useState(0)
@@ -39,6 +45,7 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
 
   const finishEnemyTurn = () => {
     matchManager.tickRespawnTimer('enemy')
+    setIsPlayerTurn(true)
     setMovedHeroes([])
   }
 
@@ -242,12 +249,17 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
       .getPlayerHeroesInMatch()
       .filter((h: HeroInMatch) => !h.isDead)
     if (movedHeroes.length === livingHeroes.length) {
-      doEnemyTurn()
-      matchManager.tickRespawnTimer('player')
+      endPlayerTurn()
     }
 
     // Refresh the score after each turn so that the UI updates the score if any points were scored
     refreshScore()
+  }
+
+  const endPlayerTurn = () => {
+    setIsPlayerTurn(false)
+    doEnemyTurn()
+    matchManager.tickRespawnTimer('player')
   }
 
   const onChooseAttackTarget = () => {
@@ -281,6 +293,21 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
     finishHeroAction()
   }
 
+  const checkAllPlayerHeroesDead = (): boolean => {
+    const deadHeroCount = matchManager
+      .getPlayerHeroesInMatch()
+      .reduce((acc, curr) => {
+        if (curr.isDead) {
+          acc++
+        }
+        return acc
+      }, 0)
+    if (deadHeroCount === matchManager.getPlayerHeroesInMatch().length) {
+      return true
+    }
+    return false
+  }
+
   return (
     <View style={{ width: '100%' }}>
       <View
@@ -298,6 +325,16 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
         }}
       >
         {renderGrid()}
+
+        {/* If all player heroes are dead, show a popup and let them skip their turn */}
+        <Portal>
+          <SkipTurnModal
+            isOpen={isPlayerTurn && checkAllPlayerHeroesDead()}
+            onContinue={() => {
+              endPlayerTurn()
+            }}
+          />
+        </Portal>
 
         {/* When enemy finds a player hero within range, attack it and play a series of little cutscenes */}
         <Portal>
