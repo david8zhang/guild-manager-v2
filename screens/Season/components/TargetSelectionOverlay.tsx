@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Pressable, View } from 'react-native'
 import { Portal } from 'react-native-paper'
+import { Button } from '../../../components'
 import { MatchManager } from '../../../lib/MatchManager'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
 import { AttackCutsceneModal } from './AttackCutsceneModal'
@@ -13,6 +14,8 @@ interface Props {
   onConfirmAttack: Function
   playerHero: HeroInMatch
   matchManager: MatchManager
+  cancelAttackMenuCoords?: { row: number; col: number }
+  onCancel?: Function
 }
 
 export const TargetSelectionOverlay: React.FC<Props> = ({
@@ -22,15 +25,23 @@ export const TargetSelectionOverlay: React.FC<Props> = ({
   playerHero,
   onConfirmAttack,
   matchManager,
+  cancelAttackMenuCoords,
+  onCancel,
 }) => {
   const [targetToAttack, setTargetToAttack] = React.useState<any>(null)
   const [isAttacking, setIsAttacking] = React.useState(false)
   const renderGrid = () => {
     const grid = []
     const totalNumCells = rows * cols
+
     for (let i = 0; i < totalNumCells; i++) {
       const coordinates = `${Math.floor(i / cols)},${i % cols}`
+
       const selectableHero: HeroInMatch = attackableTargetCoords[coordinates]
+      const shouldShowMenu =
+        cancelAttackMenuCoords &&
+        coordinates ===
+          `${cancelAttackMenuCoords.row},${cancelAttackMenuCoords.col}`
       grid.push(
         <Pressable
           key={`menu-${coordinates}`}
@@ -47,7 +58,20 @@ export const TargetSelectionOverlay: React.FC<Props> = ({
               setTargetToAttack(selectableHero)
             }
           }}
-        ></Pressable>
+        >
+          {shouldShowMenu && (
+            <Button
+              style={{ width: 80, marginBottom: 5, padding: 2 }}
+              textStyle={{ fontSize: 10 }}
+              text='Cancel Attack'
+              onPress={() => {
+                if (onCancel) {
+                  onCancel()
+                }
+              }}
+            />
+          )}
+        </Pressable>
       )
     }
     return grid

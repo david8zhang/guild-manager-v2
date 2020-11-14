@@ -5,11 +5,10 @@ import { FontAwesome } from '@expo/vector-icons'
 
 interface Props {
   hero: HeroInMatch
-  movedHeroes: string[]
   style?: any
 }
 
-export const HeroInArena: React.FC<Props> = ({ hero, style, movedHeroes }) => {
+export const HeroInArena: React.FC<Props> = ({ hero, style }) => {
   if (!hero) {
     return <Text></Text>
   }
@@ -36,7 +35,7 @@ export const HeroInArena: React.FC<Props> = ({ hero, style, movedHeroes }) => {
         style={{
           fontSize: 11,
           ...style,
-          color: movedHeroes.includes(heroRef.heroId) ? 'gray' : 'black',
+          color: hero.hasMoved ? 'gray' : 'black',
         }}
       >
         {heroRef.name}

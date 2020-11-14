@@ -85,14 +85,19 @@ export class MatchManager {
     this.arena.highlightSquares(squaresInRange, 'blue')
   }
 
+  public isHeroAttackable(hero: HeroInMatch): boolean {
+    return hero && !hero.isDead && !hero.isUntargetable()
+  }
+
   public getHeroesInAttackRange(rows: number, cols: number): any[] {
     const hero: HeroInMatch = this.arena.getHeroAtLocation(rows, cols)
     const heroesInAttackRange: any[] = []
     const range = hero.getAttackRange()
     const squaresInRange = this.arena.getSquaresInRange(range, rows, cols)
+
     squaresInRange.forEach((coord: number[]) => {
       const h = this.arena.getHeroAtLocation(coord[0], coord[1])
-      if (h && !h.isDead) {
+      if (this.isHeroAttackable(h)) {
         heroesInAttackRange.push({
           coordinates: coord,
           hero: h,
@@ -241,12 +246,14 @@ export class MatchManager {
     })
   }
 
+  // TODO: Move this to its own class, EnemyAI or something
   public doEnemyHeroAttacks(): any[] {
     const attackActions: any[] = []
     const enemyHeroPositions: number[][] = this.arena.getEnemyHeroPositions()
     const playerHeroIds: string[] = this.playerHeroes.map(
       (hero: HeroInMatch) => hero.getHeroRef().heroId
     )
+
     const livingEnemyHeroPositions = enemyHeroPositions.filter(
       (position: number[]) => {
         const hero = this.arena.getHeroAtLocation(position[0], position[1])
@@ -265,12 +272,18 @@ export class MatchManager {
         position[1]
       )
       let heroToAttack: any = null
+
       attackableSquares.forEach((square: number[]) => {
         const target: HeroInMatch = this.arena.getHeroAtLocation(
           square[0],
           square[1]
         )
-        if (target && playerHeroIds.includes(target.getHeroRef().heroId)) {
+        // If the hero is attackable and is on the player's side
+        if (
+          this.isHeroAttackable(target) &&
+          playerHeroIds.includes(target.getHeroRef().heroId)
+        ) {
+          // Get the target with the lowest current health
           if (
             !heroToAttack ||
             target.getCurrHealth() < heroToAttack.getCurrHealth()
@@ -297,6 +310,18 @@ export class MatchManager {
     heroes.forEach((hero: HeroInMatch) => {
       if (hero.isDead) {
         hero.countdownRespawnTimer()
+      }
+    })
+  }
+
+  public tickUntargetTimer(side: string) {
+    const heroes: HeroInMatch[] =
+      side === 'enemy'
+        ? this.getEnemyHeroesInMatch()
+        : this.getPlayerHeroesInMatch()
+    heroes.forEach((hero: HeroInMatch) => {
+      if (!hero.isDead && hero.isUntargetable()) {
+        hero.countdownUntargetTimer()
       }
     })
   }
@@ -333,6 +358,24 @@ export class MatchManager {
     }
     console.error('No empty spawn location found!')
     return [0, 0]
+  }
+
+  public haveAllPlayerHeroesMoved(): boolean {
+    const playerHeroes: HeroInMatch[] = this.getPlayerHeroesInMatch()
+    for (let i = 0; i < playerHeroes.length; i++) {
+      const hero: HeroInMatch = playerHeroes[i]
+      if (!hero.isDead && !hero.hasMoved) {
+        return false
+      }
+    }
+    return true
+  }
+
+  public resetPlayerMoves(): void {
+    const playerHeroes: HeroInMatch[] = this.getPlayerHeroesInMatch()
+    playerHeroes.forEach((h: HeroInMatch) => {
+      h.hasMoved = false
+    })
   }
 
   public respawnHero(hero: HeroInMatch, side: string) {

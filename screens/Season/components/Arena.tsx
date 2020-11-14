@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Pressable, Text, View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import { Portal } from 'react-native-paper'
 import { MatchManager } from '../../../lib/MatchManager'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
@@ -20,15 +20,18 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
 
   // Where to show the overlay menu with 'wait', 'cancel move', and 'attack'
   const [menuToShowCoords, setMenuToShowCoords] = React.useState<any>(null)
+  const [pendingMove, setPendingMove] = React.useState<any>(null) // store a reference to move so that it can be reversed
 
-  // Check if it's the player's turn, and which heroes have already moved
-  const [movedHeroes, setMovedHeroes] = React.useState<string[]>([])
+  // Check if it's the player's turn
   const [isPlayerTurn, setIsPlayerTurn] = React.useState(true)
 
   // Manage attack actions for player
   const [showAttackButton, setShowAttackButton] = React.useState(false)
   const [targetableHeroesMap, setTargetHeroesMap] = React.useState(null)
   const [attackerHero, setAttackerHero] = React.useState<any>(null)
+  const [cancelAttackMenuCoords, setCancelAttackMenuCoords] = React.useState<
+    any
+  >(null)
 
   // Enemy Attack cutscenes
   const [enemyAttackActions, setEnemyAttackActions] = React.useState<any[]>([])
@@ -43,28 +46,17 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
     setSelectedHeroAndCoordinates,
   ] = React.useState<any>(null)
 
-  const finishEnemyTurn = () => {
-    matchManager.tickRespawnTimer('enemy')
-    setIsPlayerTurn(true)
-    setMovedHeroes([])
-  }
-
-  const doEnemyTurn = () => {
-    setTimeout(() => {
-      matchManager.moveEnemyHeroes()
-      setUpdateCounter(updateCounter + 1) // Force an update so the enemies move, wait, then attack
-      const attackActions = matchManager.doEnemyHeroAttacks()
-      if (attackActions.length > 0) {
-        setTimeout(() => {
-          setEnemyAttackActions(attackActions)
-        }, 1000)
-      } else {
-        finishEnemyTurn()
-      }
-    }, 1000)
-  }
-
-  const moveHero = (selectedHeroCoordinates: string, coordinates: string) => {
+  const moveHero = (
+    selectedHeroCoordinates: string,
+    coordinates: string,
+    selectedHeroId: string
+  ) => {
+    const hero: HeroInMatch | undefined = matchManager.getHeroByHeroId(
+      selectedHeroId
+    )
+    if (hero) {
+      hero.hasMoved = true
+    }
     const [startRow, startCol] = selectedHeroCoordinates.split(',')
     const [targetRow, targetCol] = coordinates.split(',')
     matchManager.resetHighlightedSquares()
@@ -77,6 +69,10 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
         row: parseInt(targetRow, 10),
         col: parseInt(targetCol, 10),
       },
+    })
+    setPendingMove({
+      origin: [startRow, startCol],
+      dest: [targetRow, targetCol],
     })
   }
 
@@ -133,7 +129,12 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
     if (selectedHeroAndCoordinates) {
       const { selectedHeroId } = selectedHeroAndCoordinates
       matchManager.resetHighlightedSquares()
-      setMovedHeroes(movedHeroes.concat(selectedHeroId))
+      const hero: HeroInMatch | undefined = matchManager.getHeroByHeroId(
+        selectedHeroId
+      )
+      if (hero) {
+        hero.hasMoved = true
+      }
       showHeroActionMenu(coordinates)
     }
   }
@@ -143,7 +144,7 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
       return
     }
     if (hero) {
-      if (hero.isDead || movedHeroes.includes(hero.getHeroRef().heroId)) {
+      if (hero.isDead || hero.hasMoved) {
         return
       }
       if (didDeselectHero(hero)) {
@@ -157,11 +158,7 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
           selectedHeroId,
           selectedHeroCoordinates,
         } = selectedHeroAndCoordinates
-        if (movedHeroes.includes(selectedHeroId)) {
-          return
-        }
-        moveHero(selectedHeroCoordinates, coordinates)
-        setMovedHeroes(movedHeroes.concat(selectedHeroId))
+        moveHero(selectedHeroCoordinates, coordinates, selectedHeroId)
         showHeroActionMenu(coordinates)
       }
     }
@@ -190,6 +187,9 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
 
     if (isSelected) {
       return '#ffe599'
+    }
+    if (hero && hero.isUntargetable()) {
+      return '#DAA520'
     }
     if (hero && isHeroInPlayerTeam(hero.getHeroRef().heroId)) {
       return '#b6d7a8'
@@ -232,68 +232,119 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
             padding: 5,
           }}
         >
-          <HeroInArena hero={hero} movedHeroes={movedHeroes} />
+          <HeroInArena hero={hero} />
         </Pressable>
       )
     }
     return grid
   }
 
-  const onPostAction = () => {
+  const finishHeroAction = () => {
+    // If all the heroes in the player's team have been moved, do the enemy's turn
+    if (matchManager.haveAllPlayerHeroesMoved()) {
+      finishPlayerTurn()
+    }
+    // Refresh the score after each turn so that the UI updates the score if any points were scored
+    refreshScore()
+  }
+
+  const doEnemyTurn = () => {
+    setTimeout(() => {
+      matchManager.moveEnemyHeroes()
+      setUpdateCounter(updateCounter + 1) // Force an update so the enemies move, wait, then attack
+      const attackActions = matchManager.doEnemyHeroAttacks()
+      if (attackActions.length > 0) {
+        setTimeout(() => {
+          setEnemyAttackActions(attackActions)
+        }, 1000)
+      } else {
+        finishEnemyTurn()
+      }
+    }, 1000)
+  }
+
+  // Manage turn transitions
+  const finishPlayerTurn = () => {
+    matchManager.tickUntargetTimer('player')
+    matchManager.tickRespawnTimer('player')
+    setIsPlayerTurn(false)
+    doEnemyTurn()
+  }
+
+  const finishEnemyTurn = () => {
+    matchManager.tickUntargetTimer('enemy')
+    matchManager.tickRespawnTimer('enemy')
+    matchManager.resetPlayerMoves()
+    setIsPlayerTurn(true)
+  }
+
+  // Manage attack logic
+  const onChooseAttackTarget = () => {
+    const { row, col } = menuToShowCoords
+    const { selectedHeroId } = selectedHeroAndCoordinates
+    matchManager.highlightAttackableSquares(row, col)
+    const attackerHero: HeroInMatch | undefined = matchManager.getHeroByHeroId(
+      selectedHeroId
+    )
+    if (attackerHero) {
+      setAttackerHero(attackerHero)
+      setMenuToShowCoords(null)
+      setCancelAttackMenuCoords(menuToShowCoords)
+      const attackableEnemies = getEnemiesInAttackRange(row, col).reduce(
+        (acc, curr) => {
+          const { coordinates, hero } = curr
+          const key = `${coordinates[0]},${coordinates[1]}`
+          acc[key] = hero
+          return acc
+        },
+        {}
+      )
+      setTargetHeroesMap(attackableEnemies)
+    }
+  }
+
+  const onCancelAttack = () => {
+    matchManager.resetHighlightedSquares()
+    setMenuToShowCoords(cancelAttackMenuCoords)
+    setCancelAttackMenuCoords(null)
+  }
+
+  const onFinishedAttacking = () => {
+    matchManager.resetHighlightedSquares()
+    setAttackerHero(null)
+    finishHeroAction()
+    onPostActionCleanup()
+  }
+
+  const onPostActionCleanup = () => {
     setMenuToShowCoords(null)
     setSelectedHeroAndCoordinates(null)
     setShowAttackButton(false)
     setTargetHeroesMap(null)
   }
 
-  const finishHeroAction = () => {
-    // If all the heroes in the player's team have been moved, do the enemy's turn
-    const livingHeroes = matchManager
-      .getPlayerHeroesInMatch()
-      .filter((h: HeroInMatch) => !h.isDead)
-    if (movedHeroes.length === livingHeroes.length) {
-      endPlayerTurn()
-    }
-
-    // Refresh the score after each turn so that the UI updates the score if any points were scored
-    refreshScore()
-  }
-
-  const endPlayerTurn = () => {
-    setIsPlayerTurn(false)
-    doEnemyTurn()
-    matchManager.tickRespawnTimer('player')
-  }
-
-  const onChooseAttackTarget = () => {
-    const { row, col } = menuToShowCoords
-    matchManager.highlightAttackableSquares(row, col)
-    setAttackerHero(
-      matchManager.getHeroByHeroId(selectedHeroAndCoordinates.selectedHeroId)
-    )
-    onPostAction()
-    const attackableEnemies = getEnemiesInAttackRange(row, col).reduce(
-      (acc, curr) => {
-        const { coordinates, hero } = curr
-        const key = `${coordinates[0]},${coordinates[1]}`
-        acc[key] = hero
-        return acc
-      },
-      {}
-    )
-    setTargetHeroesMap(attackableEnemies)
-  }
-
-  const onFinishedAttacking = () => {
-    matchManager.resetHighlightedSquares()
-    setTargetHeroesMap(null)
-    finishHeroAction()
-  }
-
   const onUndoMove = () => {
-    // TODO: Implement undo move logic
-    onPostAction()
-    finishHeroAction()
+    const { selectedHeroId } = selectedHeroAndCoordinates
+    const hero: HeroInMatch | undefined = matchManager.getHeroByHeroId(
+      selectedHeroId
+    )
+    if (hero) {
+      hero.hasMoved = false
+      if (pendingMove) {
+        const { origin, dest } = pendingMove
+        matchManager.moveHero({
+          start: {
+            row: dest[0],
+            col: dest[1],
+          },
+          target: {
+            row: origin[0],
+            col: origin[1],
+          },
+        })
+      }
+      onPostActionCleanup()
+    }
   }
 
   const checkAllPlayerHeroesDead = (): boolean => {
@@ -310,6 +361,8 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
     }
     return false
   }
+
+  console.log(cancelAttackMenuCoords)
 
   return (
     <View style={{ width: '100%' }}>
@@ -334,7 +387,7 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
           <SkipTurnModal
             isOpen={isPlayerTurn && checkAllPlayerHeroesDead()}
             onContinue={() => {
-              endPlayerTurn()
+              finishPlayerTurn()
             }}
           />
         </Portal>
@@ -363,6 +416,8 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
         {targetableHeroesMap && (
           <TargetSelectionOverlay
             matchManager={matchManager}
+            cancelAttackMenuCoords={cancelAttackMenuCoords}
+            onCancel={() => onCancelAttack()}
             attackableTargetCoords={targetableHeroesMap}
             rows={rows}
             cols={cols}
@@ -385,7 +440,7 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
               onUndoMove()
             }}
             onWait={() => {
-              onPostAction()
+              onPostActionCleanup()
               finishHeroAction()
             }}
           />

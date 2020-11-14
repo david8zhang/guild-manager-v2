@@ -10,20 +10,26 @@ export interface AttackResult {
 }
 
 const RESPAWN_TIME = 3
+const UNTARGET_TIME = 1
 
 export class HeroInMatch {
   private hero: Hero
   private currHealth: number
-  public isDead: boolean
   private heroStats: HeroStats
   private respawnTimer: number
+  private untargetTimer: number // Timer that prevents spawn killing
+
+  public isDead: boolean
+  public hasMoved: boolean
 
   constructor(hero: Hero) {
     this.hero = hero
     this.currHealth = hero.health
     this.isDead = false
+    this.hasMoved = false
     this.heroStats = new HeroStats()
     this.respawnTimer = 0
+    this.untargetTimer = 0
   }
 
   public getHeroRef(): Hero {
@@ -129,6 +135,16 @@ export class HeroInMatch {
     this.respawnTimer = RESPAWN_TIME
   }
 
+  public isUntargetable() {
+    return this.untargetTimer > 0
+  }
+
+  public countdownUntargetTimer() {
+    if (this.untargetTimer > 0) {
+      this.untargetTimer--
+    }
+  }
+
   public respawn() {
     this.currHealth = this.hero.health
     this.isDead = false
@@ -138,6 +154,7 @@ export class HeroInMatch {
     this.respawnTimer--
     if (this.respawnTimer == 0) {
       this.respawn()
+      this.untargetTimer = UNTARGET_TIME
     }
   }
 }

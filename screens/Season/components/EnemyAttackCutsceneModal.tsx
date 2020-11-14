@@ -60,7 +60,7 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
 
   const processAttackerHeroAttack = () => {
     setTimeout(() => {
-      const attackResult: AttackResult = attacker.attack(target)
+      const attackResult: AttackResult = attacker.attack(target, 1.0, 1.0)
       setPlayerHeroDamage(attackResult.damageDealt)
       if (target.isDead) {
         matchManager.enemyScoreKill()
@@ -228,10 +228,12 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
               ],
             }}
           >
-            <DamageText
-              isOpen={playerHeroDamage !== -1}
-              damage={playerHeroDamage}
-            />
+            {playerHeroDamage !== -1 && (
+              <DamageText
+                isOpen={playerHeroDamage !== -1}
+                damage={playerHeroDamage}
+              />
+            )}
             <AttackCutsceneHero hero={target} />
           </Animated.View>
           <Animated.View
@@ -250,10 +252,12 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
               ],
             }}
           >
-            <DamageText
-              isOpen={enemyHeroDamage !== -1}
-              damage={enemyHeroDamage}
-            />
+            {enemyHeroDamage !== -1 && (
+              <DamageText
+                isOpen={enemyHeroDamage !== -1}
+                damage={enemyHeroDamage}
+              />
+            )}
             <AttackCutsceneHero hero={attacker} />
           </Animated.View>
         </View>

@@ -7,6 +7,7 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 - Figure out why enemy damage numbers don't show up all the time
 - Invincibility timer for dead heroes
 - Undo move
+- Cancel attack
 - Win condition/match countdown timer
 
 ## Future Features
