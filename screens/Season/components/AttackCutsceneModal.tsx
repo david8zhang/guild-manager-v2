@@ -39,7 +39,7 @@ export const AttackCutsceneModal: React.FC<Props> = ({
 
   const processPlayerHeroAttack = () => {
     setTimeout(() => {
-      const attackResult: AttackResult = playerHero.attack(targetHero, 1.0)
+      const attackResult: AttackResult = playerHero.attack(targetHero)
       setDefenderDamage(attackResult.damageDealt)
       if (targetHero.isDead) {
         matchManager.playerScoreKill()

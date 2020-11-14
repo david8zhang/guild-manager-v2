@@ -1,3 +1,4 @@
+import { times } from 'lodash'
 import { Arena } from './model/Arena'
 import { Hero } from './model/Hero'
 import { HeroInMatch } from './model/HeroInMatch'
@@ -64,7 +65,23 @@ export class MatchManager {
   public highlightMoveableSquares(rows: number, cols: number) {
     const hero: HeroInMatch = this.arena.getHeroAtLocation(rows, cols)
     const range = hero.getMoveRange()
-    const squaresInRange = this.arena.getSquaresInRange(range, rows, cols)
+    let squaresInRange: number[][] = this.arena.getSquaresInRange(
+      range,
+      rows,
+      cols
+    )
+
+    // Filter out the enemy starting locations, enemy locations
+    const enemySpawnLocations = this.enemySpawnLocations.map(
+      (loc: number[]) => `${loc[0]},${loc[1]}`
+    )
+    squaresInRange = squaresInRange.filter((coord: number[]) => {
+      return (
+        !enemySpawnLocations.includes(`${coord[0]},${coord[1]}`) &&
+        !this.arena.getHeroAtLocation(coord[0], coord[1])
+      )
+    })
+
     this.arena.highlightSquares(squaresInRange, 'blue')
   }
 
@@ -188,9 +205,17 @@ export class MatchManager {
         ]
       let closestSquareToTarget: number[] = []
       let runningDistance = Number.MAX_SAFE_INTEGER
+
+      // Filter out squares that are occupied or are part of the player's spawn locations
+      const playerSpawnLocations: string[] = this.playerSpawnLocations.map(
+        (coord: number[]) => `${coord[0]},${coord[1]}`
+      )
       const emptyMoveableSquares = moveableSquares.filter(
         (coordinate: number[]) => {
-          return !this.arena.getHeroAtLocation(coordinate[0], coordinate[1])
+          return (
+            !this.arena.getHeroAtLocation(coordinate[0], coordinate[1]) &&
+            !playerSpawnLocations.includes(`${coordinate[0]},${coordinate[1]}`)
+          )
         }
       )
       emptyMoveableSquares.forEach((coordinate: number[]) => {

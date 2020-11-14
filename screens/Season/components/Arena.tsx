@@ -139,6 +139,9 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
   }
 
   const onSquarePress = (hero: HeroInMatch, coordinates: string) => {
+    if (!isPlayerTurn) {
+      return
+    }
     if (hero) {
       if (hero.isDead || movedHeroes.includes(hero.getHeroRef().heroId)) {
         return
