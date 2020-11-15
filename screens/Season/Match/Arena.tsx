@@ -12,9 +12,14 @@ import { TargetSelectionOverlay } from './TargetSelectionOverlay'
 interface Props {
   matchManager: MatchManager
   refreshScore: Function
+  refreshTimer: Function
 }
 
-export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
+export const Arena: React.FC<Props> = ({
+  matchManager,
+  refreshScore,
+  refreshTimer,
+}) => {
   const { map, rows, cols } = matchManager?.getArena()
   const highlightedSquares = matchManager.getHighlightedSquares()
 
@@ -276,6 +281,10 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
     matchManager.tickRespawnTimer('enemy')
     matchManager.resetPlayerMoves()
     setIsPlayerTurn(true)
+    matchManager.decrementMatchTimer()
+    setTimeout(() => {
+      refreshTimer()
+    }, 1000)
   }
 
   // Manage attack logic
@@ -320,6 +329,7 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
     setMenuToShowCoords(null)
     setSelectedHeroAndCoordinates(null)
     setShowAttackButton(false)
+    setPendingMove(null)
     setTargetHeroesMap(null)
   }
 
@@ -361,8 +371,6 @@ export const Arena: React.FC<Props> = ({ matchManager, refreshScore }) => {
     }
     return false
   }
-
-  console.log(cancelAttackMenuCoords)
 
   return (
     <View style={{ width: '100%' }}>

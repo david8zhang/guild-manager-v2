@@ -1,15 +1,14 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import * as guildActions from '../../redux/guildWidget'
-import { Pressable, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 import { Button, Navbar } from '../../components'
 import { SeasonManager } from '../../lib/SeasonManager'
 import { TeamRecord } from './components/TeamRecord'
 import { Schedule } from '../../lib/model/Schedule'
 import { MatchupTeam } from './components/MatchupTeam'
 import { SeasonCalendar } from './components/SeasonCalendar'
-import { Match } from './components/Match'
-import { Hero } from '../../lib/model/Hero'
+import { Match } from './Match/Match'
 import { Team } from '../../lib/model/Team'
 
 interface Props {

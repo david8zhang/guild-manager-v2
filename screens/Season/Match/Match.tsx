@@ -5,6 +5,8 @@ import { Team } from '../../../lib/model/Team'
 import { Arena } from './Arena'
 import { LineupConfirm } from './LineupConfirm'
 import { Portal } from 'react-native-paper'
+import { ScoreBoard } from './ScoreBoard'
+import { PostMatch } from './PostMatch'
 
 interface Props {
   playerTeam: Team
@@ -17,6 +19,8 @@ export const Match: React.FC<Props> = ({ playerTeam, enemyTeam }) => {
   )
   const [lineupConfirmed, setLineupConfirmed] = React.useState(false)
   const [score, setScore] = React.useState<any>({})
+  const [turnsRemaining, setTurnsRemaining] = React.useState<number>(0)
+  const [isMatchOver, setIsMatchOver] = React.useState(false)
 
   React.useEffect(() => {
     const playerHeroes = playerTeam.roster.filter((h) =>
@@ -53,51 +57,30 @@ export const Match: React.FC<Props> = ({ playerTeam, enemyTeam }) => {
         onConfirm={() => {
           matchManager.startMatch()
           setScore(matchManager.getScore())
+          setTurnsRemaining(matchManager.getTurnsRemaining())
           setLineupConfirmed(true)
         }}
       />
     )
   }
 
+  if (isMatchOver) {
+    return <PostMatch score={score} matchManager={matchManager} />
+  }
+
   return (
     <Portal.Host>
       <View style={{ flexDirection: 'column', flex: 1 }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            width: 450,
-            alignSelf: 'center',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {Object.keys(score).map((key: string) => {
-            return (
-              <View
-                key={key}
-                style={{
-                  flex: 1,
-                  flexDirection: 'row',
-                  borderWidth: 1,
-                  borderColor: 'gray',
-                  marginTop: 10,
-                  marginBottom: 10,
-                }}
-              >
-                <View style={{ backgroundColor: 'gray', flex: 1 }}></View>
-                <View style={{ flexDirection: 'row', padding: 10, flex: 3 }}>
-                  <Text style={{ fontSize: 20, flex: 1 }}>{key}</Text>
-                  <Text style={{ fontSize: 20 }}>{score[key]}</Text>
-                </View>
-              </View>
-            )
-          })}
-        </View>
+        <ScoreBoard score={score} turnsRemaining={turnsRemaining} />
         <View style={{ flex: 1 }}>
           <Arena
             matchManager={matchManager}
             refreshScore={() => {
               setScore({ ...matchManager.getScore() })
+            }}
+            refreshTimer={() => {
+              setIsMatchOver(matchManager.isGameOver())
+              setTurnsRemaining(matchManager.getTurnsRemaining())
             }}
           />
         </View>

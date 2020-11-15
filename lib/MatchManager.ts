@@ -17,6 +17,8 @@ export interface MatchManagerConfig {
 }
 
 export class MatchManager {
+  private static MATCH_DURATION = 1
+
   private playerHeroes: HeroInMatch[]
   private enemyHeroes: HeroInMatch[]
 
@@ -30,6 +32,8 @@ export class MatchManager {
   private playerSpawnLocations: number[][] = []
   private enemySpawnLocations: number[][] = []
 
+  private matchTimer: number
+
   constructor(config: MatchManagerConfig) {
     this.playerHeroes = config.playerHeroes.map((h) => new HeroInMatch(h))
     this.enemyHeroes = config.enemyHeroes.map((h) => new HeroInMatch(h))
@@ -37,6 +41,7 @@ export class MatchManager {
     this.eventLog = []
     this.playerTeamInfo = config.playerTeamInfo
     this.enemyTeamInfo = config.enemyTeamInfo
+    this.matchTimer = 0
   }
 
   // Do all initialization logic here
@@ -48,6 +53,7 @@ export class MatchManager {
       [this.playerTeamInfo.abbrev]: 0,
       [this.enemyTeamInfo.abbrev]: 0,
     }
+    this.matchTimer = MatchManager.MATCH_DURATION
   }
 
   public getScore(): any {
@@ -406,5 +412,17 @@ export class MatchManager {
         col: emptySpawnLocation[1],
       }
     )
+  }
+
+  public isGameOver(): boolean {
+    return this.matchTimer === 0
+  }
+
+  public decrementMatchTimer() {
+    this.matchTimer--
+  }
+
+  public getTurnsRemaining(): number {
+    return this.matchTimer
   }
 }
