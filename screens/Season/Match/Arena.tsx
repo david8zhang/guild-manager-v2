@@ -8,6 +8,7 @@ import { HeroInArena } from './HeroInArena'
 import { OverlayMenu } from './OverlayMenu'
 import { SkipTurnModal } from './SkipTurnModal'
 import { TargetSelectionOverlay } from './TargetSelectionOverlay'
+import { TurnDisplayModal } from './TurnDisplayModal'
 
 interface Props {
   matchManager: MatchManager
@@ -27,8 +28,9 @@ export const Arena: React.FC<Props> = ({
   const [menuToShowCoords, setMenuToShowCoords] = React.useState<any>(null)
   const [pendingMove, setPendingMove] = React.useState<any>(null) // store a reference to move so that it can be reversed
 
-  // Check if it's the player's turn
+  // Check if it's the player's turn, also show a turn display modal
   const [isPlayerTurn, setIsPlayerTurn] = React.useState(true)
+  const [turnDisplaySide, setTurnDisplaySide] = React.useState('') // Show a modal to player saying whether it's their turn or enemy turn
 
   // Manage attack actions for player
   const [showAttackButton, setShowAttackButton] = React.useState(false)
@@ -273,7 +275,11 @@ export const Arena: React.FC<Props> = ({
     matchManager.tickUntargetTimer('player')
     matchManager.tickRespawnTimer('player')
     setIsPlayerTurn(false)
-    doEnemyTurn()
+    setTurnDisplaySide('Enemy')
+    setTimeout(() => {
+      doEnemyTurn()
+      setTurnDisplaySide('')
+    }, 1000)
   }
 
   const finishEnemyTurn = () => {
@@ -282,9 +288,19 @@ export const Arena: React.FC<Props> = ({
     matchManager.resetPlayerMoves()
     setIsPlayerTurn(true)
     matchManager.decrementMatchTimer()
-    setTimeout(() => {
-      refreshTimer()
-    }, 1000)
+
+    // If the game is over, don't show a 'Player Turn' info modal
+    if (!matchManager.isGameOver()) {
+      setTurnDisplaySide('Player')
+      setTimeout(() => {
+        refreshTimer()
+        setTurnDisplaySide('')
+      }, 1000)
+    } else {
+      setTimeout(() => {
+        refreshTimer()
+      }, 1000)
+    }
   }
 
   // Manage attack logic
@@ -397,6 +413,14 @@ export const Arena: React.FC<Props> = ({
             onContinue={() => {
               finishPlayerTurn()
             }}
+          />
+        </Portal>
+
+        <Portal>
+          <TurnDisplayModal
+            currTurn={turnDisplaySide}
+            isOpen={turnDisplaySide !== ''}
+            onClose={() => setTurnDisplaySide('')}
           />
         </Portal>
 
