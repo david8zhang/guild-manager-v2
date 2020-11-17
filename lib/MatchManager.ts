@@ -151,8 +151,14 @@ export class MatchManager {
     return this.enemyHeroes
   }
 
-  public playerScoreKill(): void {
+  public playerScoreKill(killerId: string, targetId: string): void {
     this.score[this.playerTeamInfo.abbrev] += 2
+    const killer: HeroInMatch | undefined = this.getHeroByHeroId(killerId)
+    const target: HeroInMatch | undefined = this.getHeroByHeroId(targetId)
+    if (killer && target) {
+      killer.addKillToRecord()
+      target.addDeathToRecord()
+    }
   }
 
   public getPlayerScore() {
@@ -163,8 +169,14 @@ export class MatchManager {
     return this.playerTeamInfo
   }
 
-  public enemyScoreKill(): void {
+  public enemyScoreKill(killerId: string, targetId: string): void {
     this.score[this.enemyTeamInfo.abbrev] += 2
+    const killer: HeroInMatch | undefined = this.getHeroByHeroId(killerId)
+    const target: HeroInMatch | undefined = this.getHeroByHeroId(targetId)
+    if (killer && target) {
+      killer.addKillToRecord()
+      target.addDeathToRecord()
+    }
   }
 
   public getEnemyScore() {

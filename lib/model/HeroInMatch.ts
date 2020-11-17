@@ -40,6 +40,15 @@ export class HeroInMatch {
     return this.currHealth
   }
 
+  public addKillToRecord(): void {
+    this.heroStats.numKills++
+    this.heroStats.numPoints++
+  }
+
+  public addDeathToRecord(): void {
+    this.heroStats.numDeaths++
+  }
+
   public getAttackRange(): number {
     let attackPlusSpeedAvg = Math.floor(
       (this.hero.speed + this.hero.attack) / 2

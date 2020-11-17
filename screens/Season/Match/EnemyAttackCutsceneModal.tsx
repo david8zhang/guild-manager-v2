@@ -41,13 +41,6 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
         onContinue()
       } else {
         startAttackerAnimation()
-        processAttackerHeroAttack()
-        setTimeout(() => {
-          if (!target.isDead) {
-            startDefenderAnimation()
-          }
-        }, 2500)
-        processDefenderHeroAttack()
       }
     }
   }, [attackAction])
@@ -58,53 +51,55 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
 
   const { attacker, target } = attackAction
 
-  const processAttackerHeroAttack = () => {
-    setTimeout(() => {
-      const attackResult: AttackResult = attacker.attack(target)
-      setPlayerHeroDamage(attackResult.damageDealt)
-      if (target.isDead) {
-        matchManager.enemyScoreKill()
-        setScorePayload({
-          message: `${attacker.getHeroRef().name} killed ${
-            target.getHeroRef().name
-          } and scored 2 points!`,
-          score: matchManager.getEnemyScore(),
-          teamName: matchManager.getEnemyTeamInfo().name,
-        })
-        matchManager.respawnHero(target, 'player')
-      }
-    }, 1000)
+  const processAttackerHeroAttack = async () => {
+    const attackResult: AttackResult = attacker.attack(target)
+    setPlayerHeroDamage(attackResult.damageDealt)
+    if (target.isDead) {
+      matchManager.enemyScoreKill(
+        attacker.getHeroRef().heroId,
+        target.getHeroRef().heroId
+      )
+      setScorePayload({
+        message: `${attacker.getHeroRef().name} killed ${
+          target.getHeroRef().name
+        } and scored 2 points!`,
+        score: matchManager.getEnemyScore(),
+        teamName: matchManager.getEnemyTeamInfo().name,
+      })
+      matchManager.respawnHero(target, 'player')
+    }
   }
 
   const processDefenderHeroAttack = () => {
-    setTimeout(() => {
-      if (!target.isDead) {
-        const attackResult: AttackResult = target.attack(attacker)
-        setEnemyHeroDamage(Math.floor(attackResult.damageDealt))
-        if (attacker.isDead) {
-          matchManager.playerScoreKill()
-          setScorePayload({
-            message: `${target.getHeroRef().name} killed ${
-              attacker.getHeroRef().name
-            } and scored 2 points!`,
-            score: matchManager.getPlayerScore(),
-            teamName: matchManager.getPlayerTeamInfo().name,
-          })
-          matchManager.respawnHero(attacker, 'enemy')
-        }
+    if (!target.isDead) {
+      const attackResult: AttackResult = target.attack(attacker)
+      setEnemyHeroDamage(Math.floor(attackResult.damageDealt))
+      if (attacker.isDead) {
+        matchManager.playerScoreKill(
+          target.getHeroRef().heroId,
+          attacker.getHeroRef().heroId
+        )
+        setScorePayload({
+          message: `${target.getHeroRef().name} killed ${
+            attacker.getHeroRef().name
+          } and scored 2 points!`,
+          score: matchManager.getPlayerScore(),
+          teamName: matchManager.getPlayerTeamInfo().name,
+        })
+        matchManager.respawnHero(attacker, 'enemy')
       }
-      setIsFinishedAttacking(true)
-    }, 3500)
+    }
+    setIsFinishedAttacking(true)
   }
 
   const startAttackerAnimation = () => {
-    Animated.sequence([
-      Animated.timing(enemyHeroPos, {
-        toValue: -100,
-        duration: 1000,
-        easing: Easing.back(5),
-        useNativeDriver: true,
-      }),
+    Animated.timing(enemyHeroPos, {
+      toValue: -100,
+      duration: 1000,
+      easing: Easing.back(5),
+      useNativeDriver: true,
+    }).start(() => {
+      processAttackerHeroAttack()
       Animated.parallel([
         Animated.timing(enemyHeroPos, {
           toValue: 0,
@@ -131,18 +126,22 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
             useNativeDriver: true,
           }),
         ]),
-      ]),
-    ]).start()
+      ]).start(() => {
+        if (!target.isDead) {
+          startDefenderAnimation()
+        }
+      })
+    })
   }
 
   const startDefenderAnimation = () => {
-    Animated.sequence([
-      Animated.timing(playerHeroPos, {
-        toValue: 100,
-        duration: 1000,
-        easing: Easing.back(5),
-        useNativeDriver: true,
-      }),
+    Animated.timing(playerHeroPos, {
+      toValue: 100,
+      duration: 1000,
+      easing: Easing.back(5),
+      useNativeDriver: true,
+    }).start(() => {
+      processDefenderHeroAttack()
       Animated.parallel([
         Animated.timing(playerHeroPos, {
           toValue: 0,
@@ -169,8 +168,8 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
             useNativeDriver: true,
           }),
         ]),
-      ]),
-    ]).start()
+      ]).start()
+    })
   }
 
   const onAttackFinished = () => {
