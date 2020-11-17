@@ -17,7 +17,7 @@ export interface MatchManagerConfig {
 }
 
 export class MatchManager {
-  private static MATCH_DURATION = 20
+  private static MATCH_DURATION = 3
 
   private playerHeroes: HeroInMatch[]
   private enemyHeroes: HeroInMatch[]

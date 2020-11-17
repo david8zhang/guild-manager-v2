@@ -3,6 +3,7 @@ import { View } from 'react-native'
 import { Button } from '../../../components'
 import { MatchManager } from '../../../lib/MatchManager'
 import { ScoreBoard } from './ScoreBoard'
+import { MatchStats } from './MatchStats'
 
 interface Props {
   score: any
@@ -10,6 +11,15 @@ interface Props {
 }
 
 export const PostMatch: React.FC<Props> = ({ score, matchManager }) => {
+  const [showMatchStats, setShowMatchStats] = React.useState(false)
+  if (showMatchStats) {
+    return (
+      <MatchStats
+        matchManager={matchManager}
+        onContinue={() => setShowMatchStats(false)}
+      />
+    )
+  }
   return (
     <View style={{ flex: 1, flexDirection: 'column' }}>
       <ScoreBoard score={score} turnsRemaining={0} />
@@ -26,7 +36,9 @@ export const PostMatch: React.FC<Props> = ({ score, matchManager }) => {
           <Button
             text='See more stats'
             style={{ margin: 5, width: 150 }}
-            onPress={() => {}}
+            onPress={() => {
+              setShowMatchStats(true)
+            }}
           />
         </View>
       </View>

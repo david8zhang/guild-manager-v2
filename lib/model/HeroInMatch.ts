@@ -42,11 +42,15 @@ export class HeroInMatch {
 
   public addKillToRecord(): void {
     this.heroStats.numKills++
-    this.heroStats.numPoints++
+    this.heroStats.numPoints += 2
   }
 
   public addDeathToRecord(): void {
     this.heroStats.numDeaths++
+  }
+
+  public getHeroStats(): HeroStats {
+    return this.heroStats
   }
 
   public getAttackRange(): number {
