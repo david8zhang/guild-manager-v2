@@ -11,9 +11,14 @@ import { PostMatch } from './PostMatch'
 interface Props {
   playerTeam: Team
   enemyTeam: Team
+  onContinue: Function
 }
 
-export const Match: React.FC<Props> = ({ playerTeam, enemyTeam }) => {
+export const Match: React.FC<Props> = ({
+  playerTeam,
+  enemyTeam,
+  onContinue,
+}) => {
   const [matchManager, setMatchManager] = React.useState<MatchManager | null>(
     null
   )
@@ -34,10 +39,12 @@ export const Match: React.FC<Props> = ({ playerTeam, enemyTeam }) => {
       playerTeamInfo: {
         name: playerTeam.name,
         abbrev: playerTeam.getNameAbbrev(),
+        teamId: playerTeam.teamId,
       },
       enemyTeamInfo: {
         name: enemyTeam.name,
         abbrev: enemyTeam.getNameAbbrev(),
+        teamId: enemyTeam.teamId,
       },
       playerHeroes,
       enemyHeroes,
@@ -65,7 +72,19 @@ export const Match: React.FC<Props> = ({ playerTeam, enemyTeam }) => {
   }
 
   if (isMatchOver) {
-    return <PostMatch score={score} matchManager={matchManager} />
+    return (
+      <PostMatch
+        score={score}
+        matchManager={matchManager}
+        onContinue={(outcome: {
+          winner: string
+          loser: string
+          enemyId: string
+        }) => {
+          onContinue(outcome)
+        }}
+      />
+    )
   }
 
   return (

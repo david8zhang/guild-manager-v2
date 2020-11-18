@@ -34,4 +34,8 @@ export class Hero {
   public static deserializeHeroObj(heroObj: any): Hero {
     return new Hero(heroObj)
   }
+
+  public getOverall(): number {
+    return Math.round((this.attack + this.defense + this.speed) / 3)
+  }
 }

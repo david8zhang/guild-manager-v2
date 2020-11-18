@@ -91,6 +91,11 @@ export class Schedule {
     })
   }
 
+  public advanceToNextMatch(): void {
+    console.log(this.currentMatchupIndex)
+    this.currentMatchupIndex++
+  }
+
   static deserializeObj(scheduleObj: any, teams: Team[]): Schedule {
     const { matchList, currentMatchupIndex } = scheduleObj
     const dsMatchList = matchList.map((m: any) => {

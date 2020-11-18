@@ -8,9 +8,14 @@ import { MatchStats } from './MatchStats'
 interface Props {
   score: any
   matchManager: MatchManager
+  onContinue: Function
 }
 
-export const PostMatch: React.FC<Props> = ({ score, matchManager }) => {
+export const PostMatch: React.FC<Props> = ({
+  score,
+  matchManager,
+  onContinue,
+}) => {
   const [showMatchStats, setShowMatchStats] = React.useState(false)
   if (showMatchStats) {
     return (
@@ -20,6 +25,16 @@ export const PostMatch: React.FC<Props> = ({ score, matchManager }) => {
       />
     )
   }
+
+  const enemyScore = matchManager.getEnemyScore()
+  const playerScore = matchManager.getPlayerScore()
+
+  const playerTeamId = matchManager.getPlayerTeamInfo().teamId
+  const enemyTeamId = matchManager.getEnemyTeamInfo().teamId
+
+  const winnerId = playerScore > enemyScore ? playerTeamId : enemyTeamId
+  const loserId = playerScore > enemyScore ? enemyTeamId : playerTeamId
+
   return (
     <View style={{ flex: 1, flexDirection: 'column' }}>
       <ScoreBoard score={score} turnsRemaining={0} />
@@ -32,7 +47,17 @@ export const PostMatch: React.FC<Props> = ({ score, matchManager }) => {
         }}
       >
         <View style={{ flexDirection: 'row' }}>
-          <Button text='Continue' style={{ margin: 5 }} onPress={() => {}} />
+          <Button
+            text='Continue'
+            style={{ margin: 5 }}
+            onPress={() => {
+              onContinue({
+                winner: winnerId,
+                loser: loserId,
+                enemyId: enemyTeamId,
+              })
+            }}
+          />
           <Button
             text='See more stats'
             style={{ margin: 5, width: 150 }}

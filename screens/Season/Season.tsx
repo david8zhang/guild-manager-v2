@@ -48,6 +48,19 @@ const Season: React.FC<Props> = ({
   const currentMatchup = schedule.getCurrentMatch()
   const playerTeam = seasonManager.getPlayer()
 
+  const updateTeamRecords = (matchOutcome: {
+    winner: string
+    loser: string
+    enemyId: string
+  }) => {
+    const { winner, loser, enemyId } = matchOutcome
+    seasonManager.updateTeamRecord(winner, true)
+    seasonManager.updateTeamRecord(loser, false)
+    seasonManager.simulateMatchesAndUpdateRecords(enemyId)
+    schedule.advanceToNextMatch()
+    setShowMatch(false)
+  }
+
   if (showMatch) {
     return (
       <Match
@@ -55,6 +68,13 @@ const Season: React.FC<Props> = ({
         enemyTeam={
           seasonManager.getTeam(currentMatchup.teamInfo.teamId) as Team
         }
+        onContinue={(outcome: {
+          winner: string
+          loser: string
+          enemyId: string
+        }) => {
+          updateTeamRecords(outcome)
+        }}
       />
     )
   }

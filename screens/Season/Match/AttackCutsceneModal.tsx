@@ -38,7 +38,7 @@ export const AttackCutsceneModal: React.FC<Props> = ({
   const [isFinishedAttacking, setIsFinishedAttacking] = React.useState(false)
 
   const processPlayerHeroAttack = () => {
-    const attackResult: AttackResult = playerHero.attack(targetHero)
+    const attackResult: AttackResult = playerHero.attack(targetHero, 1.0, 1.0)
     setDefenderDamage(attackResult.damageDealt)
     if (targetHero.isDead) {
       matchManager.playerScoreKill(
@@ -80,16 +80,6 @@ export const AttackCutsceneModal: React.FC<Props> = ({
 
   React.useEffect(() => {
     startAttackerAnimation()
-    // // Attacker wind up and lunge animations
-    // startAttackerAnimation()
-    // processPlayerHeroAttack()
-    // // Start the defender attack animation after the attacker animation has finished
-    // setTimeout(() => {
-    //   if (!targetHero.isDead) {
-    //     startDefenderAnimation()
-    //   }
-    // }, 2500)
-    // processDefenderHeroAttack()
   }, [])
 
   const startDefenderAnimation = () => {
