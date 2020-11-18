@@ -1,4 +1,5 @@
 import { times } from 'lodash'
+import { HeroStats } from './constants/HeroStats'
 import { Arena } from './model/Arena'
 import { Hero } from './model/Hero'
 import { HeroInMatch } from './model/HeroInMatch'
@@ -7,6 +8,7 @@ import { MatchEvent } from './model/MatchEvent'
 interface TeamInfo {
   name: string
   abbrev: string
+  teamId: string
 }
 
 export interface MatchManagerConfig {
@@ -185,6 +187,27 @@ export class MatchManager {
 
   public getEnemyTeamInfo(): TeamInfo {
     return this.enemyTeamInfo
+  }
+
+  public getMVP(winnerTeamId: string): HeroInMatch {
+    const winningHeroes =
+      winnerTeamId === this.playerTeamInfo.teamId
+        ? this.playerHeroes
+        : this.enemyHeroes
+    let heroWithBestStats = winningHeroes[0]
+
+    const getTotalStats = (hero: HeroInMatch): number => {
+      const heroStats: HeroStats = hero.getHeroStats()
+      return heroStats.numKills + heroStats.numPoints - heroStats.numDeaths
+    }
+
+    winningHeroes.forEach((hero: HeroInMatch) => {
+      const thisTotalStats = getTotalStats(hero)
+      if (thisTotalStats > getTotalStats(heroWithBestStats)) {
+        heroWithBestStats = hero
+      }
+    })
+    return heroWithBestStats
   }
 
   public moveEnemyHeroes(): void {

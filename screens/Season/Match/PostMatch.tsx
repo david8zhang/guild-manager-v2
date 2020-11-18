@@ -1,9 +1,10 @@
 import * as React from 'react'
-import { View } from 'react-native'
+import { Text, View } from 'react-native'
 import { Button } from '../../../components'
 import { MatchManager } from '../../../lib/MatchManager'
 import { ScoreBoard } from './ScoreBoard'
 import { MatchStats } from './MatchStats'
+import { MatchMVP } from './MatchMVP'
 
 interface Props {
   score: any
@@ -35,6 +36,8 @@ export const PostMatch: React.FC<Props> = ({
   const winnerId = playerScore > enemyScore ? playerTeamId : enemyTeamId
   const loserId = playerScore > enemyScore ? enemyTeamId : playerTeamId
 
+  const mvp = matchManager.getMVP(winnerId)
+
   return (
     <View style={{ flex: 1, flexDirection: 'column' }}>
       <ScoreBoard score={score} turnsRemaining={0} />
@@ -46,6 +49,7 @@ export const PostMatch: React.FC<Props> = ({
           padding: 20,
         }}
       >
+        <MatchMVP mvp={mvp} style={{ flex: 1 }} />
         <View style={{ flexDirection: 'row' }}>
           <Button
             text='Continue'
