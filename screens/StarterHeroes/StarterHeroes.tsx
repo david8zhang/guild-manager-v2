@@ -23,6 +23,7 @@ const StarterHeroes: React.FC<Props> = ({
   const [starterHeroes, setStarterHeroes] = React.useState([])
   const [reserveHeroes, setReserveHeroes] = React.useState([])
   React.useEffect(() => {
+    // Generate 3 attackers, 2 supports for starters and reserves
     const starters: any = RandomHeroGenerator.generateStarterHeroes(5)
     const reserves: any = RandomHeroGenerator.generateReserveHeroes(5)
     setStarterHeroes(starters)

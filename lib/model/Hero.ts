@@ -6,7 +6,9 @@ export class Hero {
   public defense: number
   public health: number
   public speed: number
+  public magic: number
   public contract: any
+  public moveSet: string[]
 
   constructor(config: any) {
     this.heroId = config.heroId
@@ -16,7 +18,9 @@ export class Hero {
     this.defense = config.defense
     this.health = config.health
     this.speed = config.speed
+    this.magic = config.magic
     this.contract = config.contract
+    this.moveSet = config.moveSet
   }
 
   public serialize(): any {
@@ -28,6 +32,8 @@ export class Hero {
       defense: this.defense,
       health: this.health,
       speed: this.speed,
+      magic: this.magic,
+      moveSet: this.moveSet,
     }
   }
 

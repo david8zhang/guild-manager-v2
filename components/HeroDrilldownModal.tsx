@@ -11,6 +11,7 @@ interface Props {
     health: number
     defense: number
     speed: number
+    magic: number
     potential: number
     name: string
     contract: {
@@ -28,7 +29,16 @@ export const HeroDrilldownModal: React.FC<Props> = ({
   if (!hero || !isOpen) {
     return <View />
   }
-  const { name, attack, defense, health, speed, potential, contract } = hero
+  const {
+    name,
+    attack,
+    defense,
+    health,
+    speed,
+    potential,
+    contract,
+    magic,
+  } = hero
   const { amount, duration } = contract
   const ovr = Math.round((attack + defense + speed) / 3)
   const stars = []
@@ -60,7 +70,24 @@ export const HeroDrilldownModal: React.FC<Props> = ({
         <View style={{ flex: 2, flexDirection: 'column' }}>
           {/* Header Section */}
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text style={{ flex: 1, fontSize: 30 }}>{name}</Text>
+            <View
+              style={{
+                flex: 1,
+                flexDirection: 'column',
+                justifyContent: 'center',
+              }}
+            >
+              <Text style={{ fontSize: 30 }}>{name}</Text>
+              <View
+                style={{
+                  marginTop: 10,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}
+              >
+                {stars}
+              </View>
+            </View>
             <View
               style={{
                 flexDirection: 'column',
@@ -75,20 +102,11 @@ export const HeroDrilldownModal: React.FC<Props> = ({
 
           {/* Stats section */}
           <View style={{ flexDirection: 'column' }}>
-            <Text style={{ fontSize: 14, fontWeight: 'bold' }}>Stats</Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
               <Text style={{ width: '25%', fontSize: 20 }}>ATK: {attack}</Text>
               <Text style={{ width: '25%', fontSize: 20 }}>SPD: {speed}</Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  width: '50%',
-                }}
-              >
-                <Text style={{ fontSize: 20, marginRight: 5 }}>POT:</Text>
-                {stars}
-              </View>
+              <Text style={{ width: '50%', fontSize: 20 }}>MGK: {magic}</Text>
+
               <Text style={{ width: '25%', fontSize: 20 }}>DEF: {defense}</Text>
               <Text style={{ width: '25%', fontSize: 20 }}>HP: {health}</Text>
               <Text style={{ width: '50%', fontSize: 20 }}>
