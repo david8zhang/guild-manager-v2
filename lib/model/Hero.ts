@@ -1,3 +1,6 @@
+import { Move } from '../moves/Move'
+import { MoveFactory } from '../moves/MoveFactory'
+
 export enum HeroType {
   ATTACKER = 'attacker',
   SUPPORT = 'support',

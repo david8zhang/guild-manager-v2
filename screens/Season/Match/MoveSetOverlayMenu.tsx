@@ -1,6 +1,10 @@
 import * as React from 'react'
 import { Text, View } from 'react-native'
 import { Button } from '../../../components'
+import { MatchManager } from '../../../lib/MatchManager'
+import { HeroInMatch } from '../../../lib/model/HeroInMatch'
+import { Move } from '../../../lib/moves/Move'
+import { MoveFactory } from '../../../lib/moves/MoveFactory'
 
 interface Props {
   rows: number
@@ -9,23 +13,35 @@ interface Props {
     row: number
     col: number
   }
-  onAttack: Function
-  onWait: Function
+  selectedHeroId: string
+  matchManager: MatchManager
+  onUseMove: Function
   onCancel: Function
-  onUseSkill: Function
-  canAttack: boolean
 }
 
-export const OverlayMenu: React.FC<Props> = ({
+export const MoveSetOverlayMenu: React.FC<Props> = ({
   rows,
   cols,
   menuToShowCoords,
-  onAttack,
-  onWait,
+  selectedHeroId,
+  matchManager,
+  onUseMove,
   onCancel,
-  onUseSkill,
-  canAttack,
 }) => {
+  const hero: HeroInMatch | undefined = matchManager.getHeroByHeroId(
+    selectedHeroId
+  )
+  if (!hero) {
+    return <View />
+  }
+  const moveSet = hero.getHeroRef().moveSet
+
+  // Deserialize move object
+  const moveObjects =
+    moveSet.length > 0
+      ? moveSet.map((move: string) => MoveFactory.getMove(move))
+      : []
+
   const renderGrid = () => {
     const grid = []
     const totalNumCells = rows * cols
@@ -47,36 +63,27 @@ export const OverlayMenu: React.FC<Props> = ({
         >
           {shouldShowMenu && (
             <View>
-              {canAttack && (
-                <Button
-                  style={{ width: 90, marginBottom: 5, padding: 2 }}
-                  textStyle={{ fontSize: 10 }}
-                  text='Attack'
-                  onPress={() => {
-                    onAttack()
-                  }}
-                />
-              )}
+              {moveObjects.map((move: Move | null) => {
+                if (!move) {
+                  return <View />
+                }
+                return (
+                  <Button
+                    key={move.name}
+                    style={{ width: 90, marginBottom: 5, padding: 2 }}
+                    textStyle={{ fontSize: 10 }}
+                    text={move.name}
+                    onPress={() => {
+                      onUseMove(move)
+                    }}
+                  />
+                )
+              })}
               <Button
+                key='cancel'
                 style={{ width: 90, marginBottom: 5, padding: 2 }}
                 textStyle={{ fontSize: 10 }}
-                text='Use Skill'
-                onPress={() => {
-                  onUseSkill()
-                }}
-              />
-              <Button
-                style={{ width: 90, marginBottom: 5, padding: 2 }}
-                textStyle={{ fontSize: 10 }}
-                text='Wait'
-                onPress={() => {
-                  onWait()
-                }}
-              />
-              <Button
-                style={{ width: 90, marginBottom: 5, padding: 2 }}
-                textStyle={{ fontSize: 10 }}
-                text='Cancel Move'
+                text='Cancel'
                 onPress={() => {
                   onCancel()
                 }}

@@ -5,6 +5,7 @@ import { MatchManager } from '../../../lib/MatchManager'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
 import { EnemyAttackCutsceneModal } from './EnemyAttackCutsceneModal'
 import { HeroInArena } from './HeroInArena'
+import { MoveSetOverlayMenu } from './MoveSetOverlayMenu'
 import { OverlayMenu } from './OverlayMenu'
 import { SkipTurnModal } from './SkipTurnModal'
 import { TargetSelectionOverlay } from './TargetSelectionOverlay'
@@ -26,6 +27,7 @@ export const Arena: React.FC<Props> = ({
 
   // Where to show the overlay menu with 'wait', 'cancel move', and 'attack'
   const [menuToShowCoords, setMenuToShowCoords] = React.useState<any>(null)
+  const [moveSetMenuCoords, setMoveSetMenuCoords] = React.useState<any>(null) // coordinates for showing the move set menu
   const [pendingMove, setPendingMove] = React.useState<any>(null) // store a reference to move so that it can be reversed
 
   // Check if it's the player's turn, also show a turn display modal
@@ -459,6 +461,22 @@ export const Arena: React.FC<Props> = ({
             }}
           />
         )}
+        {moveSetMenuCoords && (
+          <MoveSetOverlayMenu
+            rows={rows}
+            cols={cols}
+            selectedHeroId={selectedHeroAndCoordinates.selectedHeroId}
+            matchManager={matchManager}
+            menuToShowCoords={moveSetMenuCoords}
+            onCancel={() => {
+              setMenuToShowCoords(moveSetMenuCoords)
+              setMoveSetMenuCoords(null)
+            }}
+            onUseMove={(move: string) => {
+              console.log('Move:', move)
+            }}
+          />
+        )}
         {menuToShowCoords && (
           <OverlayMenu
             rows={rows}
@@ -467,6 +485,10 @@ export const Arena: React.FC<Props> = ({
             canAttack={showAttackButton}
             onAttack={() => {
               onChooseAttackTarget()
+            }}
+            onUseSkill={() => {
+              setMenuToShowCoords(null)
+              setMoveSetMenuCoords(menuToShowCoords)
             }}
             onCancel={() => {
               onUndoMove()

@@ -1,7 +1,9 @@
 import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { CustomModal } from './CustomModal'
 import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons'
+import { Button } from './Button'
+import { TextLink } from './TextLink'
 
 interface Props {
   isOpen: boolean
@@ -132,6 +134,18 @@ export const HeroDrilldownModal: React.FC<Props> = ({
                 Contract: {duration}YR @ {amount}G
               </Text>
             </View>
+          </View>
+
+          {/* Show Moveset modal */}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'flex-end',
+              justifyContent: 'flex-end',
+              marginTop: 20,
+            }}
+          >
+            <TextLink text='Show move set' onPress={() => {}} />
           </View>
         </View>
       </View>

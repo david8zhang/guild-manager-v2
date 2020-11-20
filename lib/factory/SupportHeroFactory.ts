@@ -2,7 +2,7 @@ import { HeroFactory } from './HeroFactory'
 import { Hero, HeroType } from '../model/Hero'
 
 export class SupportHeroFactory extends HeroFactory {
-  private static SUPPORT_MOVES = ['heal', 'atkBuff', 'defBuff']
+  private static SUPPORT_MOVES = ['Heal', 'ATK Buff', 'DEF Buff']
   constructor(
     minHealth: number,
     maxHealth: number,
