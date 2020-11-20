@@ -4,10 +4,6 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
-- Introduce support and attacker hero archetypes
-
-  - Magic stat for supports
-
 - Movesets for heroes
 
   - Special moves for attackers

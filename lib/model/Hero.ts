@@ -1,3 +1,8 @@
+export enum HeroType {
+  ATTACKER = 'attacker',
+  SUPPORT = 'support',
+}
+
 export class Hero {
   public heroId: string
   public name: string
@@ -9,6 +14,7 @@ export class Hero {
   public magic: number
   public contract: any
   public moveSet: string[]
+  public heroType: HeroType
 
   constructor(config: any) {
     this.heroId = config.heroId
@@ -21,6 +27,7 @@ export class Hero {
     this.magic = config.magic
     this.contract = config.contract
     this.moveSet = config.moveSet
+    this.heroType = config.heroType
   }
 
   public serialize(): any {
@@ -34,6 +41,7 @@ export class Hero {
       speed: this.speed,
       magic: this.magic,
       moveSet: this.moveSet,
+      type: this.heroType,
     }
   }
 

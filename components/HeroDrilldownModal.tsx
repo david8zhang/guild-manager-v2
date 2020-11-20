@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { CustomModal } from './CustomModal'
-import { FontAwesome } from '@expo/vector-icons'
+import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons'
 
 interface Props {
   isOpen: boolean
@@ -14,6 +14,7 @@ interface Props {
     magic: number
     potential: number
     name: string
+    heroType: string
     contract: {
       amount: number
       duration: number
@@ -38,6 +39,7 @@ export const HeroDrilldownModal: React.FC<Props> = ({
     potential,
     contract,
     magic,
+    heroType,
   } = hero
   const { amount, duration } = contract
   const ovr = Math.round((attack + defense + speed) / 3)
@@ -63,7 +65,24 @@ export const HeroDrilldownModal: React.FC<Props> = ({
         <View style={{ flex: 1 }}>
           <View
             style={{ backgroundColor: 'gray', height: '90%', width: '90%' }}
-          ></View>
+          >
+            <View
+              style={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                padding: 5,
+                borderColor: 'black',
+                borderWidth: 1,
+                backgroundColor: 'white',
+              }}
+            >
+              <MaterialCommunityIcons
+                name={heroType === 'attacker' ? 'sword-cross' : 'medical-bag'}
+                size={20}
+              />
+            </View>
+          </View>
         </View>
 
         {/* Body */}

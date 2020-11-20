@@ -1,5 +1,5 @@
 import { HeroFactory } from './HeroFactory'
-import { Hero } from '../model/Hero'
+import { Hero, HeroType } from '../model/Hero'
 
 export class SupportHeroFactory extends HeroFactory {
   private static SUPPORT_MOVES = ['heal', 'atkBuff', 'defBuff']
@@ -23,6 +23,7 @@ export class SupportHeroFactory extends HeroFactory {
       const name = super.generateRandomName(gender)
       heroes.push(
         new Hero({
+          heroType: HeroType.SUPPORT,
           heroId: super.generateRandomHeroId(),
           gender,
           name,

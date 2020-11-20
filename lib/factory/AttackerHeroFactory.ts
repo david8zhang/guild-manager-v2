@@ -1,4 +1,4 @@
-import { Hero } from '../model/Hero'
+import { Hero, HeroType } from '../model/Hero'
 import { HeroFactory } from './HeroFactory'
 
 export class AttackerHeroFactory extends HeroFactory {
@@ -23,6 +23,7 @@ export class AttackerHeroFactory extends HeroFactory {
       const name = super.generateRandomName(gender)
       heroes.push(
         new Hero({
+          heroType: HeroType.ATTACKER,
           heroId: super.generateRandomHeroId(),
           gender,
           name,

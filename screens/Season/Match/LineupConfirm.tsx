@@ -41,6 +41,7 @@ export const LineupConfirm: React.FC<Props> = ({ playerTeam, onConfirm }) => {
             <StarterHero
               key={`starter-${hero.heroId}`}
               name={hero.name}
+              heroType={hero.heroType}
               attack={hero.attack}
               defense={hero.defense}
               health={hero.health}
