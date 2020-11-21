@@ -11,6 +11,7 @@ export const TextLink: React.FC<Props> = ({ onPress, text }) => {
   return (
     <Pressable
       onPressIn={() => {
+        onPress()
         setIsPressed(true)
       }}
       onPressOut={() => {

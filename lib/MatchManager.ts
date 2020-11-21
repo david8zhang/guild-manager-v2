@@ -97,22 +97,25 @@ export class MatchManager {
     return hero && !hero.isDead && !hero.isUntargetable()
   }
 
-  public getHeroesInAttackRange(rows: number, cols: number): any[] {
-    const hero: HeroInMatch = this.arena.getHeroAtLocation(rows, cols)
-    const heroesInAttackRange: any[] = []
-    const range = hero.getAttackRange()
-    const squaresInRange = this.arena.getSquaresInRange(range, rows, cols)
-
+  public getHeroesInRange(row: number, col: number, range: number): any[] {
+    const heroesInRange: any[] = []
+    const squaresInRange = this.getSquaresWithinRange(row, col, range)
     squaresInRange.forEach((coord: number[]) => {
       const h = this.arena.getHeroAtLocation(coord[0], coord[1])
       if (this.isHeroAttackable(h)) {
-        heroesInAttackRange.push({
+        heroesInRange.push({
           coordinates: coord,
           hero: h,
         })
       }
     })
-    return heroesInAttackRange
+    return heroesInRange
+  }
+
+  public getHeroesInAttackRange(rows: number, cols: number): any[] {
+    const hero: HeroInMatch = this.arena.getHeroAtLocation(rows, cols)
+    const range = hero.getAttackRange()
+    return this.getHeroesInRange(rows, cols, range)
   }
 
   public getHeroByHeroId = (heroId: string) => {
@@ -125,6 +128,20 @@ export class MatchManager {
     const range = hero.getAttackRange()
     const squaresToHighlight = this.arena.getSquaresInRange(range, rows, cols)
     this.arena.highlightSquares(squaresToHighlight, 'red')
+  }
+
+  public highlightSquaresWithinRange(
+    rows: number,
+    cols: number,
+    range: number,
+    color: string
+  ) {
+    const squaresToHighlight = this.arena.getSquaresInRange(range, rows, cols)
+    this.arena.highlightSquares(squaresToHighlight, color)
+  }
+
+  public getSquaresWithinRange(rows: number, cols: number, range: number) {
+    return this.arena.getSquaresInRange(range, rows, cols)
   }
 
   public getHighlightedSquares() {

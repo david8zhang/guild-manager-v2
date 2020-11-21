@@ -1,9 +1,10 @@
 import * as React from 'react'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
-import { CustomModal } from './CustomModal'
+import { StyleSheet, Text, View } from 'react-native'
+import { CustomModal } from '../../../components/CustomModal'
 import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons'
-import { Button } from './Button'
-import { TextLink } from './TextLink'
+import { TextLink } from '../../../components/TextLink'
+import { MovesetModal } from './MovesetModal'
+import { Portal } from 'react-native-paper'
 
 interface Props {
   isOpen: boolean
@@ -17,6 +18,7 @@ interface Props {
     potential: number
     name: string
     heroType: string
+    moveSet: string[]
     contract: {
       amount: number
       duration: number
@@ -29,6 +31,7 @@ export const HeroDrilldownModal: React.FC<Props> = ({
   onClose,
   hero,
 }) => {
+  const [showMovesetModal, setShowMovesetModal] = React.useState(false)
   if (!hero || !isOpen) {
     return <View />
   }
@@ -42,6 +45,7 @@ export const HeroDrilldownModal: React.FC<Props> = ({
     contract,
     magic,
     heroType,
+    moveSet,
   } = hero
   const { amount, duration } = contract
   const ovr = Math.round((attack + defense + speed) / 3)
@@ -137,6 +141,14 @@ export const HeroDrilldownModal: React.FC<Props> = ({
           </View>
 
           {/* Show Moveset modal */}
+          <Portal>
+            <MovesetModal
+              isOpen={showMovesetModal}
+              onClose={() => setShowMovesetModal(false)}
+              moveSet={moveSet}
+            />
+          </Portal>
+
           <View
             style={{
               flexDirection: 'row',
@@ -145,7 +157,14 @@ export const HeroDrilldownModal: React.FC<Props> = ({
               marginTop: 20,
             }}
           >
-            <TextLink text='Show move set' onPress={() => {}} />
+            <TextLink
+              text='Show move set'
+              onPress={() => {
+                if (moveSet.length > 0) {
+                  setShowMovesetModal(true)
+                }
+              }}
+            />
           </View>
         </View>
       </View>

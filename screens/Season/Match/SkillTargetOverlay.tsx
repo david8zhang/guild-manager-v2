@@ -1,47 +1,43 @@
 import * as React from 'react'
 import { Pressable, View } from 'react-native'
-import { Portal } from 'react-native-paper'
 import { Button } from '../../../components'
 import { MatchManager } from '../../../lib/MatchManager'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
-import { AttackCutsceneModal } from './AttackCutsceneModal'
-import { AttackMatchupModal } from './AttackMatchupModal'
+import { Move } from '../../../lib/moves/Move'
 
 interface Props {
   rows: number
   cols: number
-  attackableHeroes: any
-  onConfirmAttack: Function
-  playerHero: HeroInMatch
-  matchManager: MatchManager
-  cancelAttackMenuCoords?: { row: number; col: number }
-  onCancel?: Function
+  cancelMoveMenuCoords: {
+    row: number
+    col: number
+  }
+  targetableHeroes: any
+  onCancel: Function
+  onConfirmMove: Function
 }
 
-export const TargetSelectionOverlay: React.FC<Props> = ({
+export const SkillTargetOverlay: React.FC<Props> = ({
   rows,
   cols,
-  attackableHeroes,
-  playerHero,
-  onConfirmAttack,
-  matchManager,
-  cancelAttackMenuCoords,
+  cancelMoveMenuCoords,
+  targetableHeroes,
   onCancel,
 }) => {
-  const [targetToAttack, setTargetToAttack] = React.useState<any>(null)
-  const [isAttacking, setIsAttacking] = React.useState(false)
   const renderGrid = () => {
     const grid = []
     const totalNumCells = rows * cols
 
     for (let i = 0; i < totalNumCells; i++) {
       const coordinates = `${Math.floor(i / cols)},${i % cols}`
+      const selectableHero: HeroInMatch = targetableHeroes[coordinates]
 
-      const selectableHero: HeroInMatch = attackableHeroes[coordinates]
+      // Determine when to show a cancel button
       const shouldShowMenu =
-        cancelAttackMenuCoords &&
+        cancelMoveMenuCoords &&
         coordinates ===
-          `${cancelAttackMenuCoords.row},${cancelAttackMenuCoords.col}`
+          `${cancelMoveMenuCoords.row},${cancelMoveMenuCoords.col}`
+
       grid.push(
         <Pressable
           key={`menu-${coordinates}`}
@@ -54,16 +50,17 @@ export const TargetSelectionOverlay: React.FC<Props> = ({
             padding: 5,
           }}
           onPress={() => {
-            if (selectableHero) {
-              setTargetToAttack(selectableHero)
-            }
+            console.log('Hero to target: ', selectableHero)
+            // if (selectableHero) {
+            //   setTarget(selectableHero)
+            // }
           }}
         >
           {shouldShowMenu && (
             <Button
               style={{ width: 80, marginBottom: 5, padding: 2 }}
               textStyle={{ fontSize: 10 }}
-              text='Cancel Attack'
+              text='Cancel'
               onPress={() => {
                 if (onCancel) {
                   onCancel()
@@ -90,28 +87,6 @@ export const TargetSelectionOverlay: React.FC<Props> = ({
         zIndex: 1,
       }}
     >
-      <Portal>
-        <AttackMatchupModal
-          isOpen={targetToAttack !== null}
-          onClose={() => setTargetToAttack(null)}
-          targetToAttack={targetToAttack}
-          playerHero={playerHero}
-          onAttack={() => {
-            setIsAttacking(true)
-          }}
-        />
-        <AttackCutsceneModal
-          matchManager={matchManager}
-          isOpen={isAttacking}
-          onClose={() => {
-            setIsAttacking(false)
-            setTargetToAttack(null)
-            onConfirmAttack()
-          }}
-          targetHero={targetToAttack}
-          playerHero={playerHero}
-        />
-      </Portal>
       {renderGrid()}
     </View>
   )

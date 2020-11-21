@@ -14,6 +14,7 @@ interface Props {
   onCancel: Function
   onUseSkill: Function
   canAttack: boolean
+  canUseSkill: boolean
 }
 
 export const OverlayMenu: React.FC<Props> = ({
@@ -25,6 +26,7 @@ export const OverlayMenu: React.FC<Props> = ({
   onCancel,
   onUseSkill,
   canAttack,
+  canUseSkill,
 }) => {
   const renderGrid = () => {
     const grid = []
@@ -57,14 +59,16 @@ export const OverlayMenu: React.FC<Props> = ({
                   }}
                 />
               )}
-              <Button
-                style={{ width: 90, marginBottom: 5, padding: 2 }}
-                textStyle={{ fontSize: 10 }}
-                text='Use Skill'
-                onPress={() => {
-                  onUseSkill()
-                }}
-              />
+              {canUseSkill && (
+                <Button
+                  style={{ width: 90, marginBottom: 5, padding: 2 }}
+                  textStyle={{ fontSize: 10 }}
+                  text='Use Skill'
+                  onPress={() => {
+                    onUseSkill()
+                  }}
+                />
+              )}
               <Button
                 style={{ width: 90, marginBottom: 5, padding: 2 }}
                 textStyle={{ fontSize: 10 }}

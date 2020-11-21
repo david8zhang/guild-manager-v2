@@ -15,17 +15,17 @@ interface Props {
   }
   selectedHeroId: string
   matchManager: MatchManager
-  onUseMove: Function
+  onUseSkill: Function
   onCancel: Function
 }
 
-export const MoveSetOverlayMenu: React.FC<Props> = ({
+export const SkillSetOverlayMenu: React.FC<Props> = ({
   rows,
   cols,
   menuToShowCoords,
   selectedHeroId,
   matchManager,
-  onUseMove,
+  onUseSkill,
   onCancel,
 }) => {
   const hero: HeroInMatch | undefined = matchManager.getHeroByHeroId(
@@ -74,7 +74,7 @@ export const MoveSetOverlayMenu: React.FC<Props> = ({
                     textStyle={{ fontSize: 10 }}
                     text={move.name}
                     onPress={() => {
-                      onUseMove(move)
+                      onUseSkill(move)
                     }}
                   />
                 )

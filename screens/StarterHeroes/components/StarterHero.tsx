@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Pressable, Text, View } from 'react-native'
-import { Button } from './Button'
+import { Button } from '../../../components/Button'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 
 interface Props {

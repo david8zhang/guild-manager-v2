@@ -3,9 +3,11 @@ import { Pressable, View } from 'react-native'
 import { Portal } from 'react-native-paper'
 import { MatchManager } from '../../../lib/MatchManager'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
+import { Move } from '../../../lib/moves/Move'
 import { EnemyAttackCutsceneModal } from './EnemyAttackCutsceneModal'
 import { HeroInArena } from './HeroInArena'
-import { MoveSetOverlayMenu } from './MoveSetOverlayMenu'
+import { SkillSetOverlayMenu } from './SkillSetOverlayMenu'
+import { SkillTargetOverlay } from './SkillTargetOverlay'
 import { OverlayMenu } from './OverlayMenu'
 import { SkipTurnModal } from './SkipTurnModal'
 import { TargetSelectionOverlay } from './TargetSelectionOverlay'
@@ -41,6 +43,16 @@ export const Arena: React.FC<Props> = ({
   const [cancelAttackMenuCoords, setCancelAttackMenuCoords] = React.useState<
     any
   >(null)
+
+  // Manage skill actions for player (i.e, support moves like buffs and heals)
+  const [heroesWithinSkillRange, setHeroesWithinSkillRange] = React.useState<
+    any
+  >(null)
+  const [moveToUse, setMoveToUse] = React.useState<any>(null)
+  const [heroUsingSkill, setHeroUsingSkill] = React.useState<any>(null)
+  const [cancelMoveMenuCoords, setCancelMoveMenuCoords] = React.useState<any>(
+    null
+  )
 
   // Enemy Attack cutscenes
   const [enemyAttackActions, setEnemyAttackActions] = React.useState<any[]>([])
@@ -305,7 +317,7 @@ export const Arena: React.FC<Props> = ({
     }
   }
 
-  // Manage attack logic
+  // Handle when player decides to attack an enemy near their hero
   const onChooseAttackTarget = () => {
     const { row, col } = menuToShowCoords
     const { selectedHeroId } = selectedHeroAndCoordinates
@@ -317,6 +329,8 @@ export const Arena: React.FC<Props> = ({
       setAttackerHero(attackerHero)
       setMenuToShowCoords(null)
       setCancelAttackMenuCoords(menuToShowCoords)
+
+      // Get the enemies that are attackable
       const attackableEnemies = getEnemiesInAttackRange(row, col).reduce(
         (acc, curr) => {
           const { coordinates, hero } = curr
@@ -343,12 +357,56 @@ export const Arena: React.FC<Props> = ({
     onPostActionCleanup()
   }
 
+  // Handle what happens when player decides to have a hero use some skill on a nearby hero (i.e. heals, buffs)
+  const onChooseSkillTarget = (move: Move) => {
+    const { row, col } = moveSetMenuCoords
+    const { selectedHeroId } = selectedHeroAndCoordinates
+    matchManager.highlightSquaresWithinRange(
+      row,
+      col,
+      move.range,
+      move.rangeHighlightColor
+    )
+    const hero: HeroInMatch | undefined = matchManager.getHeroByHeroId(
+      selectedHeroId
+    )
+    if (hero) {
+      setHeroUsingSkill(hero)
+      setMoveSetMenuCoords(null)
+      setCancelMoveMenuCoords(moveSetMenuCoords)
+
+      // Get the heroes that are valid targets for this move
+      // TODO: Add some kind of filtering logic, as some moves target allied heroes, whereas others target enemy heroes
+      const heroesWithinRange = matchManager
+        .getHeroesInRange(row, col, move.range)
+        .reduce((acc, curr) => {
+          const { coordinates, hero } = curr
+          const key = `${coordinates[0]},${coordinates[1]}`
+          acc[key] = hero
+          return acc
+        }, {})
+      setMoveToUse(move)
+      setHeroesWithinSkillRange(heroesWithinRange)
+    }
+  }
+
+  const onCancelSkill = () => {
+    matchManager.resetHighlightedSquares()
+    setMoveSetMenuCoords(cancelMoveMenuCoords)
+    setCancelMoveMenuCoords(null)
+  }
+
   const onPostActionCleanup = () => {
+    // Reset all state variables
     setMenuToShowCoords(null)
     setSelectedHeroAndCoordinates(null)
     setShowAttackButton(false)
     setPendingMove(null)
+
     setTargetHeroesMap(null)
+    setMoveToUse(null)
+    setMoveSetMenuCoords(null)
+    setHeroesWithinSkillRange(null)
   }
 
   const onUndoMove = () => {
@@ -389,6 +447,10 @@ export const Arena: React.FC<Props> = ({
     }
     return false
   }
+
+  const selectedHero = selectedHeroAndCoordinates
+    ? matchManager.getHeroByHeroId(selectedHeroAndCoordinates.selectedHeroId)
+    : null
 
   return (
     <View style={{ width: '100%' }}>
@@ -447,12 +509,13 @@ export const Arena: React.FC<Props> = ({
           />
         </Portal>
 
+        {/* Overlay for selecting an enemy target to attack */}
         {targetableHeroesMap && (
           <TargetSelectionOverlay
             matchManager={matchManager}
             cancelAttackMenuCoords={cancelAttackMenuCoords}
             onCancel={() => onCancelAttack()}
-            attackableTargetCoords={targetableHeroesMap}
+            attackableHeroes={targetableHeroesMap}
             rows={rows}
             cols={cols}
             playerHero={attackerHero}
@@ -461,8 +524,26 @@ export const Arena: React.FC<Props> = ({
             }}
           />
         )}
+
+        {/* Overlay for selecting an enemy target to use an ability on */}
+        {moveToUse && heroesWithinSkillRange && (
+          <SkillTargetOverlay
+            cancelMoveMenuCoords={cancelMoveMenuCoords}
+            onCancel={() => {
+              onCancelSkill()
+            }}
+            targetableHeroes={heroesWithinSkillRange}
+            rows={rows}
+            cols={cols}
+            onConfirmMove={() => {
+              console.log('Using Move:', moveToUse)
+            }}
+          />
+        )}
+
+        {/* Overlay for choosing a move to use */}
         {moveSetMenuCoords && (
-          <MoveSetOverlayMenu
+          <SkillSetOverlayMenu
             rows={rows}
             cols={cols}
             selectedHeroId={selectedHeroAndCoordinates.selectedHeroId}
@@ -472,17 +553,24 @@ export const Arena: React.FC<Props> = ({
               setMenuToShowCoords(moveSetMenuCoords)
               setMoveSetMenuCoords(null)
             }}
-            onUseMove={(move: string) => {
-              console.log('Move:', move)
+            onUseSkill={(move: Move) => {
+              onChooseSkillTarget(move)
             }}
           />
         )}
+
+        {/* Overlay for all post move actions (Attack if possible, use a skill, wait, or cancel the move) */}
         {menuToShowCoords && (
           <OverlayMenu
             rows={rows}
             cols={cols}
             menuToShowCoords={menuToShowCoords}
             canAttack={showAttackButton}
+            canUseSkill={
+              selectedHero !== null &&
+              selectedHero !== undefined &&
+              selectedHero.getHeroRef().moveSet.length > 0
+            }
             onAttack={() => {
               onChooseAttackTarget()
             }}

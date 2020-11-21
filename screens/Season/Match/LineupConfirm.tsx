@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { View } from 'react-native'
-import { Button, HeroDrilldownModal, StarterHero } from '../../../components'
+import { Button } from '../../../components'
+import { StarterHero, HeroDrilldownModal } from '../../StarterHeroes/components'
 import { Hero } from '../../../lib/model/Hero'
 import { Team } from '../../../lib/model/Team'
 
