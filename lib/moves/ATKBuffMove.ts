@@ -15,4 +15,5 @@ export class ATKBuffMove implements Move {
     this.rangeHighlightColor = 'green'
   }
   processMove(user: HeroInMatch, target: HeroInMatch) {}
+  getAnimation(user: HeroInMatch, target: HeroInMatch, side: string) {}
 }

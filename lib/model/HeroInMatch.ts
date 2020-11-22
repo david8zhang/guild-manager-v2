@@ -36,6 +36,10 @@ export class HeroInMatch {
     return this.hero
   }
 
+  public setCurrHealth(health: number) {
+    this.currHealth = health
+  }
+
   public getCurrHealth(): number {
     return this.currHealth
   }

@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { Pressable, View } from 'react-native'
+import { Portal } from 'react-native-paper'
 import { Button } from '../../../components'
-import { MatchManager } from '../../../lib/MatchManager'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
 import { Move } from '../../../lib/moves/Move'
+import { SkillCutsceneModal } from './SkillCutsceneModal'
 
 interface Props {
   rows: number
@@ -12,6 +13,8 @@ interface Props {
     row: number
     col: number
   }
+  userHero: HeroInMatch
+  skillToUse: Move
   targetableHeroes: any
   onCancel: Function
   onConfirmMove: Function
@@ -20,10 +23,14 @@ interface Props {
 export const SkillTargetOverlay: React.FC<Props> = ({
   rows,
   cols,
+  userHero,
   cancelMoveMenuCoords,
   targetableHeroes,
   onCancel,
+  skillToUse,
+  onConfirmMove,
 }) => {
+  const [target, setTarget] = React.useState<any>(null)
   const renderGrid = () => {
     const grid = []
     const totalNumCells = rows * cols
@@ -50,10 +57,9 @@ export const SkillTargetOverlay: React.FC<Props> = ({
             padding: 5,
           }}
           onPress={() => {
-            console.log('Hero to target: ', selectableHero)
-            // if (selectableHero) {
-            //   setTarget(selectableHero)
-            // }
+            if (selectableHero) {
+              setTarget(selectableHero)
+            }
           }}
         >
           {shouldShowMenu && (
@@ -87,6 +93,19 @@ export const SkillTargetOverlay: React.FC<Props> = ({
         zIndex: 1,
       }}
     >
+      <Portal>
+        <SkillCutsceneModal
+          isOpen={target !== null}
+          onClose={() => {
+            setTarget(null)
+            onConfirmMove()
+          }}
+          userHero={userHero}
+          targetHero={target}
+          skill={skillToUse}
+          userSide='left'
+        />
+      </Portal>
       {renderGrid()}
     </View>
   )

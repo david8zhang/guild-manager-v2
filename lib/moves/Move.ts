@@ -10,4 +10,10 @@ export interface Move {
   rangeHighlightColor: string
 
   processMove(user: HeroInMatch, target: HeroInMatch): void
+  getAnimation(
+    user: HeroInMatch,
+    target: HeroInMatch,
+    userSide: string,
+    onFinished: Function
+  ): any
 }

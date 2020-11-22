@@ -274,9 +274,15 @@ export const Arena: React.FC<Props> = ({
       matchManager.moveEnemyHeroes()
       setUpdateCounter(updateCounter + 1) // Force an update so the enemies move, wait, then attack
       const attackActions = matchManager.doEnemyHeroAttacks()
+      const skillActions = matchManager.doEnemySkill()
       if (attackActions.length > 0) {
         setTimeout(() => {
           setEnemyAttackActions(attackActions)
+        }, 1000)
+      } else if (skillActions.length > 0) {
+        setTimeout(() => {
+          console.log(skillActions)
+          finishEnemyTurn()
         }, 1000)
       } else {
         finishEnemyTurn()
@@ -394,6 +400,16 @@ export const Arena: React.FC<Props> = ({
     matchManager.resetHighlightedSquares()
     setMoveSetMenuCoords(cancelMoveMenuCoords)
     setCancelMoveMenuCoords(null)
+  }
+
+  const onFinishedSkill = () => {
+    matchManager.resetHighlightedSquares()
+    setMoveSetMenuCoords(null)
+    setCancelMoveMenuCoords(null)
+    setMoveToUse(null)
+    setHeroUsingSkill(null)
+    finishHeroAction()
+    onPostActionCleanup()
   }
 
   const onPostActionCleanup = () => {
@@ -529,6 +545,8 @@ export const Arena: React.FC<Props> = ({
         {moveToUse && heroesWithinSkillRange && (
           <SkillTargetOverlay
             cancelMoveMenuCoords={cancelMoveMenuCoords}
+            skillToUse={moveToUse}
+            userHero={heroUsingSkill}
             onCancel={() => {
               onCancelSkill()
             }}
@@ -536,7 +554,7 @@ export const Arena: React.FC<Props> = ({
             rows={rows}
             cols={cols}
             onConfirmMove={() => {
-              console.log('Using Move:', moveToUse)
+              onFinishedSkill()
             }}
           />
         )}

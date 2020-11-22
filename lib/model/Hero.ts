@@ -44,7 +44,7 @@ export class Hero {
       speed: this.speed,
       magic: this.magic,
       moveSet: this.moveSet,
-      type: this.heroType,
+      heroType: this.heroType,
     }
   }
 

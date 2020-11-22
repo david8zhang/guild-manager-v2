@@ -1,5 +1,6 @@
 import { times } from 'lodash'
 import { HeroStats } from './constants/HeroStats'
+import { EnemyAIManager } from './EnemyAIManager'
 import { Arena } from './model/Arena'
 import { Hero } from './model/Hero'
 import { HeroInMatch } from './model/HeroInMatch'
@@ -19,7 +20,7 @@ export interface MatchManagerConfig {
 }
 
 export class MatchManager {
-  private static MATCH_DURATION = 3
+  private static MATCH_DURATION = 20
 
   private playerHeroes: HeroInMatch[]
   private enemyHeroes: HeroInMatch[]
@@ -228,136 +229,19 @@ export class MatchManager {
   }
 
   public moveEnemyHeroes(): void {
-    const enemyHeroPositions: number[][] = this.arena.getEnemyHeroPositions()
-    const playerHeroPositions: number[][] = this.arena.getPlayerHeroPositions()
-
-    const liveHeroFilterFn = (position: number[]): boolean => {
-      const hero: HeroInMatch = this.arena.getHeroAtLocation(
-        position[0],
-        position[1]
-      )
-      return hero && !hero.isDead
-    }
-
-    const livingEnemyHeroPositions = enemyHeroPositions.filter(liveHeroFilterFn)
-    const livingPlayerHeroPositions = playerHeroPositions.filter(
-      liveHeroFilterFn
-    )
-
-    // If all players are dead, then just stay where you are
-    if (livingPlayerHeroPositions.length === 0) {
-      return
-    }
-
-    livingEnemyHeroPositions.forEach((position) => {
-      const hero: HeroInMatch = this.arena.getHeroAtLocation(
-        position[0],
-        position[1]
-      )
-      const range = hero.getMoveRange()
-      const moveableSquares = this.arena.getSquaresInRange(
-        range,
-        position[0],
-        position[1]
-      )
-
-      // Target a random player and get the closest square within move range to the player's position
-      const randomPlayerToTarget =
-        livingPlayerHeroPositions[
-          Math.floor(Math.random() * livingPlayerHeroPositions.length)
-        ]
-      let closestSquareToTarget: number[] = []
-      let runningDistance = Number.MAX_SAFE_INTEGER
-
-      // Filter out squares that are occupied or are part of the player's spawn locations
-      const playerSpawnLocations: string[] = this.playerSpawnLocations.map(
-        (coord: number[]) => `${coord[0]},${coord[1]}`
-      )
-      const emptyMoveableSquares = moveableSquares.filter(
-        (coordinate: number[]) => {
-          return (
-            !this.arena.getHeroAtLocation(coordinate[0], coordinate[1]) &&
-            !playerSpawnLocations.includes(`${coordinate[0]},${coordinate[1]}`)
-          )
-        }
-      )
-      emptyMoveableSquares.forEach((coordinate: number[]) => {
-        const currDistance = this.arena.getManhattanDistance(
-          coordinate,
-          randomPlayerToTarget
-        )
-        if (currDistance < runningDistance) {
-          runningDistance = currDistance
-          closestSquareToTarget = coordinate
-        }
-      })
-      this.arena.moveHero(
-        {
-          row: position[0],
-          col: position[1],
-        },
-        {
-          row: closestSquareToTarget[0],
-          col: closestSquareToTarget[1],
-        }
-      )
-    })
+    EnemyAIManager.moveEnemyHeroes(this.arena, this.playerSpawnLocations)
   }
 
-  // TODO: Move this to its own class, EnemyAI or something
   public doEnemyHeroAttacks(): any[] {
-    const attackActions: any[] = []
-    const enemyHeroPositions: number[][] = this.arena.getEnemyHeroPositions()
-    const playerHeroIds: string[] = this.playerHeroes.map(
-      (hero: HeroInMatch) => hero.getHeroRef().heroId
-    )
+    return EnemyAIManager.doEnemyHeroAttacks(this.playerHeroes, this.arena)
+  }
 
-    const livingEnemyHeroPositions = enemyHeroPositions.filter(
-      (position: number[]) => {
-        const hero = this.arena.getHeroAtLocation(position[0], position[1])
-        return hero && !hero.isDead
-      }
+  public doEnemySkill(): any[] {
+    return EnemyAIManager.doEnemySkills(
+      this.playerHeroes,
+      this.enemyHeroes,
+      this.arena
     )
-    livingEnemyHeroPositions.forEach((position: number[]) => {
-      const hero: HeroInMatch = this.arena.getHeroAtLocation(
-        position[0],
-        position[1]
-      )
-      const range = hero.getAttackRange()
-      const attackableSquares = this.arena.getSquaresInRange(
-        range,
-        position[0],
-        position[1]
-      )
-      let heroToAttack: any = null
-
-      attackableSquares.forEach((square: number[]) => {
-        const target: HeroInMatch = this.arena.getHeroAtLocation(
-          square[0],
-          square[1]
-        )
-        // If the hero is attackable and is on the player's side
-        if (
-          this.isHeroAttackable(target) &&
-          playerHeroIds.includes(target.getHeroRef().heroId)
-        ) {
-          // Get the target with the lowest current health
-          if (
-            !heroToAttack ||
-            target.getCurrHealth() < heroToAttack.getCurrHealth()
-          ) {
-            heroToAttack = target
-          }
-        }
-      })
-      if (heroToAttack) {
-        attackActions.push({
-          target: heroToAttack,
-          attacker: hero,
-        })
-      }
-    })
-    return attackActions
   }
 
   public tickRespawnTimer(side: string) {
