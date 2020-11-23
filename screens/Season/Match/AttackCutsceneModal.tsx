@@ -38,7 +38,7 @@ export const AttackCutsceneModal: React.FC<Props> = ({
   const [isFinishedAttacking, setIsFinishedAttacking] = React.useState(false)
 
   const processPlayerHeroAttack = () => {
-    const attackResult: AttackResult = playerHero.attack(targetHero, 1.0, 1.0)
+    const attackResult: AttackResult = playerHero.attack(targetHero)
     setDefenderDamage(attackResult.damageDealt)
     if (targetHero.isDead) {
       matchManager.playerScoreKill(

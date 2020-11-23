@@ -43,7 +43,8 @@ export class EnemyAIManager {
           playerSpawnLocations,
           enemyHeroPositions,
           arena,
-          moveableSquares
+          moveableSquares,
+          hero
         )
         if (squareCandidate) {
           closestSquareToTarget = squareCandidate
@@ -78,11 +79,16 @@ export class EnemyAIManager {
     playerSpawnLocations: number[][],
     enemyHeroPositions: number[][],
     arena: Arena,
-    moveableSquares: number[][]
+    moveableSquares: number[][],
+    currHero: HeroInMatch
   ) {
     const livingAlliedHeroPositions = enemyHeroPositions.filter(
       (position: number[]) => {
-        return this.isHeroAlive(position, arena)
+        const heroAtPos = arena.getHeroAtLocation(position[0], position[1])
+        return (
+          this.isHeroAlive(position, arena) &&
+          heroAtPos.getHeroRef().heroId !== currHero.getHeroRef().heroId // exclude the current hero
+        )
       }
     )
 
@@ -108,7 +114,7 @@ export class EnemyAIManager {
     // Get a random ally to target
     const randomAllyToTargetPosition =
       livingAlliedHeroPositions[
-        Math.floor(Math.random() * enemyHeroPositions.length)
+        Math.floor(Math.random() * livingAlliedHeroPositions.length)
       ]
 
     let closestSquareToTarget: number[] = []
@@ -256,6 +262,7 @@ export class EnemyAIManager {
         (hero: HeroInMatch) => {
           return (
             hero.getCurrHealth() < hero.getHeroRef().health &&
+            !hero.isDead &&
             !this.isPlayerHero(hero, playerHeroes)
           )
         }

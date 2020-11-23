@@ -54,8 +54,9 @@ export const Arena: React.FC<Props> = ({
     null
   )
 
-  // Enemy Attack cutscenes
+  // Enemy Attack And Skill cutscenes
   const [enemyAttackActions, setEnemyAttackActions] = React.useState<any[]>([])
+  const [enemySkillActions, setEnemySkillActions] = React.useState<any[]>([])
   const [enemyAttackActionIndex, setEnemyAttackActionIndex] = React.useState(0)
 
   // general purpose counter to force a component rerender
@@ -274,18 +275,21 @@ export const Arena: React.FC<Props> = ({
       matchManager.moveEnemyHeroes()
       setUpdateCounter(updateCounter + 1) // Force an update so the enemies move, wait, then attack
       const attackActions = matchManager.doEnemyHeroAttacks()
-      const skillActions = matchManager.doEnemySkill()
       if (attackActions.length > 0) {
         setTimeout(() => {
           setEnemyAttackActions(attackActions)
-        }, 1000)
-      } else if (skillActions.length > 0) {
-        setTimeout(() => {
-          console.log(skillActions)
-          finishEnemyTurn()
+
+          // do enemy skill needs to happen after do enemy attacks. Enemies might've died after attacking
+          const skillActions = matchManager.doEnemySkill()
+          setEnemySkillActions(skillActions)
         }, 1000)
       } else {
-        finishEnemyTurn()
+        // if there are no attack actions, check if there are any skill actions
+        const skillActions = matchManager.doEnemySkill()
+        if (skillActions.length > 0) {
+          setEnemySkillActions(skillActions)
+          console.log('Skill Actions: ', skillActions)
+        }
       }
     }, 1000)
   }
