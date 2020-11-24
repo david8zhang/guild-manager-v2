@@ -4,8 +4,7 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
-- Implement skill usage for enemy AI
-  - Show cutscene when having enemies do skills
+- Add healthbar for heroes on the screen
 
 ## Future Features
 

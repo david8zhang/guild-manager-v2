@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Text, View } from 'react-native'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
 import { FontAwesome } from '@expo/vector-icons'
+import { AnimatedHealthBar } from './AnimatedHealthBar'
 
 interface Props {
   hero: HeroInMatch
@@ -33,13 +34,21 @@ export const HeroInArena: React.FC<Props> = ({ hero, style }) => {
       )}
       <Text
         style={{
-          fontSize: 11,
+          fontSize: 9,
           ...style,
           color: hero.hasMoved ? 'gray' : 'black',
         }}
       >
         {heroRef.name}
       </Text>
+      <AnimatedHealthBar
+        totalHealth={heroRef.health}
+        currHealth={hero.getCurrHealth()}
+        color='green'
+        width={50}
+        height={2}
+        style={{ padding: 1, marginTop: 2 }}
+      />
     </View>
   )
 }

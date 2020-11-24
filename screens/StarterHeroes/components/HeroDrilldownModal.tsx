@@ -157,14 +157,14 @@ export const HeroDrilldownModal: React.FC<Props> = ({
               marginTop: 20,
             }}
           >
-            <TextLink
-              text='Show move set'
-              onPress={() => {
-                if (moveSet.length > 0) {
+            {moveSet.length > 0 && (
+              <TextLink
+                text='Show move set'
+                onPress={() => {
                   setShowMovesetModal(true)
-                }
-              }}
-            />
+                }}
+              />
+            )}
           </View>
         </View>
       </View>
