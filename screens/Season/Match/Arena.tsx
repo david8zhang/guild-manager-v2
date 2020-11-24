@@ -12,6 +12,7 @@ import { OverlayMenu } from './OverlayMenu'
 import { SkipTurnModal } from './SkipTurnModal'
 import { TargetSelectionOverlay } from './TargetSelectionOverlay'
 import { TurnDisplayModal } from './TurnDisplayModal'
+import { EnemySkillCutsceneModal } from './EnemySkillCutsceneModal'
 
 interface Props {
   matchManager: MatchManager
@@ -58,6 +59,7 @@ export const Arena: React.FC<Props> = ({
   const [enemyAttackActions, setEnemyAttackActions] = React.useState<any[]>([])
   const [enemySkillActions, setEnemySkillActions] = React.useState<any[]>([])
   const [enemyAttackActionIndex, setEnemyAttackActionIndex] = React.useState(0)
+  const [enemySkillActionIndex, setEnemySkillActionIndex] = React.useState(0)
 
   // general purpose counter to force a component rerender
   const [updateCounter, setUpdateCounter] = React.useState(0)
@@ -278,17 +280,16 @@ export const Arena: React.FC<Props> = ({
       if (attackActions.length > 0) {
         setTimeout(() => {
           setEnemyAttackActions(attackActions)
-
-          // do enemy skill needs to happen after do enemy attacks. Enemies might've died after attacking
-          const skillActions = matchManager.doEnemySkill()
-          setEnemySkillActions(skillActions)
         }, 1000)
       } else {
         // if there are no attack actions, check if there are any skill actions
         const skillActions = matchManager.doEnemySkill()
         if (skillActions.length > 0) {
-          setEnemySkillActions(skillActions)
-          console.log('Skill Actions: ', skillActions)
+          setTimeout(() => {
+            setEnemySkillActions(skillActions)
+          }, 1000)
+        } else {
+          finishEnemyTurn()
         }
       }
     }, 1000)
@@ -520,11 +521,38 @@ export const Arena: React.FC<Props> = ({
               if (enemyAttackActionIndex === enemyAttackActions.length - 1) {
                 setEnemyAttackActions([])
                 setEnemyAttackActionIndex(0)
-                finishEnemyTurn()
+
+                // do enemy skill needs to happen after do enemy attacks. Enemies might've died after attacking
+                const skillActions = matchManager.doEnemySkill()
+                if (skillActions.length > 0) {
+                  setEnemySkillActions(skillActions)
+                } else {
+                  finishEnemyTurn()
+                }
               } else {
                 setEnemyAttackActionIndex(enemyAttackActionIndex + 1)
               }
               refreshScore()
+            }}
+          />
+        </Portal>
+
+        {/* Support enemies will use skills to heal allied heroes */}
+        <Portal>
+          <EnemySkillCutsceneModal
+            matchManager={matchManager}
+            isOpen={enemySkillActions.length > 0}
+            skillAction={
+              enemySkillActions && enemySkillActions[enemySkillActionIndex]
+            }
+            onContinue={() => {
+              if (enemySkillActionIndex === enemySkillActions.length - 1) {
+                setEnemySkillActions([])
+                setEnemySkillActionIndex(0)
+                finishEnemyTurn()
+              } else {
+                setEnemySkillActionIndex(enemySkillActionIndex + 1)
+              }
             }}
           />
         </Portal>
