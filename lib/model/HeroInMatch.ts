@@ -9,8 +9,14 @@ export interface AttackResult {
   isOneShot: boolean
 }
 
+export interface Buff {
+  stat: string
+  percentage: number
+}
+
 const RESPAWN_TIME = 3
 const UNTARGET_TIME = 1
+const BUFF_DURATION = 2
 
 export class HeroInMatch {
   private hero: Hero
@@ -22,6 +28,13 @@ export class HeroInMatch {
   public isDead: boolean
   public hasMoved: boolean
 
+  /**
+   * Buffs last for a set duration and stack on top of each other multiplicatively
+   * When a buff is applied, the buff timer duration is reset, refreshing all stacked buffs (This is maybe too OP)
+   */
+  public currBuffs: Buff[]
+  public buffTimer: number
+
   constructor(hero: Hero) {
     this.hero = hero
     this.currHealth = hero.health
@@ -30,6 +43,8 @@ export class HeroInMatch {
     this.heroStats = new HeroStats()
     this.respawnTimer = 0
     this.untargetTimer = 0
+    this.currBuffs = []
+    this.buffTimer = 0
   }
 
   public getHeroRef(): Hero {
@@ -102,8 +117,8 @@ export class HeroInMatch {
     if (!targetHero) {
       return 0
     }
-    const targetDefense = targetHero.getHeroRef().defense
-    const diff = this.hero.attack - targetDefense
+    const targetDefense = targetHero.getStatsWithBuffs().defense
+    const diff = this.getStatsWithBuffs().attack - targetDefense
     return (37 * Math.max(diff, 0)) / 8 + 15
   }
 
@@ -113,6 +128,36 @@ export class HeroInMatch {
     if (this.currHealth === 0) {
       this.isDead = true
     }
+  }
+
+  public getBuffs(): Buff[] {
+    return this.currBuffs
+  }
+
+  public getStatsWithBuffs() {
+    const stats: any = {
+      attack: this.hero.attack,
+      defense: this.hero.defense,
+      speed: this.hero.speed,
+      magic: this.hero.magic,
+    }
+    this.currBuffs.forEach((buff: Buff) => {
+      stats[buff.stat] *= buff.percentage
+    })
+    return stats
+  }
+
+  public applyBuff(buff: Buff) {
+    this.buffTimer = BUFF_DURATION
+    this.currBuffs.push(buff)
+  }
+
+  public tickBuffTimer() {
+    this.buffTimer--
+    if (this.buffTimer === 0) {
+      this.currBuffs = []
+    }
+    this.buffTimer = Math.max(0, this.buffTimer)
   }
 
   public attack(

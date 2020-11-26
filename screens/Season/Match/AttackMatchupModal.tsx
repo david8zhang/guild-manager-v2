@@ -39,7 +39,7 @@ export const AttackMatchupModal: React.FC<Props> = ({
 
   return (
     <CustomModal
-      customHeight={300}
+      customHeight={320}
       customWidth={500}
       isOpen={isOpen}
       onClose={() => onClose()}
@@ -48,10 +48,8 @@ export const AttackMatchupModal: React.FC<Props> = ({
         <View style={{ flex: 1 }}>
           <AttackMatchupHero
             color={playerColor}
-            hero={playerHeroRef}
+            hero={playerHero}
             name={playerHeroRef.name}
-            attack={playerHeroRef.attack}
-            defense={playerHeroRef.defense}
             health={playerHeroRef.health}
             currHealth={playerHero.getCurrHealth()}
             predictedDamageTaken={playerHeroDamageTaken}
@@ -60,11 +58,9 @@ export const AttackMatchupModal: React.FC<Props> = ({
         <View style={{ flex: 1 }}>
           <AttackMatchupHero
             color={enemyColor}
-            hero={targetHeroRef}
+            hero={targetToAttack}
             currHealth={targetToAttack.getCurrHealth()}
             name={targetHeroRef.name}
-            attack={targetHeroRef.attack}
-            defense={targetHeroRef.defense}
             health={targetHeroRef.health}
             predictedDamageTaken={targetHeroDamageTaken}
           />

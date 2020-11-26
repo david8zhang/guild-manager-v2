@@ -21,7 +21,7 @@ export interface MatchManagerConfig {
 }
 
 export class MatchManager {
-  private static MATCH_DURATION = 3
+  private static MATCH_DURATION = 10
 
   private playerHeroes: HeroInMatch[]
   private enemyHeroes: HeroInMatch[]
@@ -245,19 +245,8 @@ export class MatchManager {
     )
   }
 
-  public tickRespawnTimer(side: string) {
-    const heroes: HeroInMatch[] =
-      side === 'enemy'
-        ? this.getEnemyHeroesInMatch()
-        : this.getPlayerHeroesInMatch()
-    heroes.forEach((hero: HeroInMatch) => {
-      if (hero.isDead) {
-        hero.countdownRespawnTimer()
-      }
-    })
-  }
-
-  public tickUntargetTimer(side: string) {
+  // Do any actions that trigger after the turn is finished
+  public postTurnActions(side: string) {
     const heroes: HeroInMatch[] =
       side === 'enemy'
         ? this.getEnemyHeroesInMatch()
@@ -265,6 +254,9 @@ export class MatchManager {
     heroes.forEach((hero: HeroInMatch) => {
       if (!hero.isDead && hero.isUntargetable()) {
         hero.countdownUntargetTimer()
+        hero.tickBuffTimer()
+      } else if (hero.isDead) {
+        hero.countdownRespawnTimer()
       }
     })
   }

@@ -31,6 +31,7 @@ export const LineupConfirm: React.FC<Props> = ({ playerTeam, onConfirm }) => {
           isOpen={heroToDrilldown !== null}
           onClose={() => setHeroToDrilldown(null)}
           hero={heroToDrilldown}
+          teamColor={playerTeam.color}
         />
         <View
           style={{

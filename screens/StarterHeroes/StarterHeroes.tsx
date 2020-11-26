@@ -67,6 +67,7 @@ const StarterHeroes: React.FC<Props> = ({
           isOpen={heroToDrilldown !== null}
           onClose={() => setHeroToDrilldown(null)}
           hero={heroToDrilldown}
+          teamColor={guild.teamColor}
         />
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <View style={{ flexDirection: 'column', flex: 1 }}>

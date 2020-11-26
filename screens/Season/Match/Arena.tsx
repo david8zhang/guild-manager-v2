@@ -13,6 +13,7 @@ import { SkipTurnModal } from './SkipTurnModal'
 import { TargetSelectionOverlay } from './TargetSelectionOverlay'
 import { TurnDisplayModal } from './TurnDisplayModal'
 import { EnemySkillCutsceneModal } from './EnemySkillCutsceneModal'
+import { HeroInArenaDetails } from './HeroInArenaDetailsModal'
 
 interface Props {
   matchManager: MatchManager
@@ -27,6 +28,14 @@ export const Arena: React.FC<Props> = ({
 }) => {
   const { map, rows, cols } = matchManager?.getArena()
   const highlightedSquares = matchManager.getHighlightedSquares()
+
+  // When the player long presses on a hero, show an info modal that displays the hero and their buffs
+  const [showHeroInArenaDetails, setShowHeroInArenaDetails] = React.useState<
+    any
+  >(null)
+  const [heroInArenaDetailsColor, setHeroInArenaDetailsColor] = React.useState(
+    ''
+  )
 
   // Where to show the overlay menu with 'wait', 'cancel move', and 'attack'
   const [menuToShowCoords, setMenuToShowCoords] = React.useState<any>(null)
@@ -238,6 +247,20 @@ export const Arena: React.FC<Props> = ({
       grid.push(
         <Pressable
           key={`hero-${coordinates}`}
+          onLongPress={() => {
+            if (hero) {
+              if (isHeroInPlayerTeam(hero.getHeroRef().heroId)) {
+                setHeroInArenaDetailsColor(
+                  matchManager.getPlayerTeamInfo().color
+                )
+              } else {
+                setHeroInArenaDetailsColor(
+                  matchManager.getEnemyTeamInfo().color
+                )
+              }
+              setShowHeroInArenaDetails(hero)
+            }
+          }}
           onPress={() => {
             onSquarePress(hero, coordinates)
           }}
@@ -297,8 +320,7 @@ export const Arena: React.FC<Props> = ({
 
   // Manage turn transitions
   const finishPlayerTurn = () => {
-    matchManager.tickUntargetTimer('player')
-    matchManager.tickRespawnTimer('player')
+    matchManager.postTurnActions('player')
     setIsPlayerTurn(false)
     setTurnDisplaySide('Enemy')
     setTimeout(() => {
@@ -308,8 +330,7 @@ export const Arena: React.FC<Props> = ({
   }
 
   const finishEnemyTurn = () => {
-    matchManager.tickUntargetTimer('enemy')
-    matchManager.tickRespawnTimer('enemy')
+    matchManager.postTurnActions('enemy')
     matchManager.resetPlayerMoves()
     setIsPlayerTurn(true)
     matchManager.decrementMatchTimer()
@@ -501,12 +522,25 @@ export const Arena: React.FC<Props> = ({
           />
         </Portal>
 
+        {/* The little pop up that says 'Enemy Turn' or 'Player Turn' */}
         <Portal>
           <TurnDisplayModal
             currTurn={turnDisplaySide}
             isOpen={turnDisplaySide !== ''}
             onClose={() => setTurnDisplaySide('')}
           />
+        </Portal>
+
+        {/* Hero details modal */}
+        <Portal>
+          {showHeroInArenaDetails && (
+            <HeroInArenaDetails
+              isOpen={showHeroInArenaDetails !== null}
+              onClose={() => setShowHeroInArenaDetails(null)}
+              hero={showHeroInArenaDetails}
+              color={heroInArenaDetailsColor}
+            />
+          )}
         </Portal>
 
         {/* When enemy finds a player hero within range, attack it and play a series of little cutscenes */}

@@ -4,10 +4,17 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
-- Generate random sprites for heroes
+- Attack and defense buffs
 
-## Future Features
+  - Attack buff icons
 
-- Respawn timer displayed
+- Show character sprites on the field
+- Add character info when long pressing
+
+## Future Features (ordered by priority)
+
+- Ranged attacks, ranged heroes
 - Smarter move selection code for enemies
 - Smarter skill usage for enemies
+- Respawn timer displayed
+- Support for different expressions

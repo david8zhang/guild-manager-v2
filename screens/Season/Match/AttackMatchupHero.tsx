@@ -1,30 +1,33 @@
 import * as React from 'react'
 import { Text, View } from 'react-native'
 import { HeroImage } from '../../../components'
-import { Hero } from '../../../lib/model/Hero'
+import { HeroInMatch } from '../../../lib/model/HeroInMatch'
 import { AttackMatchupHealthBar } from './AttackMatchupHealthBar'
+import { BuffDisplay } from './BuffDisplay'
 
 interface Props {
   name: string
-  attack: number
-  defense: number
   currHealth: number
   health: number
   predictedDamageTaken: number
-  hero: Hero
+  hero: HeroInMatch
   color: string
+  imageOptions?: {
+    width: number
+    height: number
+  }
 }
 
 export const AttackMatchupHero: React.FC<Props> = ({
   name,
-  attack,
-  defense,
   currHealth,
   health,
   predictedDamageTaken,
   hero,
   color,
+  imageOptions,
 }) => {
+  const { attack, defense, magic, speed } = hero.getHeroRef()
   return (
     <View
       style={{
@@ -41,22 +44,43 @@ export const AttackMatchupHero: React.FC<Props> = ({
       </Text>
       <View
         style={{
-          flex: 2,
-          width: 100,
+          flex: 1,
+          width: imageOptions ? imageOptions.width : 100,
           marginBottom: 20,
         }}
       >
-        <HeroImage hero={hero} width={100} height={100} teamColor={color} />
+        <HeroImage
+          hero={hero.getHeroRef()}
+          width={imageOptions ? imageOptions.width : 100}
+          height={imageOptions ? imageOptions.height : 100}
+          teamColor={color}
+        />
       </View>
-      <AttackMatchupHealthBar
-        predictedDmg={predictedDamageTaken}
-        currHealth={currHealth}
-        health={health}
-        style={{ marginBottom: 10 }}
-      />
-      <View style={{ flex: 1 }}>
-        <Text style={{ fontSize: 18 }}>ATK: {attack}</Text>
-        <Text style={{ fontSize: 18 }}>DEF: {defense}</Text>
+      <View style={{ flex: 2, flexDirection: 'column' }}>
+        <BuffDisplay hero={hero} />
+        <AttackMatchupHealthBar
+          predictedDmg={predictedDamageTaken}
+          currHealth={currHealth}
+          health={health}
+          style={{ marginBottom: 10 }}
+        />
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 0,
+          }}
+        >
+          <View style={{ flex: 1, alignItems: 'center' }}>
+            <Text style={{ fontSize: 15 }}>ATK: {attack}</Text>
+            <Text style={{ fontSize: 15 }}>DEF: {defense}</Text>
+          </View>
+          <View style={{ flex: 1, alignItems: 'center' }}>
+            <Text style={{ fontSize: 15 }}>SPD: {speed}</Text>
+            <Text style={{ fontSize: 15 }}>MGK: {magic}</Text>
+          </View>
+        </View>
       </View>
     </View>
   )

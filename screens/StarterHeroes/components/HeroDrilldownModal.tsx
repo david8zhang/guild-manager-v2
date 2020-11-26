@@ -12,12 +12,14 @@ interface Props {
   isOpen: boolean
   onClose: Function
   hero: Hero
+  teamColor: string
 }
 
 export const HeroDrilldownModal: React.FC<Props> = ({
   isOpen,
   onClose,
   hero,
+  teamColor,
 }) => {
   const [showMovesetModal, setShowMovesetModal] = React.useState(false)
   if (!hero || !isOpen) {
@@ -57,7 +59,12 @@ export const HeroDrilldownModal: React.FC<Props> = ({
       >
         {/* Image */}
         <View style={{ flex: 1 }}>
-          <HeroImage hero={hero} height={175} width={175} teamColor='red' />
+          <HeroImage
+            hero={hero}
+            height={175}
+            width={175}
+            teamColor={teamColor}
+          />
         </View>
 
         {/* Body */}
