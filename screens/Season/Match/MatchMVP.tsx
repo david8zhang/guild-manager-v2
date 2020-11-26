@@ -7,10 +7,11 @@ import { HeroInMatch } from '../../../lib/model/HeroInMatch'
 
 interface Props {
   mvp: HeroInMatch
+  teamColor: string
   style?: any
 }
 
-export const MatchMVP: React.FC<Props> = ({ mvp, style }) => {
+export const MatchMVP: React.FC<Props> = ({ mvp, style, teamColor }) => {
   const hero: Hero = mvp.getHeroRef()
   const stats: HeroStats = mvp.getHeroStats()
   return (
@@ -27,7 +28,7 @@ export const MatchMVP: React.FC<Props> = ({ mvp, style }) => {
         height={150}
         style={{ width: 150, flex: 1, marginBottom: 10 }}
         hero={hero}
-        teamColor='red'
+        teamColor={teamColor}
       />
       <Text style={{ fontSize: 20, textAlign: 'center' }}>
         MVP: {hero.name}

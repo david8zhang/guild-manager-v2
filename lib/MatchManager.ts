@@ -10,6 +10,7 @@ interface TeamInfo {
   name: string
   abbrev: string
   teamId: string
+  color: string
 }
 
 export interface MatchManagerConfig {

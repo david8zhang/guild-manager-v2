@@ -11,6 +11,8 @@ interface Props {
   targetToAttack: HeroInMatch
   playerHero: HeroInMatch
   onAttack: Function
+  playerColor: string
+  enemyColor: string
 }
 
 export const AttackMatchupModal: React.FC<Props> = ({
@@ -19,6 +21,8 @@ export const AttackMatchupModal: React.FC<Props> = ({
   targetToAttack,
   playerHero,
   onAttack,
+  playerColor,
+  enemyColor,
 }) => {
   if (!targetToAttack || !playerHero) {
     return <View />
@@ -43,6 +47,7 @@ export const AttackMatchupModal: React.FC<Props> = ({
       <View style={{ flexDirection: 'row', flex: 1 }}>
         <View style={{ flex: 1 }}>
           <AttackMatchupHero
+            color={playerColor}
             hero={playerHeroRef}
             name={playerHeroRef.name}
             attack={playerHeroRef.attack}
@@ -54,6 +59,7 @@ export const AttackMatchupModal: React.FC<Props> = ({
         </View>
         <View style={{ flex: 1 }}>
           <AttackMatchupHero
+            color={enemyColor}
             hero={targetHeroRef}
             currHealth={targetToAttack.getCurrHealth()}
             name={targetHeroRef.name}

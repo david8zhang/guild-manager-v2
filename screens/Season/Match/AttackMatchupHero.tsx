@@ -12,6 +12,7 @@ interface Props {
   health: number
   predictedDamageTaken: number
   hero: Hero
+  color: string
 }
 
 export const AttackMatchupHero: React.FC<Props> = ({
@@ -22,6 +23,7 @@ export const AttackMatchupHero: React.FC<Props> = ({
   health,
   predictedDamageTaken,
   hero,
+  color,
 }) => {
   return (
     <View
@@ -44,7 +46,7 @@ export const AttackMatchupHero: React.FC<Props> = ({
           marginBottom: 20,
         }}
       >
-        <HeroImage hero={hero} width={100} height={100} teamColor='red' />
+        <HeroImage hero={hero} width={100} height={100} teamColor={color} />
       </View>
       <AttackMatchupHealthBar
         predictedDmg={predictedDamageTaken}

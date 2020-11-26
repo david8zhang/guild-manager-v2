@@ -40,11 +40,13 @@ export const Match: React.FC<Props> = ({
         name: playerTeam.name,
         abbrev: playerTeam.getNameAbbrev(),
         teamId: playerTeam.teamId,
+        color: playerTeam.color,
       },
       enemyTeamInfo: {
         name: enemyTeam.name,
         abbrev: enemyTeam.getNameAbbrev(),
         teamId: enemyTeam.teamId,
+        color: enemyTeam.color,
       },
       playerHeroes,
       enemyHeroes,
@@ -87,10 +89,18 @@ export const Match: React.FC<Props> = ({
     )
   }
 
+  const playerColor = matchManager.getPlayerTeamInfo().color
+  const enemyColor = matchManager.getEnemyTeamInfo().color
+
   return (
     <Portal.Host>
       <View style={{ flexDirection: 'column', flex: 1 }}>
-        <ScoreBoard score={score} turnsRemaining={turnsRemaining} />
+        <ScoreBoard
+          score={score}
+          turnsRemaining={turnsRemaining}
+          playerColor={playerColor}
+          enemyColor={enemyColor}
+        />
         <View style={{ flex: 1 }}>
           <Arena
             matchManager={matchManager}

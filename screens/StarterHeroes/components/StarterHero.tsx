@@ -13,6 +13,7 @@ interface Props {
   potential: number
   health: number
   name: string
+  teamColor: string
   onPick?: Function
   isPicked?: boolean
   button?: any
@@ -28,6 +29,7 @@ export const StarterHero: React.FC<Props> = ({
   name,
   button,
   hero,
+  teamColor,
 }) => {
   const overall = Math.round((attack + defense + speed) / 3)
   return (
@@ -47,7 +49,12 @@ export const StarterHero: React.FC<Props> = ({
         }}
       >
         <View style={{ flex: 1 }}>
-          <HeroImage hero={hero} width={100} height={115} teamColor='red' />
+          <HeroImage
+            hero={hero}
+            width={100}
+            height={115}
+            teamColor={teamColor}
+          />
         </View>
         <View style={{ flex: 1, flexDirection: 'column', padding: 5 }}>
           <Text style={{ fontSize: 14, height: 35 }}>{name}</Text>

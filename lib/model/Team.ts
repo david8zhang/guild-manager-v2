@@ -5,17 +5,20 @@ export class Team {
   public name: string
   public roster: Hero[]
   public starterIds: string[]
+  public color: string
   public teamId: string
 
   constructor(config: {
     roster: any[]
     teamId?: string
     name: string
+    teamColor: string
     starterIds: string[]
   }) {
-    const { roster, teamId, name, starterIds } = config
+    const { roster, teamId, name, starterIds, teamColor } = config
     this.teamId = teamId || uuidv4()
     this.starterIds = starterIds
+    this.color = teamColor
     this.roster = roster.map((h) => Hero.deserializeHeroObj(h))
     this.name = name
   }
@@ -58,7 +61,7 @@ export class Team {
   }
 
   public static deserializeObj(guildObj: any): Team {
-    const { roster, name, teamId, starterIds } = guildObj
-    return new Team({ roster, starterIds, name, teamId })
+    const { roster, name, teamId, starterIds, teamColor } = guildObj
+    return new Team({ roster, starterIds, name, teamId, teamColor })
   }
 }

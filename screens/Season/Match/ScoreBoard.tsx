@@ -4,9 +4,16 @@ import { Text, View } from 'react-native'
 interface Props {
   score: any
   turnsRemaining: number
+  playerColor: string
+  enemyColor: string
 }
 
-export const ScoreBoard: React.FC<Props> = ({ score, turnsRemaining }) => {
+export const ScoreBoard: React.FC<Props> = ({
+  score,
+  turnsRemaining,
+  playerColor,
+  enemyColor,
+}) => {
   return (
     <View
       style={{
@@ -20,7 +27,7 @@ export const ScoreBoard: React.FC<Props> = ({ score, turnsRemaining }) => {
         paddingRight: 10,
       }}
     >
-      {Object.keys(score).map((key: string) => {
+      {Object.keys(score).map((key: string, index: number) => {
         return (
           <View
             key={key}
@@ -28,12 +35,17 @@ export const ScoreBoard: React.FC<Props> = ({ score, turnsRemaining }) => {
               flex: 1,
               flexDirection: 'row',
               borderWidth: 1,
-              borderColor: 'gray',
+              borderColor: 'black',
               marginTop: 10,
               marginBottom: 10,
             }}
           >
-            <View style={{ backgroundColor: 'gray', flex: 1 }}></View>
+            <View
+              style={{
+                backgroundColor: index == 0 ? playerColor : enemyColor,
+                flex: 1,
+              }}
+            ></View>
             <View style={{ flexDirection: 'row', padding: 10, flex: 3 }}>
               <Text style={{ fontSize: 20, flex: 1 }}>{key}</Text>
               <Text style={{ fontSize: 20 }}>{score[key]}</Text>

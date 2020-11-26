@@ -13,6 +13,8 @@ export interface Move {
   getAnimation(
     user: HeroInMatch,
     target: HeroInMatch,
+    userColor: string,
+    targetColor: string,
     userSide: string,
     onFinished: Function
   ): any

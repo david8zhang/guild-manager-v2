@@ -21,16 +21,13 @@ const CreateGuild: React.FC<Props> = ({ navigation, createGuild }) => {
   const [guildName, setGuildName] = React.useState('')
   const [homeCity, setHomeCity] = React.useState(HOME_CITIES[0])
   const [showColorModal, setShowColorModal] = React.useState(false)
-  const [pickingPrimary, setPickingPrimary] = React.useState(true)
-  const [primaryColor, setPrimaryColor] = React.useState(colors[0])
-  const [secondaryColor, setSecondaryColor] = React.useState(colors[1])
+  const [teamColor, setTeamColor] = React.useState(colors[0])
 
   const onSubmit = () => {
     const newGuild = {
       name: `${homeCity} ${guildName}`,
       homeCity,
-      primaryColor,
-      secondaryColor,
+      teamColor,
       teamId: uuidv4(),
     }
     createGuild(newGuild)
@@ -41,15 +38,11 @@ const CreateGuild: React.FC<Props> = ({ navigation, createGuild }) => {
     <View style={styles.root}>
       <StatusBar hidden />
       <ColorPickerModal
-        titleText={`Pick a ${pickingPrimary ? 'primary' : 'secondary'} color`}
+        titleText='Pick a team color'
         isOpen={showColorModal}
         onClose={() => setShowColorModal(false)}
         onConfirm={(color: string) => {
-          if (pickingPrimary) {
-            setPrimaryColor(color)
-          } else {
-            setSecondaryColor(color)
-          }
+          setTeamColor(color)
         }}
       />
       <View style={styles.header}>
@@ -78,22 +71,9 @@ const CreateGuild: React.FC<Props> = ({ navigation, createGuild }) => {
         <Pressable
           onPress={() => {
             setShowColorModal(true)
-            setPickingPrimary(true)
           }}
         >
-          <View
-            style={{ width: 50, height: 50, backgroundColor: primaryColor }}
-          />
-        </Pressable>
-        <Pressable
-          onPress={() => {
-            setShowColorModal(true)
-            setPickingPrimary(false)
-          }}
-        >
-          <View
-            style={{ width: 50, height: 50, backgroundColor: secondaryColor }}
-          />
+          <View style={{ width: 50, height: 50, backgroundColor: teamColor }} />
         </Pressable>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>

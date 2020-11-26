@@ -109,6 +109,7 @@ const StarterHeroes: React.FC<Props> = ({
           {heroesToRender.map((h: any) => (
             <StarterHero
               {...h}
+              teamColor={guild.teamColor}
               hero={h}
               key={h.heroId}
               isPicked={pickedHeroes.includes(h.heroId)}

@@ -180,6 +180,9 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
     onContinue()
   }
 
+  const playerColor = matchManager.getPlayerTeamInfo().color
+  const enemyColor = matchManager.getEnemyTeamInfo().color
+
   return (
     <CustomModal
       customHeight={300}
@@ -233,7 +236,7 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
                 damage={playerHeroDamage}
               />
             )}
-            <AttackCutsceneHero hero={target} />
+            <AttackCutsceneHero hero={target} color={playerColor} />
           </Animated.View>
           <Animated.View
             style={{
@@ -257,7 +260,7 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
                 damage={enemyHeroDamage}
               />
             )}
-            <AttackCutsceneHero hero={attacker} />
+            <AttackCutsceneHero hero={attacker} color={enemyColor} />
           </Animated.View>
         </View>
         {isFinishedAttacking && (

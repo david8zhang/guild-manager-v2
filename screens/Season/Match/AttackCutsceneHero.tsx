@@ -6,9 +6,10 @@ import { AnimatedHealthBar } from './AnimatedHealthBar'
 
 interface Props {
   hero: HeroInMatch
+  color: string
 }
 
-export const AttackCutsceneHero: React.FC<Props> = ({ hero }) => {
+export const AttackCutsceneHero: React.FC<Props> = ({ hero, color }) => {
   const heroRef = hero.getHeroRef()
   return (
     <View
@@ -24,14 +25,13 @@ export const AttackCutsceneHero: React.FC<Props> = ({ hero }) => {
         style={{
           marginTop: 10,
           marginBottom: 20,
-          backgroundColor: 'blue',
         }}
       >
         <HeroImage
           hero={heroRef}
           width={120}
           height={120}
-          teamColor='red'
+          teamColor={color}
           style={{ width: 120, height: 120 }}
         />
       </View>

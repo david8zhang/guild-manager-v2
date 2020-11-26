@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { View } from 'react-native'
 import { CustomModal } from '../../../components'
+import { MatchManager } from '../../../lib/MatchManager'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
 import { Move } from '../../../lib/moves/Move'
 
@@ -11,6 +12,7 @@ interface Props {
   targetHero: HeroInMatch
   userSide: string
   onClose: Function
+  matchManager: MatchManager
 }
 
 export const SkillCutsceneModal: React.FC<Props> = ({
@@ -20,7 +22,10 @@ export const SkillCutsceneModal: React.FC<Props> = ({
   targetHero,
   userSide,
   onClose,
+  matchManager,
 }) => {
+  const playerColor = matchManager.getPlayerTeamInfo().color
+  const enemyColor = matchManager.getEnemyTeamInfo().color
   return (
     <CustomModal
       customHeight={300}
@@ -29,7 +34,14 @@ export const SkillCutsceneModal: React.FC<Props> = ({
       isOpen={isOpen}
       onClose={() => {}}
     >
-      {skill.getAnimation(userHero, targetHero, userSide, onClose)}
+      {skill.getAnimation(
+        userHero,
+        targetHero,
+        playerColor,
+        playerColor,
+        userSide,
+        onClose
+      )}
     </CustomModal>
   )
 }

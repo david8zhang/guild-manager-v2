@@ -26,6 +26,7 @@ export const EnemySkillCutsceneModal: React.FC<Props> = ({
     return <View />
   }
   const { move, user, target } = skillAction
+  const enemyColor = matchManager.getEnemyTeamInfo().color
   return (
     <CustomModal
       customHeight={300}
@@ -34,7 +35,14 @@ export const EnemySkillCutsceneModal: React.FC<Props> = ({
       onClose={() => {}}
       hideCloseButton
     >
-      {move.getAnimation(user, target, 'right', onContinue)}
+      {move.getAnimation(
+        user,
+        target,
+        enemyColor,
+        enemyColor,
+        'right',
+        onContinue
+      )}
     </CustomModal>
   )
 }

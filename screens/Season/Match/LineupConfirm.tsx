@@ -16,6 +16,7 @@ export const LineupConfirm: React.FC<Props> = ({ playerTeam, onConfirm }) => {
 
   const { starterIds, roster } = playerTeam
   const starterHeroes = roster.filter((h) => starterIds.includes(h.heroId))
+
   return (
     <Portal.Host>
       <View
@@ -42,6 +43,7 @@ export const LineupConfirm: React.FC<Props> = ({ playerTeam, onConfirm }) => {
           {starterHeroes.map((hero: Hero) => {
             return (
               <StarterHero
+                teamColor={playerTeam.color}
                 hero={hero}
                 key={`starter-${hero.heroId}`}
                 name={hero.name}

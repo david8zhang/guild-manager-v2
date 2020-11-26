@@ -576,6 +576,7 @@ export const Arena: React.FC<Props> = ({
         {/* Overlay for selecting an enemy target to use an ability on */}
         {moveToUse && heroesWithinSkillRange && (
           <SkillTargetOverlay
+            matchManager={matchManager}
             cancelMoveMenuCoords={cancelMoveMenuCoords}
             skillToUse={moveToUse}
             userHero={heroUsingSkill}

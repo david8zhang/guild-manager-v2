@@ -36,11 +36,19 @@ export const PostMatch: React.FC<Props> = ({
   const winnerId = playerScore > enemyScore ? playerTeamId : enemyTeamId
   const loserId = playerScore > enemyScore ? enemyTeamId : playerTeamId
 
+  const playerColor = matchManager.getPlayerTeamInfo().color
+  const enemyColor = matchManager.getEnemyTeamInfo().color
+
   const mvp = matchManager.getMVP(winnerId)
 
   return (
     <View style={{ flex: 1, flexDirection: 'column' }}>
-      <ScoreBoard score={score} turnsRemaining={0} />
+      <ScoreBoard
+        score={score}
+        turnsRemaining={0}
+        playerColor={playerColor}
+        enemyColor={enemyColor}
+      />
       <View
         style={{
           flex: 1,
@@ -49,7 +57,11 @@ export const PostMatch: React.FC<Props> = ({
           padding: 20,
         }}
       >
-        <MatchMVP mvp={mvp} style={{ flex: 1 }} />
+        <MatchMVP
+          mvp={mvp}
+          style={{ flex: 1 }}
+          teamColor={winnerId === playerTeamId ? playerColor : enemyColor}
+        />
         <View style={{ flexDirection: 'row' }}>
           <Button
             text='Continue'

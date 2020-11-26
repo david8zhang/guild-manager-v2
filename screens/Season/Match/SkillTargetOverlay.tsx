@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Pressable, View } from 'react-native'
 import { Portal } from 'react-native-paper'
 import { Button } from '../../../components'
+import { MatchManager } from '../../../lib/MatchManager'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
 import { Move } from '../../../lib/moves/Move'
 import { SkillCutsceneModal } from './SkillCutsceneModal'
@@ -18,6 +19,7 @@ interface Props {
   targetableHeroes: any
   onCancel: Function
   onConfirmMove: Function
+  matchManager: MatchManager
 }
 
 export const SkillTargetOverlay: React.FC<Props> = ({
@@ -29,6 +31,7 @@ export const SkillTargetOverlay: React.FC<Props> = ({
   onCancel,
   skillToUse,
   onConfirmMove,
+  matchManager,
 }) => {
   const [target, setTarget] = React.useState<any>(null)
   const renderGrid = () => {
@@ -95,6 +98,7 @@ export const SkillTargetOverlay: React.FC<Props> = ({
     >
       <Portal>
         <SkillCutsceneModal
+          matchManager={matchManager}
           isOpen={target !== null}
           onClose={() => {
             setTarget(null)

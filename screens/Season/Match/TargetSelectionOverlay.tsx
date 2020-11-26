@@ -76,6 +76,10 @@ export const TargetSelectionOverlay: React.FC<Props> = ({
     }
     return grid
   }
+
+  const playerColor = matchManager.getPlayerTeamInfo().color
+  const enemyColor = matchManager.getEnemyTeamInfo().color
+
   return (
     <View
       style={{
@@ -96,6 +100,8 @@ export const TargetSelectionOverlay: React.FC<Props> = ({
           onClose={() => setTargetToAttack(null)}
           targetToAttack={targetToAttack}
           playerHero={playerHero}
+          playerColor={playerColor}
+          enemyColor={enemyColor}
           onAttack={() => {
             setIsAttacking(true)
           }}

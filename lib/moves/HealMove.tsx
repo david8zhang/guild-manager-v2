@@ -55,6 +55,8 @@ const HealAnimationText: React.FC<HealAnimationTextProps> = ({
 }
 
 interface HealAnimationProps {
+  userTeamColor: string
+  targetTeamColor: string
   user: HeroInMatch
   target: HeroInMatch
   userSide: string
@@ -63,6 +65,8 @@ interface HealAnimationProps {
 }
 
 const HealAnimation: React.FC<HealAnimationProps> = ({
+  userTeamColor,
+  targetTeamColor,
   user,
   target,
   userSide,
@@ -109,7 +113,10 @@ const HealAnimation: React.FC<HealAnimationProps> = ({
             healAmount={healAmount}
           />
         )}
-        <AttackCutsceneHero hero={userSide === 'left' ? user : target} />
+        <AttackCutsceneHero
+          color={userTeamColor}
+          hero={userSide === 'left' ? user : target}
+        />
       </Animated.View>
       <Animated.View style={userSide === 'left' ? targetStyle : { flex: 1 }}>
         {userSide === 'left' && (
@@ -118,7 +125,10 @@ const HealAnimation: React.FC<HealAnimationProps> = ({
             healAmount={healAmount}
           />
         )}
-        <AttackCutsceneHero hero={userSide === 'left' ? target : user} />
+        <AttackCutsceneHero
+          color={targetTeamColor}
+          hero={userSide === 'left' ? target : user}
+        />
       </Animated.View>
       {isSkillFinished && (
         <Button
@@ -161,12 +171,16 @@ export class HealMove implements Move {
   getAnimation(
     user: HeroInMatch,
     target: HeroInMatch,
+    userColor: string,
+    targetColor: string,
     userSide: string,
     onFinished: Function
   ): any {
     return (
       <HealAnimation
         user={user}
+        userTeamColor={userColor}
+        targetTeamColor={targetColor}
         target={target}
         userSide={userSide}
         processMove={() => {
