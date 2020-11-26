@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { Text, View } from 'react-native'
+import { HeroImage } from '../../../components'
+import { Hero } from '../../../lib/model/Hero'
 import { AttackMatchupHealthBar } from './AttackMatchupHealthBar'
 
 interface Props {
@@ -9,6 +11,7 @@ interface Props {
   currHealth: number
   health: number
   predictedDamageTaken: number
+  hero: Hero
 }
 
 export const AttackMatchupHero: React.FC<Props> = ({
@@ -18,6 +21,7 @@ export const AttackMatchupHero: React.FC<Props> = ({
   currHealth,
   health,
   predictedDamageTaken,
+  hero,
 }) => {
   return (
     <View
@@ -35,12 +39,13 @@ export const AttackMatchupHero: React.FC<Props> = ({
       </Text>
       <View
         style={{
-          flex: 1,
-          backgroundColor: 'gray',
+          flex: 2,
           width: 100,
-          marginBottom: 10,
+          marginBottom: 20,
         }}
-      ></View>
+      >
+        <HeroImage hero={hero} width={100} height={100} teamColor='red' />
+      </View>
       <AttackMatchupHealthBar
         predictedDmg={predictedDamageTaken}
         currHealth={currHealth}

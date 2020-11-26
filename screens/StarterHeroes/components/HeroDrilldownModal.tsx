@@ -5,25 +5,13 @@ import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons'
 import { TextLink } from '../../../components/TextLink'
 import { MovesetModal } from './MovesetModal'
 import { Portal } from 'react-native-paper'
+import { HeroImage } from '../../../components'
+import { Hero } from '../../../lib/model/Hero'
 
 interface Props {
   isOpen: boolean
   onClose: Function
-  hero: {
-    attack: number
-    health: number
-    defense: number
-    speed: number
-    magic: number
-    potential: number
-    name: string
-    heroType: string
-    moveSet: string[]
-    contract: {
-      amount: number
-      duration: number
-    }
-  }
+  hero: Hero
 }
 
 export const HeroDrilldownModal: React.FC<Props> = ({
@@ -69,26 +57,7 @@ export const HeroDrilldownModal: React.FC<Props> = ({
       >
         {/* Image */}
         <View style={{ flex: 1 }}>
-          <View
-            style={{ backgroundColor: 'gray', height: '90%', width: '90%' }}
-          >
-            <View
-              style={{
-                position: 'absolute',
-                left: 0,
-                top: 0,
-                padding: 5,
-                borderColor: 'black',
-                borderWidth: 1,
-                backgroundColor: 'white',
-              }}
-            >
-              <MaterialCommunityIcons
-                name={heroType === 'attacker' ? 'sword-cross' : 'medical-bag'}
-                size={20}
-              />
-            </View>
-          </View>
+          <HeroImage hero={hero} height={175} width={175} teamColor='red' />
         </View>
 
         {/* Body */}

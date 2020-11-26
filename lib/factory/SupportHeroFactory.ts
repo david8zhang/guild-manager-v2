@@ -44,6 +44,7 @@ export class SupportHeroFactory extends HeroFactory {
           potential: super.generateNumberWithinRange(1, 3),
           contract: { ...this.contract },
           moveSet: this.getRandomMovePool(SupportHeroFactory.SUPPORT_MOVES),
+          heroImageData: super.generateRandomHeroImage(gender),
         })
       )
     }

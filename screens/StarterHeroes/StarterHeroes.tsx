@@ -109,6 +109,7 @@ const StarterHeroes: React.FC<Props> = ({
           {heroesToRender.map((h: any) => (
             <StarterHero
               {...h}
+              hero={h}
               key={h.heroId}
               isPicked={pickedHeroes.includes(h.heroId)}
               onPick={() => {

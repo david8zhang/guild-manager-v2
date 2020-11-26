@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Text, View } from 'react-native'
+import { HeroImage } from '../../../components'
 import { HeroStats } from '../../../lib/constants/HeroStats'
 import { Hero } from '../../../lib/model/Hero'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
@@ -21,15 +22,13 @@ export const MatchMVP: React.FC<Props> = ({ mvp, style }) => {
         ...style,
       }}
     >
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: 'gray',
-          width: 150,
-          height: 50,
-          marginBottom: 10,
-        }}
-      ></View>
+      <HeroImage
+        width={150}
+        height={150}
+        style={{ width: 150, flex: 1, marginBottom: 10 }}
+        hero={hero}
+        teamColor='red'
+      />
       <Text style={{ fontSize: 20, textAlign: 'center' }}>
         MVP: {hero.name}
       </Text>

@@ -4,7 +4,17 @@ import {
   LAST_NAMES,
   MALE_FIRST_NAMES,
 } from '../constants/names'
-import { Hero } from '../model/Hero'
+import {
+  FEMALE_HAIR,
+  MALE_EYES,
+  MALE_HAIR,
+  FEMALE_EYES,
+  BODY,
+  FACES,
+  MOUTH,
+  EYEBROW,
+} from '../constants/imageMap'
+import { Hero, HeroImageData } from '../model/Hero'
 import { v4 as uuidv4 } from 'uuid'
 import { shuffle } from 'lodash'
 
@@ -74,5 +84,34 @@ export class HeroFactory {
       0,
       this.generateNumberWithinRange(1, shuffledMoves.length)
     )
+  }
+
+  generateRandomHeroImage(gender: string): string {
+    const eyesPool =
+      gender === 'male' ? Object.keys(MALE_EYES) : Object.keys(FEMALE_EYES)
+    const hairPool =
+      gender === 'male' ? Object.keys(MALE_HAIR) : Object.keys(FEMALE_HAIR)
+    const bodyPool = Object.keys(BODY)
+    const facePool = Object.keys(FACES)
+    const eyebrowPool = Object.keys(EYEBROW)
+    const mouthPool = Object.keys(MOUTH)
+
+    const randomEyes: string =
+      eyesPool[Math.floor(Math.random() * eyesPool.length)]
+    const randomHair: string =
+      hairPool[Math.floor(Math.random() * hairPool.length)]
+    const randomBody = bodyPool[Math.floor(Math.random() * bodyPool.length)]
+    const randomFace = facePool[Math.floor(Math.random() * facePool.length)]
+    const randomEyebrows =
+      eyebrowPool[Math.floor(Math.random() * eyebrowPool.length)]
+    const randomMouth = mouthPool[Math.floor(Math.random() * mouthPool.length)]
+    return JSON.stringify({
+      eyes: randomEyes,
+      hair: randomHair,
+      body: randomBody,
+      face: randomFace,
+      eyebrow: randomEyebrows,
+      mouth: randomMouth,
+    })
   }
 }

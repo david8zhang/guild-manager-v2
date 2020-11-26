@@ -1,9 +1,17 @@
-import { Move } from '../moves/Move'
-import { MoveFactory } from '../moves/MoveFactory'
-
 export enum HeroType {
   ATTACKER = 'attacker',
   SUPPORT = 'support',
+}
+
+// The hero image data encodes path to each image
+// encoding will also include gender information, i.e. 'male/eyes16.png'
+export interface HeroImageData {
+  eyes: string
+  body: string
+  face: string
+  mouth: string
+  eyebrow: string
+  hair: string
 }
 
 export class Hero {
@@ -18,6 +26,7 @@ export class Hero {
   public contract: any
   public moveSet: string[]
   public heroType: HeroType
+  public heroImageData: HeroImageData
 
   constructor(config: any) {
     this.heroId = config.heroId
@@ -31,6 +40,10 @@ export class Hero {
     this.contract = config.contract
     this.moveSet = config.moveSet
     this.heroType = config.heroType
+    this.heroImageData =
+      typeof config.heroImageData === 'string'
+        ? JSON.parse(config.heroImageData)
+        : config.heroImageData
   }
 
   public serialize(): any {
@@ -45,6 +58,7 @@ export class Hero {
       magic: this.magic,
       moveSet: this.moveSet,
       heroType: this.heroType,
+      heroImageData: JSON.stringify(this.heroImageData),
     }
   }
 

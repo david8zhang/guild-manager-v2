@@ -43,6 +43,7 @@ export const AttackMatchupModal: React.FC<Props> = ({
       <View style={{ flexDirection: 'row', flex: 1 }}>
         <View style={{ flex: 1 }}>
           <AttackMatchupHero
+            hero={playerHeroRef}
             name={playerHeroRef.name}
             attack={playerHeroRef.attack}
             defense={playerHeroRef.defense}
@@ -53,6 +54,7 @@ export const AttackMatchupModal: React.FC<Props> = ({
         </View>
         <View style={{ flex: 1 }}>
           <AttackMatchupHero
+            hero={targetHeroRef}
             currHealth={targetToAttack.getCurrHealth()}
             name={targetHeroRef.name}
             attack={targetHeroRef.attack}
