@@ -57,6 +57,7 @@ export class Team {
       roster: this.roster.map((h: Hero) => h.serialize()),
       starterIds: this.starterIds,
       name: this.name,
+      teamColor: this.color,
     }
   }
 

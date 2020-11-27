@@ -62,6 +62,7 @@ export const Match: React.FC<Props> = ({
   if (!lineupConfirmed) {
     return (
       <LineupConfirm
+        enemyTeam={enemyTeam}
         playerTeam={playerTeam}
         onConfirm={() => {
           matchManager.startMatch()

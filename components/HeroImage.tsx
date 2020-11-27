@@ -19,6 +19,7 @@ interface Props {
   height: number
   teamColor: string
   style?: any
+  hideOverlay?: boolean
 }
 
 export const HeroImage: React.FC<Props> = ({
@@ -27,6 +28,7 @@ export const HeroImage: React.FC<Props> = ({
   height,
   teamColor,
   style,
+  hideOverlay,
 }) => {
   const { heroType, heroImageData } = hero
 
@@ -71,22 +73,24 @@ export const HeroImage: React.FC<Props> = ({
         source={hairImage}
         style={{ ...styles.imageStyle, width, height }}
       />
-      <View
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          padding: 5,
-          borderColor: 'black',
-          borderWidth: 1,
-          backgroundColor: 'white',
-        }}
-      >
-        <MaterialCommunityIcons
-          name={heroType === 'attacker' ? 'sword-cross' : 'medical-bag'}
-          size={20}
-        />
-      </View>
+      {!hideOverlay && (
+        <View
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            padding: 5,
+            borderColor: 'black',
+            borderWidth: 1,
+            backgroundColor: 'white',
+          }}
+        >
+          <MaterialCommunityIcons
+            name={heroType === 'attacker' ? 'sword-cross' : 'medical-bag'}
+            size={20}
+          />
+        </View>
+      )}
     </View>
   )
 }

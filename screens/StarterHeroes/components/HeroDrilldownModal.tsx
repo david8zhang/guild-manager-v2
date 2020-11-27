@@ -34,10 +34,8 @@ export const HeroDrilldownModal: React.FC<Props> = ({
     potential,
     contract,
     magic,
-    heroType,
     moveSet,
   } = hero
-  const { amount, duration } = contract
   const ovr = Math.round((attack + defense + speed) / 3)
   const stars = []
   for (let i = 0; i < potential; i++) {
@@ -110,9 +108,11 @@ export const HeroDrilldownModal: React.FC<Props> = ({
 
               <Text style={{ width: '25%', fontSize: 20 }}>DEF: {defense}</Text>
               <Text style={{ width: '25%', fontSize: 20 }}>HP: {health}</Text>
-              <Text style={{ width: '50%', fontSize: 20 }}>
-                Contract: {duration}YR @ {amount}G
-              </Text>
+              {contract && (
+                <Text style={{ width: '50%', fontSize: 20 }}>
+                  Contract: {contract.duration}YR @ {contract.amount}G
+                </Text>
+              )}
             </View>
           </View>
 

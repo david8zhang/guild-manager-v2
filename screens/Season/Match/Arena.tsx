@@ -221,13 +221,7 @@ export const Arena: React.FC<Props> = ({
     if (isSelected) {
       return '#ffe599'
     }
-    if (hero && hero.isUntargetable()) {
-      return '#DAA520'
-    }
-    if (hero && isHeroInPlayerTeam(hero.getHeroRef().heroId)) {
-      return '#b6d7a8'
-    }
-    if (highlightColor) {
+    if (!hero && highlightColor) {
       return highlightColor
     }
     if (isSpawnLocation) {
@@ -240,23 +234,28 @@ export const Arena: React.FC<Props> = ({
   }
 
   const renderGrid = () => {
+    const playerTeamColor = matchManager.getPlayerTeamInfo().color
+    const enemyTeamColor = matchManager.getEnemyTeamInfo().color
     const grid = []
     for (let i = 0; i < totalNumCells; i++) {
       const coordinates = `${Math.floor(i / cols)},${i % cols}`
       const hero: HeroInMatch = map[coordinates]
+      let teamColor = ''
+      if (hero) {
+        teamColor = isHeroInPlayerTeam(hero.getHeroRef().heroId)
+          ? playerTeamColor
+          : enemyTeamColor
+      }
+
       grid.push(
         <Pressable
           key={`hero-${coordinates}`}
           onLongPress={() => {
             if (hero) {
               if (isHeroInPlayerTeam(hero.getHeroRef().heroId)) {
-                setHeroInArenaDetailsColor(
-                  matchManager.getPlayerTeamInfo().color
-                )
+                setHeroInArenaDetailsColor(playerTeamColor)
               } else {
-                setHeroInArenaDetailsColor(
-                  matchManager.getEnemyTeamInfo().color
-                )
+                setHeroInArenaDetailsColor(enemyTeamColor)
               }
               setShowHeroInArenaDetails(hero)
             }
@@ -272,14 +271,15 @@ export const Arena: React.FC<Props> = ({
             borderBottomWidth: 1,
             height: 50,
             backgroundColor: getSquareColor(coordinates),
-            alignItems: 'center',
-            justifyContent: 'center',
             position: 'relative',
             zIndex: 1,
-            padding: 5,
           }}
         >
-          <HeroInArena hero={hero} />
+          <HeroInArena
+            hero={hero}
+            teamColor={teamColor}
+            highlightColor={highlightedSquares[coordinates]}
+          />
         </Pressable>
       )
     }
