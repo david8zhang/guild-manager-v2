@@ -4,12 +4,9 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
-- Attack and defense buffs
-
-  - Attack buff icons
-
-- Show character sprites on the field
-- Add character info when long pressing
+- Enemy buff usage and smarter attack target selection
+- Substitions during lineup confirm
+- Defense buffs
 
 ## Future Features (ordered by priority)
 

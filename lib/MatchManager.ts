@@ -1,4 +1,3 @@
-import { times } from 'lodash'
 import { HeroStats } from './constants/HeroStats'
 import { EnemyAIManager } from './EnemyAIManager'
 import { Arena } from './model/Arena'
@@ -37,6 +36,7 @@ export class MatchManager {
   private enemySpawnLocations: number[][] = []
 
   private matchTimer: number
+  private enemyAIManager: any
 
   constructor(config: MatchManagerConfig) {
     this.playerHeroes = config.playerHeroes.map((h) => new HeroInMatch(h))
@@ -46,6 +46,7 @@ export class MatchManager {
     this.playerTeamInfo = config.playerTeamInfo
     this.enemyTeamInfo = config.enemyTeamInfo
     this.matchTimer = 0
+    this.enemyAIManager = null
   }
 
   // Do all initialization logic here
@@ -58,6 +59,12 @@ export class MatchManager {
       [this.enemyTeamInfo.abbrev]: 0,
     }
     this.matchTimer = MatchManager.MATCH_DURATION
+    this.enemyAIManager = new EnemyAIManager({
+      playerSpawnLocations: this.playerSpawnLocations,
+      playerHeroes: this.playerHeroes,
+      enemyHeroes: this.enemyHeroes,
+      arena: this.arena,
+    })
   }
 
   public getScore(): any {
@@ -230,19 +237,15 @@ export class MatchManager {
   }
 
   public moveEnemyHeroes(): void {
-    EnemyAIManager.moveEnemyHeroes(this.arena, this.playerSpawnLocations)
+    return (this.enemyAIManager as EnemyAIManager).moveEnemyHeroes()
   }
 
   public doEnemyHeroAttacks(): any[] {
-    return EnemyAIManager.doEnemyHeroAttacks(this.playerHeroes, this.arena)
+    return (this.enemyAIManager as EnemyAIManager).doEnemyHeroAttacks()
   }
 
   public doEnemySkill(): any[] {
-    return EnemyAIManager.doEnemySkills(
-      this.playerHeroes,
-      this.enemyHeroes,
-      this.arena
-    )
+    return (this.enemyAIManager as EnemyAIManager).doEnemySkills()
   }
 
   // Do any actions that trigger after the turn is finished
@@ -254,10 +257,10 @@ export class MatchManager {
     heroes.forEach((hero: HeroInMatch) => {
       if (!hero.isDead && hero.isUntargetable()) {
         hero.countdownUntargetTimer()
-        hero.tickBuffTimer()
       } else if (hero.isDead) {
         hero.countdownRespawnTimer()
       }
+      hero.tickBuffTimer()
     })
   }
 

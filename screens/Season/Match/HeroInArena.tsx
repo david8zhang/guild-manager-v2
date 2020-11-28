@@ -73,7 +73,7 @@ export const HeroInArena: React.FC<Props> = ({
           }}
         ></View>
       )}
-      {hero.hasMoved && (
+      {(hero.isDead || hero.hasMoved) && (
         <View
           style={{
             position: 'absolute',
