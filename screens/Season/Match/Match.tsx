@@ -28,28 +28,9 @@ export const Match: React.FC<Props> = ({
   const [isMatchOver, setIsMatchOver] = React.useState(false)
 
   React.useEffect(() => {
-    const playerHeroes = playerTeam.roster.filter((h) =>
-      playerTeam.starterIds.includes(h.heroId)
-    )
-    const enemyHeroes = enemyTeam.roster.filter((h) =>
-      enemyTeam.starterIds.includes(h.heroId)
-    )
-
     const config = {
-      playerTeamInfo: {
-        name: playerTeam.name,
-        abbrev: playerTeam.getNameAbbrev(),
-        teamId: playerTeam.teamId,
-        color: playerTeam.color,
-      },
-      enemyTeamInfo: {
-        name: enemyTeam.name,
-        abbrev: enemyTeam.getNameAbbrev(),
-        teamId: enemyTeam.teamId,
-        color: enemyTeam.color,
-      },
-      playerHeroes,
-      enemyHeroes,
+      playerTeam,
+      enemyTeam,
     }
     const manager = new MatchManager(config)
     setMatchManager(manager)

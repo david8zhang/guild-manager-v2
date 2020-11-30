@@ -17,6 +17,7 @@ interface Props {
   onPick?: Function
   isPicked?: boolean
   button?: any
+  style?: any
 }
 
 export const StarterHero: React.FC<Props> = ({
@@ -30,6 +31,7 @@ export const StarterHero: React.FC<Props> = ({
   button,
   hero,
   teamColor,
+  style,
 }) => {
   const overall = Math.round((attack + defense + speed) / 3)
   return (
@@ -38,6 +40,7 @@ export const StarterHero: React.FC<Props> = ({
         flexDirection: 'column',
         width: '30%',
         margin: 5,
+        ...style,
       }}
     >
       <View

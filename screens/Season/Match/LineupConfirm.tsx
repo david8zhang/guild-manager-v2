@@ -5,6 +5,7 @@ import { StarterHero, HeroDrilldownModal } from '../../StarterHeroes/components'
 import { Hero } from '../../../lib/model/Hero'
 import { Team } from '../../../lib/model/Team'
 import { Portal } from 'react-native-paper'
+import { SubstitutionScreen } from './SubstitutionScreen'
 
 interface Props {
   playerTeam: Team
@@ -19,13 +20,37 @@ export const LineupConfirm: React.FC<Props> = ({
 }) => {
   const [heroToDrilldown, setHeroToDrilldown] = React.useState<any>(null)
   const [teamColorToDrilldown, setTeamColorToDrilldown] = React.useState('')
+  const [playerHeroes, setPlayerHeroes] = React.useState<any[]>([])
+  const [heroToSwap, setHeroToSwap] = React.useState<any>(null)
 
-  const { starterIds, roster } = playerTeam
-  const starterHeroes = roster.filter((h) => starterIds.includes(h.heroId))
+  React.useEffect(() => {
+    const starterHeroes = playerTeam.getStarters()
+    setPlayerHeroes(starterHeroes)
+  }, [])
 
   const enemyHeroes = enemyTeam.roster.filter((h) =>
     enemyTeam.starterIds.includes(h.heroId)
   )
+
+  if (heroToSwap) {
+    return (
+      <Portal.Host>
+        <SubstitutionScreen
+          heroToSwap={heroToSwap}
+          onSwap={(replacementId: string) => {
+            playerTeam.swapOutStarter(heroToSwap.heroId, replacementId)
+            const starterHeroes = playerTeam.getStarters()
+            setPlayerHeroes(starterHeroes)
+            setHeroToSwap(null)
+          }}
+          onBack={() => {
+            setHeroToSwap(null)
+          }}
+          playerTeam={playerTeam}
+        />
+      </Portal.Host>
+    )
+  }
 
   return (
     <Portal.Host>
@@ -83,7 +108,7 @@ export const LineupConfirm: React.FC<Props> = ({
             justifyContent: 'center',
           }}
         >
-          {starterHeroes.map((hero: Hero) => {
+          {playerHeroes.map((hero: Hero) => {
             return (
               <StarterHero
                 teamColor={playerTeam.color}
@@ -103,7 +128,9 @@ export const LineupConfirm: React.FC<Props> = ({
                   <Button
                     style={{ width: '100%', padding: 5, marginTop: 10 }}
                     textStyle={{ color: 'black' }}
-                    onPress={() => {}}
+                    onPress={() => {
+                      setHeroToSwap(hero)
+                    }}
                     text='Switch'
                   />
                 }

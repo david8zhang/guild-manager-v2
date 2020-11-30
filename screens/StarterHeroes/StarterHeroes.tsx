@@ -42,7 +42,7 @@ const StarterHeroes: React.FC<Props> = ({
           pickedReserves.push(h)
         }
       })
-      addReserveHeroes(reserveHeroes)
+      addReserveHeroes(pickedReserves)
       setPickedHeroes([])
       navigation.navigate('Home')
     } else {

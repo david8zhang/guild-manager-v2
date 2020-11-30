@@ -4,6 +4,7 @@ import { Arena } from './model/Arena'
 import { Hero } from './model/Hero'
 import { HeroInMatch } from './model/HeroInMatch'
 import { MatchEvent } from './model/MatchEvent'
+import { Team } from './model/Team'
 
 interface TeamInfo {
   name: string
@@ -13,20 +14,20 @@ interface TeamInfo {
 }
 
 export interface MatchManagerConfig {
-  playerHeroes: Hero[]
-  enemyHeroes: Hero[]
-  playerTeamInfo: TeamInfo
-  enemyTeamInfo: TeamInfo
+  playerTeam: Team
+  enemyTeam: Team
 }
 
 export class MatchManager {
   private static MATCH_DURATION = 10
 
-  private playerHeroes: HeroInMatch[]
-  private enemyHeroes: HeroInMatch[]
+  private playerHeroes: HeroInMatch[] = []
+  private enemyHeroes: HeroInMatch[] = []
 
   private playerTeamInfo: TeamInfo
   private enemyTeamInfo: TeamInfo
+  private fullPlayerTeam: Team
+  private fullEnemyTeam: Team
 
   private arena: Arena
   private eventLog: MatchEvent[]
@@ -39,18 +40,39 @@ export class MatchManager {
   private enemyAIManager: any
 
   constructor(config: MatchManagerConfig) {
-    this.playerHeroes = config.playerHeroes.map((h) => new HeroInMatch(h))
-    this.enemyHeroes = config.enemyHeroes.map((h) => new HeroInMatch(h))
-    this.arena = new Arena(this.playerHeroes, this.enemyHeroes)
     this.eventLog = []
-    this.playerTeamInfo = config.playerTeamInfo
-    this.enemyTeamInfo = config.enemyTeamInfo
+    this.playerTeamInfo = {
+      teamId: config.playerTeam.teamId,
+      name: config.playerTeam.name,
+      abbrev: config.playerTeam.getNameAbbrev(),
+      color: config.playerTeam.color,
+    }
+    this.enemyTeamInfo = {
+      teamId: config.enemyTeam.teamId,
+      name: config.enemyTeam.name,
+      abbrev: config.enemyTeam.getNameAbbrev(),
+      color: config.enemyTeam.color,
+    }
+    this.fullPlayerTeam = config.playerTeam
+    this.fullEnemyTeam = config.enemyTeam
     this.matchTimer = 0
+    this.arena = new Arena(this.playerHeroes, this.enemyHeroes)
     this.enemyAIManager = null
   }
 
   // Do all initialization logic here
   public startMatch(): void {
+    const playerHeroes = this.fullPlayerTeam
+      .getStarters()
+      .map((h: Hero) => new HeroInMatch(h))
+    const enemyHeroes = this.fullEnemyTeam
+      .getStarters()
+      .map((h: Hero) => new HeroInMatch(h))
+
+    this.playerHeroes = playerHeroes
+    this.enemyHeroes = enemyHeroes
+    this.arena = new Arena(playerHeroes, enemyHeroes)
+
     this.arena.initializeArena()
     this.playerSpawnLocations = this.arena.getPlayerHeroPositions()
     this.enemySpawnLocations = this.arena.getEnemyHeroPositions()

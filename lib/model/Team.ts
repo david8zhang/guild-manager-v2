@@ -37,6 +37,21 @@ export class Team {
     return starterHeroes
   }
 
+  public getReserves(): Hero[] {
+    const reserveHeroes: Hero[] = []
+    this.roster.forEach((hero: Hero) => {
+      if (!this.starterIds.includes(hero.heroId)) {
+        reserveHeroes.push(hero)
+      }
+    })
+    return reserveHeroes
+  }
+
+  public swapOutStarter(toSwapId: string, replacementId: string) {
+    this.starterIds = this.starterIds.filter((id: string) => id !== toSwapId)
+    this.starterIds = this.starterIds.concat(replacementId)
+  }
+
   public getNameAbbrev(): string {
     const nameTokens = this.name.split(' ')
     const cityNameAbb = nameTokens[0].slice(0, 2)
