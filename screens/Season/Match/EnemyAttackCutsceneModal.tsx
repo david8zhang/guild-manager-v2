@@ -127,8 +127,10 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
           }),
         ]),
       ]).start(() => {
-        if (!target.isDead) {
+        if (matchManager.canTargetRetaliate(target, attacker)) {
           startDefenderAnimation()
+        } else {
+          setIsFinishedAttacking(true)
         }
       })
     })

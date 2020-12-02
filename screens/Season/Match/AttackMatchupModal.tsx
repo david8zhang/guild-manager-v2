@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Text, View } from 'react-native'
 import { Button, CustomModal } from '../../../components'
+import { MatchManager } from '../../../lib/MatchManager'
 import { Hero } from '../../../lib/model/Hero'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
 import { AttackMatchupHero } from './AttackMatchupHero'
@@ -13,6 +14,7 @@ interface Props {
   onAttack: Function
   playerColor: string
   enemyColor: string
+  matchManager: MatchManager
 }
 
 export const AttackMatchupModal: React.FC<Props> = ({
@@ -23,6 +25,7 @@ export const AttackMatchupModal: React.FC<Props> = ({
   onAttack,
   playerColor,
   enemyColor,
+  matchManager,
 }) => {
   if (!targetToAttack || !playerHero) {
     return <View />
@@ -30,9 +33,12 @@ export const AttackMatchupModal: React.FC<Props> = ({
   const targetHeroRef: Hero = targetToAttack.getHeroRef()
   const playerHeroRef: Hero = playerHero.getHeroRef()
 
-  const playerHeroDamageTaken: number = targetToAttack.calculateDamage(
+  const playerHeroDamageTaken: number = matchManager.canTargetRetaliate(
+    targetToAttack,
     playerHero
   )
+    ? targetToAttack.calculateDamage(playerHero)
+    : 0
   const targetHeroDamageTaken: number = playerHero.calculateDamage(
     targetToAttack
   )

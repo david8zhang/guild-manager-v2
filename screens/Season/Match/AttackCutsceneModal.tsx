@@ -57,7 +57,7 @@ export const AttackCutsceneModal: React.FC<Props> = ({
   }
 
   const processDefenderHeroAttack = () => {
-    if (!targetHero.isDead) {
+    if (matchManager.canTargetRetaliate(targetHero, playerHero)) {
       const attackResult: AttackResult = targetHero.attack(playerHero)
       setAttackerDamage(Math.floor(attackResult.damageDealt))
       if (playerHero.isDead) {
@@ -155,8 +155,10 @@ export const AttackCutsceneModal: React.FC<Props> = ({
           }),
         ]),
       ]).start(() => {
-        if (!targetHero.isDead) {
+        if (matchManager.canTargetRetaliate(targetHero, playerHero)) {
           startDefenderAnimation()
+        } else {
+          setIsFinishedAttacking(true)
         }
       })
     })

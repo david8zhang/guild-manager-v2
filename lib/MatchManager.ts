@@ -101,6 +101,37 @@ export class MatchManager {
     }
   }
 
+  public canTargetRetaliate(
+    targetHero: HeroInMatch,
+    attackerHero: HeroInMatch
+  ): boolean {
+    if (targetHero.isDead) {
+      return false
+    }
+
+    // Check if the attacker is within the target's range. If not, then do nothing
+    const targetHeroPosition = this.arena.getHeroLocation(
+      targetHero.getHeroRef().heroId
+    )
+    const targetHeroRange = targetHero.getAttackRange()
+    const attackableSquares = this.arena.getSquaresInRange(
+      targetHeroRange,
+      targetHeroPosition[0],
+      targetHeroPosition[1]
+    )
+    for (let i = 0; i < attackableSquares.length; i++) {
+      const pos = attackableSquares[i]
+      const hero = this.arena.getHeroAtLocation(pos[0], pos[1])
+      if (
+        hero &&
+        hero.getHeroRef().heroId === attackerHero.getHeroRef().heroId
+      ) {
+        return true
+      }
+    }
+    return false
+  }
+
   public highlightMoveableSquares(rows: number, cols: number) {
     const hero: HeroInMatch = this.arena.getHeroAtLocation(rows, cols)
     const range = hero.getMoveRange()

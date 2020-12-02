@@ -1,6 +1,7 @@
 export enum HeroType {
-  ATTACKER = 'attacker',
   SUPPORT = 'support',
+  RANGER = 'ranger',
+  TANK = 'tank',
 }
 
 // The hero image data encodes path to each image
@@ -27,6 +28,7 @@ export class Hero {
   public moveSet: string[]
   public heroType: HeroType
   public heroImageData: HeroImageData
+  public attackRange: number
 
   constructor(config: any) {
     this.heroId = config.heroId
@@ -40,6 +42,7 @@ export class Hero {
     this.contract = config.contract
     this.moveSet = config.moveSet
     this.heroType = config.heroType
+    this.attackRange = config.attackRange || 2
     this.heroImageData =
       typeof config.heroImageData === 'string'
         ? JSON.parse(config.heroImageData)

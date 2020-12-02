@@ -14,32 +14,53 @@ import {
   MOUTH,
   EYEBROW,
 } from '../constants/imageMap'
-import { Hero, HeroImageData } from '../model/Hero'
+import { Hero, HeroImageData, HeroType } from '../model/Hero'
 import { v4 as uuidv4 } from 'uuid'
 import { shuffle } from 'lodash'
+
+interface HeroFactoryConfig {
+  minStat?: number
+  maxStat?: number
+  minPotential?: number
+  minHealth?: number
+  maxHealth?: number
+  contract: {
+    duration: number
+    amount: number
+  }
+}
 
 export class HeroFactory {
   public minStat: number
   public maxStat: number
   public minHealth: number
   public maxHealth: number
+  public minPotential: number
   public contract: {
     duration: number
     amount: number
   }
 
-  constructor(
-    minHealth: number,
-    maxHealth: number,
-    minStat: number,
-    maxStat: number,
-    contract: any
-  ) {
-    this.minHealth = minHealth
-    this.maxHealth = maxHealth
-    this.minStat = minStat
-    this.maxStat = maxStat
-    this.contract = contract
+  constructor(config: HeroFactoryConfig) {
+    this.minHealth = config.minHealth || 100
+    this.maxHealth = config.maxHealth || 300
+    this.minStat = config.minStat || 59
+    this.maxStat = config.maxStat || 99
+    this.minPotential = config.minPotential || 1
+    this.contract = config.contract
+  }
+
+  static getIcon(heroType: string): any {
+    switch (heroType) {
+      case HeroType.TANK:
+        return require('../../assets/icons/shield.png')
+      case HeroType.RANGER:
+        return require('../../assets/icons/ranged.png')
+      case HeroType.SUPPORT:
+        return require('../../assets/icons/support.png')
+      default:
+        return ''
+    }
   }
 
   getHeroes(numHeroes: number): Hero[] {

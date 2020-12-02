@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Image, StyleSheet, View } from 'react-native'
-import { Hero } from '../lib/model/Hero'
+import { Hero, HeroType } from '../lib/model/Hero'
 import {
   FEMALE_HAIR,
   MALE_EYES,
@@ -12,6 +12,7 @@ import {
   BODY,
 } from '../lib/constants/imageMap'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { HeroFactory } from '../lib/factory/HeroFactory'
 
 interface Props {
   hero: Hero
@@ -85,9 +86,9 @@ export const HeroImage: React.FC<Props> = ({
             backgroundColor: 'white',
           }}
         >
-          <MaterialCommunityIcons
-            name={heroType === 'attacker' ? 'sword-cross' : 'medical-bag'}
-            size={20}
+          <Image
+            source={HeroFactory.getIcon(heroType)}
+            style={{ width: 20, height: 20 }}
           />
         </View>
       )}

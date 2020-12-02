@@ -18,16 +18,6 @@ export class CPUHero {
   ) {
     this.heroType = hero.getHeroRef().heroType
     switch (hero.getHeroRef().heroType) {
-      case HeroType.ATTACKER: {
-        this.behavior = new AttackCPUBehavior(
-          playerSpawnLocations,
-          playerHeroes,
-          enemyHeroes,
-          arena,
-          hero
-        )
-        break
-      }
       case HeroType.SUPPORT: {
         this.behavior = new SupportCPUBehavior(
           playerSpawnLocations,

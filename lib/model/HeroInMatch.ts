@@ -73,24 +73,7 @@ export class HeroInMatch {
   }
 
   public getAttackRange(): number {
-    let attackPlusSpeedAvg = Math.floor(
-      (this.hero.speed + this.hero.attack) / 2
-    )
-    const sumToRangeMap: any = {
-      '50-79': 2,
-      '80-89': 3,
-      '90-99': 4,
-    }
-    let range: number = 0
-    Object.keys(sumToRangeMap).forEach((key: string) => {
-      const ranges = key.split('-')
-      const bottom = parseInt(ranges[0], 10)
-      const top = parseInt(ranges[1], 10)
-      if (attackPlusSpeedAvg >= bottom && attackPlusSpeedAvg <= top) {
-        range = sumToRangeMap[key]
-      }
-    })
-    return range
+    return this.getHeroRef().attackRange
   }
 
   public getMoveRange(): number {

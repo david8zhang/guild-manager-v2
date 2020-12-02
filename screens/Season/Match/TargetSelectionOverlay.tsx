@@ -96,6 +96,7 @@ export const TargetSelectionOverlay: React.FC<Props> = ({
     >
       <Portal>
         <AttackMatchupModal
+          matchManager={matchManager}
           isOpen={targetToAttack !== null}
           onClose={() => setTargetToAttack(null)}
           targetToAttack={targetToAttack}

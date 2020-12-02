@@ -1,8 +1,8 @@
-import { HeroFactory } from './HeroFactory'
 import { Hero, HeroType } from '../model/Hero'
+import { HeroFactory } from './HeroFactory'
 
-export class SupportHeroFactory extends HeroFactory {
-  private static SUPPORT_MOVES = ['Heal', 'ATK Buff']
+export class TankHeroFactory extends HeroFactory {
+  private static MOVES = []
 
   getHeroes(numHeroes: number): Hero[] {
     const heroes: Hero[] = []
@@ -11,7 +11,7 @@ export class SupportHeroFactory extends HeroFactory {
       const name = super.generateRandomName(gender)
       heroes.push(
         new Hero({
-          heroType: HeroType.SUPPORT,
+          heroType: HeroType.TANK,
           heroId: super.generateRandomHeroId(),
           gender,
           name,
@@ -19,11 +19,11 @@ export class SupportHeroFactory extends HeroFactory {
             this.minStat,
             this.maxStat - 10
           ),
-          defense: super.generateNumberWithinRange(
+          defense: super.generateNumberWithinRange(70, 80),
+          magic: super.generateNumberWithinRange(
             this.minStat,
             this.maxStat - 10
           ),
-          magic: super.generateNumberWithinRange(70, 80),
           speed: super.generateNumberWithinRange(this.minStat, this.maxStat),
           health: super.generateNumberWithinRange(
             this.minHealth,
@@ -31,7 +31,7 @@ export class SupportHeroFactory extends HeroFactory {
           ),
           potential: super.generateNumberWithinRange(this.minPotential, 3),
           contract: { ...this.contract },
-          moveSet: this.getRandomMovePool(SupportHeroFactory.SUPPORT_MOVES),
+          moveSet: this.getRandomMovePool(TankHeroFactory.MOVES),
           heroImageData: super.generateRandomHeroImage(gender),
         })
       )

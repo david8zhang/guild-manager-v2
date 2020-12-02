@@ -66,7 +66,7 @@ export class EnemyAIManager {
   }
   public doEnemyHeroAttacks(): any[] {
     const attackHeroes: CPUHero[] = this.enemyHeroes.filter(
-      (hero: CPUHero) => hero.heroType === HeroType.ATTACKER
+      (hero: CPUHero) => hero.heroType !== HeroType.SUPPORT
     )
     const attackActions: any[] = []
     attackHeroes.forEach((hero: CPUHero) => {

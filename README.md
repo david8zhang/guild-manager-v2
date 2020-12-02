@@ -4,7 +4,7 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
-- Ranged attacks, ranged heroes
+- Handle ties with overtime turns added
 - Defense buffs
 
 ## Future Features (ordered by priority)
