@@ -6,6 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { Hero } from '../model/Hero'
 import { AttackCutsceneHero } from '../../screens/Season/Match/AttackCutsceneHero'
 import { Button } from '../../components'
+import { MatchManager } from '../MatchManager'
 
 interface ATKBuffAnimationIconProps {
   isOpen: boolean
@@ -194,5 +195,18 @@ export class ATKBuffMove implements Move {
         onFinished={onFinished}
       />
     )
+  }
+
+  isTargetValid(
+    user: HeroInMatch,
+    target: HeroInMatch,
+    matchManager: MatchManager
+  ) {
+    const userTeam = matchManager.getHeroTeam(user)
+    const targetTeam = matchManager.getHeroTeam(target)
+    if (userTeam.teamId === targetTeam.teamId) {
+      return true
+    }
+    return false
   }
 }

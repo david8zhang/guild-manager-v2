@@ -4,7 +4,7 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
-- Handle ties with overtime turns added
+- Fix move targeting (Prevent self heals, prevent healing enemies)
 - Defense buffs
 
 ## Future Features (ordered by priority)

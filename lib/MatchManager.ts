@@ -92,6 +92,15 @@ export class MatchManager {
     })
   }
 
+  public getHeroTeam(hero: HeroInMatch): Team {
+    for (let i = 0; i < this.fullPlayerTeam.roster.length; i++) {
+      if (this.fullPlayerTeam.roster[i].heroId === hero.getHeroRef().heroId) {
+        return this.fullPlayerTeam
+      }
+    }
+    return this.fullEnemyTeam
+  }
+
   public getScore(): any {
     return this.score
   }

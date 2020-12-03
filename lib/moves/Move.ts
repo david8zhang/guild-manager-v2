@@ -18,4 +18,11 @@ export interface Move {
     userSide: string,
     onFinished: Function
   ): any
+
+  // used to restrict which heroes can be targeted by the move. Some moves target allies, others target enemies
+  isTargetValid(
+    user: HeroInMatch,
+    target: HeroInMatch,
+    matchManager: MatchManager
+  ): boolean
 }

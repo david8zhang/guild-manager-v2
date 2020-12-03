@@ -5,6 +5,7 @@ import * as React from 'react'
 import { Animated, View, Easing } from 'react-native'
 import { AttackCutsceneHero } from '../../screens/Season/Match/AttackCutsceneHero'
 import { Button } from '../../components'
+import { MatchManager } from '../MatchManager'
 
 interface HealAnimationTextProps {
   isOpen: boolean
@@ -189,5 +190,18 @@ export class HealMove implements Move {
         onFinished={onFinished}
       />
     )
+  }
+
+  isTargetValid(
+    user: HeroInMatch,
+    target: HeroInMatch,
+    matchManager: MatchManager
+  ) {
+    const userTeam = matchManager.getHeroTeam(user)
+    const targetTeam = matchManager.getHeroTeam(target)
+    if (userTeam.teamId === targetTeam.teamId) {
+      return true
+    }
+    return false
   }
 }

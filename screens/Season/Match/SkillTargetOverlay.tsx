@@ -60,7 +60,10 @@ export const SkillTargetOverlay: React.FC<Props> = ({
             padding: 5,
           }}
           onPress={() => {
-            if (selectableHero) {
+            if (
+              selectableHero &&
+              skillToUse.isTargetValid(userHero, selectableHero, matchManager)
+            ) {
               setTarget(selectableHero)
             }
           }}

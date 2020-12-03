@@ -1,3 +1,4 @@
+import { MatchManager } from '../MatchManager'
 import { HeroInMatch } from '../model/HeroInMatch'
 import { Move } from './Move'
 
@@ -16,4 +17,11 @@ export class DEFBuffMove implements Move {
   }
   processMove(user: HeroInMatch, target: HeroInMatch) {}
   getAnimation(user: HeroInMatch, target: HeroInMatch, side: string) {}
+  isTargetValid(
+    user: HeroInMatch,
+    target: HeroInMatch,
+    matchManager: MatchManager
+  ): boolean {
+    return true
+  }
 }
