@@ -79,6 +79,7 @@ export const Match: React.FC<Props> = ({
       <View style={{ flexDirection: 'column', flex: 1 }}>
         <ScoreBoard
           score={score}
+          isOvertime={matchManager.getIsOvertime()}
           turnsRemaining={turnsRemaining}
           playerColor={playerColor}
           enemyColor={enemyColor}

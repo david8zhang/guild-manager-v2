@@ -44,6 +44,7 @@ export const PostMatch: React.FC<Props> = ({
   return (
     <View style={{ flex: 1, flexDirection: 'column' }}>
       <ScoreBoard
+        isOvertime={false}
         score={score}
         turnsRemaining={0}
         playerColor={playerColor}

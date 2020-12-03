@@ -19,7 +19,7 @@ export interface MatchManagerConfig {
 }
 
 export class MatchManager {
-  private static MATCH_DURATION = 10
+  private static MATCH_DURATION = 15
 
   private playerHeroes: HeroInMatch[] = []
   private enemyHeroes: HeroInMatch[] = []
@@ -38,6 +38,7 @@ export class MatchManager {
 
   private matchTimer: number
   private enemyAIManager: any
+  private isOvertime: boolean
 
   constructor(config: MatchManagerConfig) {
     this.eventLog = []
@@ -56,6 +57,7 @@ export class MatchManager {
     this.fullPlayerTeam = config.playerTeam
     this.fullEnemyTeam = config.enemyTeam
     this.matchTimer = 0
+    this.isOvertime = false
     this.arena = new Arena(this.playerHeroes, this.enemyHeroes)
     this.enemyAIManager = null
   }
@@ -72,6 +74,7 @@ export class MatchManager {
     this.playerHeroes = playerHeroes
     this.enemyHeroes = enemyHeroes
     this.arena = new Arena(playerHeroes, enemyHeroes)
+    this.isOvertime = false
 
     this.arena.initializeArena()
     this.playerSpawnLocations = this.arena.getPlayerHeroPositions()
@@ -400,7 +403,26 @@ export class MatchManager {
   }
 
   public isGameOver(): boolean {
-    return this.matchTimer === 0
+    // check if there is a tie, if so, then add 5 turns to the match timer for "overtime"
+    if (this.matchTimer === 0) {
+      const keys = Object.keys(this.score)
+      const teamAbbrev1 = keys[0]
+      const teamAbbrev2 = keys[1]
+      const isTie = this.score[teamAbbrev1] === this.score[teamAbbrev2]
+      if (isTie) {
+        this.matchTimer += 5
+        this.isOvertime = true
+        return false
+      } else {
+        return true
+      }
+    } else {
+      return false
+    }
+  }
+
+  public getIsOvertime() {
+    return this.isOvertime
   }
 
   public decrementMatchTimer() {

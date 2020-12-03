@@ -3,6 +3,7 @@ import { Text, View } from 'react-native'
 
 interface Props {
   score: any
+  isOvertime: boolean
   turnsRemaining: number
   playerColor: string
   enemyColor: string
@@ -13,6 +14,7 @@ export const ScoreBoard: React.FC<Props> = ({
   turnsRemaining,
   playerColor,
   enemyColor,
+  isOvertime,
 }) => {
   return (
     <View
@@ -64,8 +66,19 @@ export const ScoreBoard: React.FC<Props> = ({
         <Text style={{ fontSize: 24 }}>
           {turnsRemaining > 0 ? turnsRemaining : 'FINAL'}
         </Text>
+        {isOvertime && (
+          <Text
+            style={{
+              fontSize: 8,
+              fontStyle: 'italic',
+              fontWeight: 'bold',
+            }}
+          >
+            (Overtime)
+          </Text>
+        )}
         {turnsRemaining > 0 && (
-          <Text style={{ fontSize: 12 }}>Turns remaining</Text>
+          <Text style={{ fontSize: 12 }}>Turns Remaining</Text>
         )}
       </View>
     </View>
