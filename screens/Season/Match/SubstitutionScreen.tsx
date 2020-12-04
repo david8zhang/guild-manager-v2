@@ -62,7 +62,7 @@ export const SubstitutionScreen: React.FC<Props> = ({
           return (
             <StarterHero
               key={hero.heroId}
-              style={{ width: 200 }}
+              style={{ width: 220 }}
               hero={hero}
               {...hero}
               onShowDetails={() => {

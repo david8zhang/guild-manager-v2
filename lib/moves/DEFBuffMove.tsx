@@ -8,11 +8,11 @@ import { AttackCutsceneHero } from '../../screens/Season/Match/AttackCutsceneHer
 import { Button } from '../../components'
 import { MatchManager } from '../MatchManager'
 
-interface ATKBuffAnimationIconProps {
+interface DEFBuffAnimationIconProps {
   isOpen: boolean
 }
 
-const ATKBuffAnimationIcon: React.FC<ATKBuffAnimationIconProps> = ({
+const DEFBuffAnimationIcon: React.FC<DEFBuffAnimationIconProps> = ({
   isOpen,
 }) => {
   const [opacity] = React.useState(new Animated.Value(1))
@@ -42,14 +42,14 @@ const ATKBuffAnimationIcon: React.FC<ATKBuffAnimationIconProps> = ({
     >
       <MaterialCommunityIcons
         style={{ color: 'blue' }}
-        name='sword-cross'
+        name='shield-plus'
         size={20}
       />
     </Animated.View>
   )
 }
 
-export interface ATKBuffAnimationProps {
+export interface DEFBuffAnimation {
   userTeamColor: string
   targetTeamColor: string
   user: HeroInMatch
@@ -59,7 +59,7 @@ export interface ATKBuffAnimationProps {
   onFinished: Function
 }
 
-const ATKBuffAnimation: React.FC<ATKBuffAnimationProps> = ({
+const DEFBuffAnimation: React.FC<DEFBuffAnimation> = ({
   userTeamColor,
   targetTeamColor,
   user,
@@ -103,7 +103,7 @@ const ATKBuffAnimation: React.FC<ATKBuffAnimationProps> = ({
     <View style={{ flexDirection: 'row' }}>
       <Animated.View style={userSide === 'left' ? { flex: 1 } : targetStyle}>
         {userSide === 'right' && (
-          <ATKBuffAnimationIcon isOpen={healAmount !== -1} />
+          <DEFBuffAnimationIcon isOpen={healAmount !== -1} />
         )}
         <AttackCutsceneHero
           color={userTeamColor}
@@ -112,7 +112,7 @@ const ATKBuffAnimation: React.FC<ATKBuffAnimationProps> = ({
       </Animated.View>
       <Animated.View style={userSide === 'left' ? targetStyle : { flex: 1 }}>
         {userSide === 'left' && (
-          <ATKBuffAnimationIcon isOpen={healAmount !== -1} />
+          <DEFBuffAnimationIcon isOpen={healAmount !== -1} />
         )}
         <AttackCutsceneHero
           color={targetTeamColor}
@@ -132,16 +132,16 @@ const ATKBuffAnimation: React.FC<ATKBuffAnimationProps> = ({
   )
 }
 
-export class ATKBuffMove implements Move {
+export class DEFBuffMove implements Move {
   public name: string
   public description: string
   public range: number
   public rangeHighlightColor: string
 
   constructor() {
-    this.name = 'ATK Buff'
+    this.name = 'DEF Buff'
     this.description =
-      'Apply ATK increase by some percentage for 2 turns. Percentage increase scales with MGK attribute. Can stack this effect up to 2 times.'
+      'Apply DEF increase by some percentage for 2 turns. Percentage increase scales with MGK attribute. Can stack this effect up to 2 times.'
     this.range = 3
     this.rangeHighlightColor = 'green'
   }
@@ -162,14 +162,14 @@ export class ATKBuffMove implements Move {
     }
     // check if the target already has 2 attack buff stacks
     let numAttackBuffs: number = target.getBuffs().reduce((acc, curr) => {
-      if (curr.stat === 'attack') {
+      if (curr.stat === 'defense') {
         acc++
       }
       return acc
     }, 0)
     if (numAttackBuffs < 2) {
       target.applyBuff({
-        stat: 'attack',
+        stat: 'defense',
         percentage: buffPercentage,
       })
     }
@@ -183,7 +183,7 @@ export class ATKBuffMove implements Move {
     onFinished: Function
   ) {
     return (
-      <ATKBuffAnimation
+      <DEFBuffAnimation
         user={user}
         userTeamColor={userColor}
         targetTeamColor={targetColor}

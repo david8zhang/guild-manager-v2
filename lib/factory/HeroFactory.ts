@@ -31,6 +31,8 @@ interface HeroFactoryConfig {
 }
 
 export class HeroFactory {
+  private static MAX_NUM_MOVES = 2
+
   public minStat: number
   public maxStat: number
   public minHealth: number
@@ -42,8 +44,8 @@ export class HeroFactory {
   }
 
   constructor(config: HeroFactoryConfig) {
-    this.minHealth = config.minHealth || 100
-    this.maxHealth = config.maxHealth || 300
+    this.minHealth = config.minHealth || 150
+    this.maxHealth = config.maxHealth || 200
     this.minStat = config.minStat || 59
     this.maxStat = config.maxStat || 99
     this.minPotential = config.minPotential || 1
@@ -101,10 +103,7 @@ export class HeroFactory {
 
   getRandomMovePool(moves: string[]) {
     const shuffledMoves = shuffle(moves)
-    return shuffledMoves.slice(
-      0,
-      this.generateNumberWithinRange(1, shuffledMoves.length)
-    )
+    return shuffledMoves.slice(0, HeroFactory.MAX_NUM_MOVES)
   }
 
   generateRandomHeroImage(gender: string): string {

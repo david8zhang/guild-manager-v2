@@ -16,18 +16,21 @@ export class TankHeroFactory extends HeroFactory {
           gender,
           name,
           attack: super.generateNumberWithinRange(
-            this.minStat,
+            this.minStat - 10,
             this.maxStat - 10
           ),
-          defense: super.generateNumberWithinRange(70, 80),
+          defense: super.generateNumberWithinRange(
+            this.minStat + 5,
+            this.maxStat + 5
+          ),
           magic: super.generateNumberWithinRange(
             this.minStat,
             this.maxStat - 10
           ),
           speed: super.generateNumberWithinRange(this.minStat, this.maxStat),
           health: super.generateNumberWithinRange(
-            this.minHealth,
-            this.maxHealth
+            this.minHealth + 25,
+            this.maxHealth + 25
           ),
           potential: super.generateNumberWithinRange(this.minPotential, 3),
           contract: { ...this.contract },

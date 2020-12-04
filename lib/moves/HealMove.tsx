@@ -199,7 +199,10 @@ export class HealMove implements Move {
   ) {
     const userTeam = matchManager.getHeroTeam(user)
     const targetTeam = matchManager.getHeroTeam(target)
-    if (userTeam.teamId === targetTeam.teamId) {
+    if (
+      userTeam.teamId === targetTeam.teamId &&
+      user.getHeroRef().heroId !== target.getHeroRef().heroId
+    ) {
       return true
     }
     return false

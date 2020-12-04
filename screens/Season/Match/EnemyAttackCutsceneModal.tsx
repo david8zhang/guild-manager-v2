@@ -89,7 +89,6 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
         matchManager.respawnHero(attacker, 'enemy')
       }
     }
-    setIsFinishedAttacking(true)
   }
 
   const startAttackerAnimation = () => {
@@ -170,7 +169,9 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
             useNativeDriver: true,
           }),
         ]),
-      ]).start()
+      ]).start(() => {
+        setIsFinishedAttacking(true)
+      })
     })
   }
 

@@ -2,7 +2,7 @@ import { HeroFactory } from './HeroFactory'
 import { Hero, HeroType } from '../model/Hero'
 
 export class SupportHeroFactory extends HeroFactory {
-  private static SUPPORT_MOVES = ['Heal', 'ATK Buff']
+  private static SUPPORT_MOVES = ['Heal', 'ATK Buff', 'DEF Buff']
 
   getHeroes(numHeroes: number): Hero[] {
     const heroes: Hero[] = []
@@ -16,18 +16,21 @@ export class SupportHeroFactory extends HeroFactory {
           gender,
           name,
           attack: super.generateNumberWithinRange(
-            this.minStat,
+            this.minStat - 10,
             this.maxStat - 10
           ),
           defense: super.generateNumberWithinRange(
-            this.minStat,
+            this.minStat - 10,
             this.maxStat - 10
           ),
-          magic: super.generateNumberWithinRange(70, 80),
+          magic: super.generateNumberWithinRange(
+            this.minStat + 5,
+            this.maxStat + 5
+          ),
           speed: super.generateNumberWithinRange(this.minStat, this.maxStat),
           health: super.generateNumberWithinRange(
-            this.minHealth,
-            this.maxHealth
+            this.minHealth - 25,
+            this.maxHealth - 25
           ),
           potential: super.generateNumberWithinRange(this.minPotential, 3),
           contract: { ...this.contract },

@@ -16,19 +16,25 @@ export class RangedHeroFactory extends HeroFactory {
           heroId: super.generateRandomHeroId(),
           gender,
           name,
-          attack: super.generateNumberWithinRange(70, 80),
+          attack: super.generateNumberWithinRange(
+            this.minStat + 5,
+            this.maxStat + 5
+          ),
           defense: super.generateNumberWithinRange(
-            this.minStat,
+            this.minStat - 10,
             this.maxStat - 10
           ),
           magic: super.generateNumberWithinRange(
-            this.minStat,
+            this.minStat - 10,
             this.maxStat - 10
           ),
-          speed: super.generateNumberWithinRange(this.minStat, this.maxStat),
+          speed: super.generateNumberWithinRange(
+            this.minStat + 5,
+            this.maxStat + 5
+          ),
           health: super.generateNumberWithinRange(
-            this.minHealth,
-            this.maxHealth
+            this.minHealth - 25,
+            this.maxHealth - 25
           ),
           potential: super.generateNumberWithinRange(this.minPotential, 3),
           contract: { ...this.contract },

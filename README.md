@@ -4,12 +4,12 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
-- Fix move targeting (Prevent self heals, prevent healing enemies)
-- Defense buffs
+- Randomized Post match stat improvements
+- Team logo picking
 
 ## Future Features (ordered by priority)
 
-- Smarter move selection code for enemies
-- Smarter skill usage for enemies
+- Smarter AIs randomly set for different enemy teams
+- Better animations for ranged attacks (Bow firing animation)
 - Respawn timer displayed
 - Support for different expressions

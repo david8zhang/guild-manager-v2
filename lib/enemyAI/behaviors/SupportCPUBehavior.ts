@@ -87,7 +87,10 @@ export class SupportCPUBehavior extends CPUBehavior {
       if (alliesWithMissingHealth.length > 0) {
         const heroWithLowestHealth: HeroInMatch = alliesWithMissingHealth.reduce(
           (acc, curr) => {
-            if (acc.getCurrHealth() < curr.getCurrHealth()) {
+            if (
+              acc.getCurrHealth() < curr.getCurrHealth() &&
+              curr.getHeroRef().heroId !== this.hero.getHeroRef().heroId // Prevent self heals
+            ) {
               acc = curr
             }
             return acc
