@@ -7,24 +7,13 @@ interface Props {
 }
 
 export const TextLink: React.FC<Props> = ({ onPress, text }) => {
-  const [isPressed, setIsPressed] = React.useState(false)
   return (
-    <Pressable
-      onPressIn={() => {
-        onPress()
-        setIsPressed(true)
-      }}
-      onPressOut={() => {
-        setIsPressed(false)
-      }}
-      style={{ padding: 10 }}
-    >
+    <Pressable onPress={() => onPress()} style={{ padding: 10 }}>
       <Text
         style={{
           fontWeight: 'bold',
           textDecorationLine: 'underline',
           color: 'blue',
-          opacity: isPressed ? 0.2 : 1,
         }}
       >
         {text}

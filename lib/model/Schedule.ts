@@ -92,7 +92,6 @@ export class Schedule {
   }
 
   public advanceToNextMatch(): void {
-    console.log(this.currentMatchupIndex)
     this.currentMatchupIndex++
   }
 

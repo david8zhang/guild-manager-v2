@@ -8,34 +8,23 @@ import { AttackCutsceneHero } from '../../screens/Season/Match/AttackCutsceneHer
 import { Button } from '../../components'
 import { MatchManager } from '../MatchManager'
 
-interface ATKBuffAnimationIconProps {
-  isOpen: boolean
-}
-
-const ATKBuffAnimationIcon: React.FC<ATKBuffAnimationIconProps> = ({
-  isOpen,
-}) => {
+const ATKBuffAnimationIcon: React.FC = () => {
   const [opacity] = React.useState(new Animated.Value(1))
   const [yPos] = React.useState(new Animated.Value(60))
   React.useEffect(() => {
-    if (isOpen) {
-      Animated.parallel([
-        Animated.timing(opacity, {
-          toValue: 0,
-          duration: 1000,
-          useNativeDriver: false,
-        }),
-        Animated.timing(yPos, {
-          toValue: 100,
-          duration: 1000,
-          useNativeDriver: false,
-        }),
-      ]).start()
-    }
-  }, [isOpen])
-  if (!isOpen) {
-    return <View />
-  }
+    Animated.parallel([
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 1000,
+        useNativeDriver: false,
+      }),
+      Animated.timing(yPos, {
+        toValue: 100,
+        duration: 1000,
+        useNativeDriver: false,
+      }),
+    ]).start()
+  }, [])
   return (
     <Animated.View
       style={{ position: 'absolute', bottom: yPos, right: 0, opacity }}
@@ -68,7 +57,7 @@ const ATKBuffAnimation: React.FC<ATKBuffAnimationProps> = ({
   processMove,
   onFinished,
 }) => {
-  const [healAmount, setHealAmount] = React.useState(-1)
+  const [showBuffIcon, setShowBuffIcon] = React.useState(false)
   const [targetColor, setTargetColor] = React.useState(new Animated.Value(0))
   const [isSkillFinished, setIsSkillFinished] = React.useState(false)
   React.useEffect(() => {
@@ -87,11 +76,10 @@ const ATKBuffAnimation: React.FC<ATKBuffAnimationProps> = ({
       }),
     ]).start(() => {
       processMove()
-      const healAmount = Math.floor(user.getHeroRef().magic * 0.75)
-      setHealAmount(healAmount)
+      setShowBuffIcon(true)
       setIsSkillFinished(true)
     })
-  }, [])
+  }, [user.getHeroRef().heroId, target.getHeroRef().heroId])
   const targetStyle = {
     flex: 1,
     backgroundColor: targetColor.interpolate({
@@ -102,18 +90,14 @@ const ATKBuffAnimation: React.FC<ATKBuffAnimationProps> = ({
   return (
     <View style={{ flexDirection: 'row' }}>
       <Animated.View style={userSide === 'left' ? { flex: 1 } : targetStyle}>
-        {userSide === 'right' && (
-          <ATKBuffAnimationIcon isOpen={healAmount !== -1} />
-        )}
+        {userSide === 'right' && showBuffIcon && <ATKBuffAnimationIcon />}
         <AttackCutsceneHero
           color={userTeamColor}
           hero={userSide === 'left' ? user : target}
         />
       </Animated.View>
       <Animated.View style={userSide === 'left' ? targetStyle : { flex: 1 }}>
-        {userSide === 'left' && (
-          <ATKBuffAnimationIcon isOpen={healAmount !== -1} />
-        )}
+        {userSide === 'left' && showBuffIcon && <ATKBuffAnimationIcon />}
         <AttackCutsceneHero
           color={targetTeamColor}
           hero={userSide === 'left' ? target : user}
@@ -124,6 +108,7 @@ const ATKBuffAnimation: React.FC<ATKBuffAnimationProps> = ({
           style={{ position: 'absolute', bottom: -20, right: 200 }}
           text='Continue'
           onPress={() => {
+            setShowBuffIcon(false)
             onFinished()
           }}
         />

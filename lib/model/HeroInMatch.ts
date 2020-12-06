@@ -146,7 +146,7 @@ export class HeroInMatch {
   public attack(
     target: HeroInMatch,
     critRate: number = 0.2,
-    oneShotRate: number = 0.05
+    oneShotRate: number = 0.01
   ): AttackResult {
     let damage = this.calculateDamage(target)
     let didOneShot = false

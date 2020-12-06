@@ -2,6 +2,7 @@ import * as React from 'react'
 import { View, Animated, Easing } from 'react-native'
 import { Portal } from 'react-native-paper'
 import { Button, CustomModal } from '../../../components'
+import { DEBUG_CONFIG } from '../../../lib/constants/debugConfig'
 import { MatchManager } from '../../../lib/MatchManager'
 import { HeroInMatch, AttackResult } from '../../../lib/model/HeroInMatch'
 import { AttackCutsceneHero } from './AttackCutsceneHero'
@@ -38,7 +39,11 @@ export const AttackCutsceneModal: React.FC<Props> = ({
   const [isFinishedAttacking, setIsFinishedAttacking] = React.useState(false)
 
   const processPlayerHeroAttack = () => {
-    const attackResult: AttackResult = playerHero.attack(targetHero)
+    const attackResult: AttackResult = playerHero.attack(
+      targetHero,
+      DEBUG_CONFIG.playerCritRate,
+      DEBUG_CONFIG.playerOneShotRate
+    )
     setDefenderDamage(attackResult.damageDealt)
     if (targetHero.isDead) {
       matchManager.playerScoreKill(
@@ -58,7 +63,11 @@ export const AttackCutsceneModal: React.FC<Props> = ({
 
   const processDefenderHeroAttack = () => {
     if (matchManager.canTargetRetaliate(targetHero, playerHero)) {
-      const attackResult: AttackResult = targetHero.attack(playerHero)
+      const attackResult: AttackResult = targetHero.attack(
+        playerHero,
+        DEBUG_CONFIG.enemyCritRate,
+        DEBUG_CONFIG.enemyOneShotRate
+      )
       setAttackerDamage(Math.floor(attackResult.damageDealt))
       if (playerHero.isDead) {
         matchManager.enemyScoreKill(

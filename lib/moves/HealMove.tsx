@@ -8,36 +8,28 @@ import { Button } from '../../components'
 import { MatchManager } from '../MatchManager'
 
 interface HealAnimationTextProps {
-  isOpen: boolean
   healAmount: number
 }
 
 const HealAnimationText: React.FC<HealAnimationTextProps> = ({
-  isOpen,
   healAmount,
 }) => {
   const [opacity] = React.useState(new Animated.Value(1))
   const [yPos] = React.useState(new Animated.Value(60))
   React.useEffect(() => {
-    if (isOpen) {
-      Animated.parallel([
-        Animated.timing(opacity, {
-          toValue: 0,
-          duration: 1000,
-          useNativeDriver: false,
-        }),
-        Animated.timing(yPos, {
-          toValue: 100,
-          duration: 1000,
-          useNativeDriver: false,
-        }),
-      ]).start()
-    }
-  }, [isOpen])
-
-  if (!isOpen) {
-    return <View />
-  }
+    Animated.parallel([
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 1000,
+        useNativeDriver: false,
+      }),
+      Animated.timing(yPos, {
+        toValue: 100,
+        duration: 1000,
+        useNativeDriver: false,
+      }),
+    ]).start()
+  }, [])
 
   return (
     <Animated.Text
@@ -97,7 +89,7 @@ const HealAnimation: React.FC<HealAnimationProps> = ({
       setHealAmount(healAmount)
       setIsSkillFinished(true)
     })
-  }, [])
+  }, [user.getHeroRef().heroId, target.getHeroRef().heroId])
   const targetStyle = {
     flex: 1,
     backgroundColor: targetColor.interpolate({
@@ -108,11 +100,8 @@ const HealAnimation: React.FC<HealAnimationProps> = ({
   return (
     <View style={{ flexDirection: 'row' }}>
       <Animated.View style={userSide === 'left' ? { flex: 1 } : targetStyle}>
-        {userSide === 'right' && (
-          <HealAnimationText
-            isOpen={healAmount !== -1}
-            healAmount={healAmount}
-          />
+        {userSide === 'right' && healAmount !== -1 && (
+          <HealAnimationText healAmount={healAmount} />
         )}
         <AttackCutsceneHero
           color={userTeamColor}
@@ -120,11 +109,8 @@ const HealAnimation: React.FC<HealAnimationProps> = ({
         />
       </Animated.View>
       <Animated.View style={userSide === 'left' ? targetStyle : { flex: 1 }}>
-        {userSide === 'left' && (
-          <HealAnimationText
-            isOpen={healAmount !== -1}
-            healAmount={healAmount}
-          />
+        {userSide === 'left' && healAmount !== -1 && (
+          <HealAnimationText healAmount={healAmount} />
         )}
         <AttackCutsceneHero
           color={targetTeamColor}

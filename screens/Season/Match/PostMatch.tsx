@@ -5,6 +5,7 @@ import { MatchManager } from '../../../lib/MatchManager'
 import { ScoreBoard } from './ScoreBoard'
 import { MatchStats } from './MatchStats'
 import { MatchMVP } from './MatchMVP'
+import { PostMatchStatGains } from './PostMatchStatGains'
 
 interface Props {
   score: any
@@ -18,14 +19,8 @@ export const PostMatch: React.FC<Props> = ({
   onContinue,
 }) => {
   const [showMatchStats, setShowMatchStats] = React.useState(false)
-  if (showMatchStats) {
-    return (
-      <MatchStats
-        matchManager={matchManager}
-        onContinue={() => setShowMatchStats(false)}
-      />
-    )
-  }
+  const [showPostMatchGains, setShowPostMatchGains] = React.useState(false)
+  const [statIncreases, setStatIncreases] = React.useState<any>(null)
 
   const enemyScore = matchManager.getEnemyScore()
   const playerScore = matchManager.getPlayerScore()
@@ -33,13 +28,43 @@ export const PostMatch: React.FC<Props> = ({
   const playerTeamId = matchManager.getPlayerTeamInfo().teamId
   const enemyTeamId = matchManager.getEnemyTeamInfo().teamId
 
-  const winnerId = playerScore > enemyScore ? playerTeamId : enemyTeamId
-  const loserId = playerScore > enemyScore ? enemyTeamId : playerTeamId
-
   const playerColor = matchManager.getPlayerTeamInfo().color
   const enemyColor = matchManager.getEnemyTeamInfo().color
 
+  const winnerId = playerScore > enemyScore ? playerTeamId : enemyTeamId
+  const loserId = playerScore > enemyScore ? enemyTeamId : playerTeamId
   const mvp = matchManager.getMVP(winnerId)
+
+  React.useEffect(() => {
+    const statIncreases = matchManager.getStatIncreases(mvp.getHeroRef().heroId)
+    setStatIncreases(statIncreases)
+  }, [])
+
+  if (showMatchStats) {
+    return (
+      <MatchStats
+        matchManager={matchManager}
+        onContinue={() => {
+          setShowMatchStats(false)
+          setShowPostMatchGains(true)
+        }}
+      />
+    )
+  }
+
+  if (showPostMatchGains) {
+    return (
+      <PostMatchStatGains
+        statIncreases={statIncreases}
+        matchManager={matchManager}
+        onBack={() => {
+          setShowMatchStats(true)
+          setShowPostMatchGains(false)
+        }}
+        onContinue={() => setShowPostMatchGains(false)}
+      />
+    )
+  }
 
   return (
     <View style={{ flex: 1, flexDirection: 'column' }}>
@@ -72,6 +97,7 @@ export const PostMatch: React.FC<Props> = ({
                 winner: winnerId,
                 loser: loserId,
                 enemyId: enemyTeamId,
+                statIncreases,
               })
             }}
           />

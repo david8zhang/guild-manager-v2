@@ -61,6 +61,10 @@ const Season: React.FC<Props> = ({
     setShowMatch(false)
   }
 
+  const applyTeamStatIncreases = (statIncreases: any) => {
+    seasonManager.applyStatIncreases(statIncreases)
+  }
+
   if (showMatch) {
     return (
       <Match
@@ -72,7 +76,9 @@ const Season: React.FC<Props> = ({
           winner: string
           loser: string
           enemyId: string
+          statIncreases: any
         }) => {
+          applyTeamStatIncreases(outcome.statIncreases)
           updateTeamRecords(outcome)
         }}
       />

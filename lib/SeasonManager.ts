@@ -44,6 +44,17 @@ export class SeasonManager {
     return this.teamRecords[teamId]
   }
 
+  public applyStatIncreases(statIncreases: { [heroId: string]: any }): void {
+    const playerRoster = this.playerTeam.roster
+    playerRoster.forEach((hero: Hero) => {
+      const increasePayload = statIncreases[hero.heroId]
+      if (increasePayload) {
+        const { statToIncrease, amountToIncrease } = increasePayload
+        hero.improveStats(statToIncrease, amountToIncrease)
+      }
+    })
+  }
+
   public updateTeamRecord(teamId: string, didWin: boolean) {
     const record: Record = this.teamRecords[teamId]
     if (didWin) {

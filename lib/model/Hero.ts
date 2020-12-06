@@ -72,4 +72,26 @@ export class Hero {
   public getOverall(): number {
     return Math.round((this.attack + this.defense + this.speed) / 3)
   }
+
+  public improveStats(stat: string, value: number) {
+    switch (stat) {
+      case 'attack':
+        this.attack += value
+        break
+      case 'defense':
+        this.defense += value
+        break
+      case 'speed':
+        this.speed += value
+        break
+      case 'health':
+        this.health += value
+        break
+      case 'magic':
+        this.magic += value
+        break
+      default:
+        break
+    }
+  }
 }

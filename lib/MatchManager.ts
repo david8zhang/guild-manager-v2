@@ -1,3 +1,4 @@
+import { DEBUG_CONFIG } from './constants/debugConfig'
 import { HeroStats } from './constants/HeroStats'
 import { EnemyAIManager } from './EnemyAIManager'
 import { Arena } from './model/Arena'
@@ -5,6 +6,7 @@ import { Hero } from './model/Hero'
 import { HeroInMatch } from './model/HeroInMatch'
 import { MatchEvent } from './model/MatchEvent'
 import { Team } from './model/Team'
+import { StatGainManager } from './StatGainManager'
 
 interface TeamInfo {
   name: string
@@ -19,7 +21,7 @@ export interface MatchManagerConfig {
 }
 
 export class MatchManager {
-  private static MATCH_DURATION = 15
+  private static MATCH_DURATION = DEBUG_CONFIG.numTurnsInMatch || 15
 
   private playerHeroes: HeroInMatch[] = []
   private enemyHeroes: HeroInMatch[] = []
@@ -38,6 +40,7 @@ export class MatchManager {
 
   private matchTimer: number
   private enemyAIManager: any
+  private statGainManager: any
   private isOvertime: boolean
 
   constructor(config: MatchManagerConfig) {
@@ -60,6 +63,7 @@ export class MatchManager {
     this.isOvertime = false
     this.arena = new Arena(this.playerHeroes, this.enemyHeroes)
     this.enemyAIManager = null
+    this.statGainManager = null
   }
 
   // Do all initialization logic here
@@ -89,6 +93,9 @@ export class MatchManager {
       playerHeroes: this.playerHeroes,
       enemyHeroes: this.enemyHeroes,
       arena: this.arena,
+    })
+    this.statGainManager = new StatGainManager({
+      playerHeroTeam: this.playerHeroes,
     })
   }
 
@@ -418,7 +425,7 @@ export class MatchManager {
       const teamAbbrev1 = keys[0]
       const teamAbbrev2 = keys[1]
       const isTie = this.score[teamAbbrev1] === this.score[teamAbbrev2]
-      if (isTie) {
+      if (isTie && !DEBUG_CONFIG.disableOvertime) {
         this.matchTimer += 5
         this.isOvertime = true
         return false
@@ -440,5 +447,13 @@ export class MatchManager {
 
   public getTurnsRemaining(): number {
     return this.matchTimer
+  }
+
+  public getStatIncreases(
+    mvpId: string
+  ): {
+    [heroId: string]: any
+  } {
+    return (this.statGainManager as StatGainManager).getStatGains(mvpId)
   }
 }

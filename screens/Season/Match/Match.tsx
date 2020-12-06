@@ -64,6 +64,7 @@ export const Match: React.FC<Props> = ({
           winner: string
           loser: string
           enemyId: string
+          statIncreases: any
         }) => {
           onContinue(outcome)
         }}

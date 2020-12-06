@@ -6,6 +6,7 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 - Randomized Post match stat improvements
 - Team logo picking
+- Superstars for some teams
 
 ## Future Features (ordered by priority)
 
