@@ -72,8 +72,8 @@ export const Match: React.FC<Props> = ({
     )
   }
 
-  const playerColor = matchManager.getPlayerTeamInfo().color
-  const enemyColor = matchManager.getEnemyTeamInfo().color
+  const playerTeamName = matchManager.getPlayerTeamInfo().name
+  const enemyTeamName = matchManager.getEnemyTeamInfo().name
 
   return (
     <Portal.Host>
@@ -82,8 +82,8 @@ export const Match: React.FC<Props> = ({
           score={score}
           isOvertime={matchManager.getIsOvertime()}
           turnsRemaining={turnsRemaining}
-          playerColor={playerColor}
-          enemyColor={enemyColor}
+          playerTeamName={playerTeamName}
+          enemyTeamName={enemyTeamName}
         />
         <View style={{ flex: 1 }}>
           <Arena

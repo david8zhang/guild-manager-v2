@@ -72,8 +72,8 @@ export const PostMatch: React.FC<Props> = ({
         isOvertime={false}
         score={score}
         turnsRemaining={0}
-        playerColor={playerColor}
-        enemyColor={enemyColor}
+        playerTeamName={matchManager.getPlayerTeamInfo().name}
+        enemyTeamName={matchManager.getEnemyTeamInfo().name}
       />
       <View
         style={{

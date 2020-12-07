@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { Text, View } from 'react-native'
+import { Text, View, Image } from 'react-native'
+import { TEAM_IMAGES } from '../../../lib/constants/fullTeamImages'
 
 interface Props {
   team: {
@@ -17,13 +18,14 @@ export const MatchupTeam: React.FC<Props> = ({ team, record }) => {
   return (
     <View style={{ flexDirection: 'column', flex: 1 }}>
       <View style={{ flex: 3, alignItems: 'center', justifyContent: 'center' }}>
-        <View
+        <Image
           style={{
             height: '80%',
             width: '80%',
-            backgroundColor: 'gray',
           }}
-        ></View>
+          resizeMode='contain'
+          source={TEAM_IMAGES[name]}
+        />
       </View>
       <View style={{ flex: 1 }}>
         <Text style={{ fontSize: 20, textAlign: 'center' }}>{name}</Text>

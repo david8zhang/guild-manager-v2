@@ -2,10 +2,9 @@ import { Record } from './model/Record'
 import { Team } from './model/Team'
 import { Schedule } from './model/Schedule'
 import { TeamGenerator } from './TeamGenerator'
-import { NAME_POOL } from './constants/teamNames'
-import { HOME_CITIES } from './constants/homeCities'
 import { Hero } from './model/Hero'
 import { shuffle } from 'lodash'
+import { TEAM_NAMES } from './constants/fullTeamNames'
 
 export class SeasonManager {
   public numGamesInSeason: number = 21
@@ -15,15 +14,13 @@ export class SeasonManager {
   public playerSeasonSchedule: Schedule
 
   constructor(playerObj: any) {
+    this.playerTeam = Team.deserializeObj(playerObj)
     this.teams = playerObj.league
       ? playerObj.league.map((t: Team) => Team.deserializeObj(t))
       : TeamGenerator.generateRandomTeams({
-          numTeams: 7,
-          namePool: NAME_POOL,
-          homeCityPool: HOME_CITIES,
-          playerHomeCity: playerObj.homeCity,
+          numTeams: TEAM_NAMES.length - 1,
+          playerTeam: this.playerTeam,
         })
-    this.playerTeam = Team.deserializeObj(playerObj)
 
     // Set the player team's matchup schedule
     this.playerSeasonSchedule = playerObj.schedule

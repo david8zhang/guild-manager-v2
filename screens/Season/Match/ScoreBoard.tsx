@@ -1,20 +1,21 @@
 import * as React from 'react'
-import { Text, View } from 'react-native'
+import { Text, View, Image } from 'react-native'
+import { TEAM_IMAGES } from '../../../lib/constants/fullTeamImages'
 
 interface Props {
   score: any
   isOvertime: boolean
   turnsRemaining: number
-  playerColor: string
-  enemyColor: string
+  playerTeamName: string
+  enemyTeamName: string
 }
 
 export const ScoreBoard: React.FC<Props> = ({
   score,
   turnsRemaining,
-  playerColor,
-  enemyColor,
   isOvertime,
+  playerTeamName,
+  enemyTeamName,
 }) => {
   return (
     <View
@@ -30,6 +31,7 @@ export const ScoreBoard: React.FC<Props> = ({
       }}
     >
       {Object.keys(score).map((key: string, index: number) => {
+        const name = index === 0 ? playerTeamName : enemyTeamName
         return (
           <View
             key={key}
@@ -42,13 +44,19 @@ export const ScoreBoard: React.FC<Props> = ({
               marginBottom: 10,
             }}
           >
+            <Image
+              resizeMode='contain'
+              source={TEAM_IMAGES[name]}
+              style={{ flex: 1, padding: 5, height: 50, width: 50 }}
+            />
             <View
               style={{
-                backgroundColor: index == 0 ? playerColor : enemyColor,
-                flex: 1,
+                flexDirection: 'row',
+                padding: 10,
+                flex: 3,
+                borderLeftWidth: 1,
               }}
-            ></View>
-            <View style={{ flexDirection: 'row', padding: 10, flex: 3 }}>
+            >
               <Text style={{ fontSize: 20, flex: 1 }}>{key}</Text>
               <Text style={{ fontSize: 20 }}>{score[key]}</Text>
             </View>
