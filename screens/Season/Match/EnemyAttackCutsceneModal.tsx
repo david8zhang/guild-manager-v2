@@ -13,7 +13,7 @@ interface Props {
   isOpen: boolean
   onContinue: Function
   attackAction: {
-    attacker: HeroInMatch
+    user: HeroInMatch
     target: HeroInMatch
   }
   matchManager: MatchManager
@@ -38,7 +38,7 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
 
   React.useEffect(() => {
     if (isOpen && attackAction) {
-      if (attackAction.target.isDead || attackAction.attacker.isDead) {
+      if (attackAction.target.isDead || attackAction.user.isDead) {
         onContinue()
       } else {
         startAttackerAnimation()
@@ -50,7 +50,8 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
     return <View />
   }
 
-  const { attacker, target } = attackAction
+  const { user, target } = attackAction
+  const attacker = user
 
   const processAttackerHeroAttack = async () => {
     const attackResult: AttackResult = attacker.attack(

@@ -14,6 +14,7 @@ import { TargetSelectionOverlay } from './TargetSelectionOverlay'
 import { TurnDisplayModal } from './TurnDisplayModal'
 import { EnemySkillCutsceneModal } from './EnemySkillCutsceneModal'
 import { HeroInArenaDetails } from './HeroInArenaDetailsModal'
+import { ActionTypes } from '../../../lib/enemyAI/CPUBehavior'
 
 interface Props {
   matchManager: MatchManager
@@ -65,10 +66,12 @@ export const Arena: React.FC<Props> = ({
   )
 
   // Enemy Attack And Skill cutscenes
-  const [enemyAttackActions, setEnemyAttackActions] = React.useState<any[]>([])
-  const [enemySkillActions, setEnemySkillActions] = React.useState<any[]>([])
-  const [enemyAttackActionIndex, setEnemyAttackActionIndex] = React.useState(0)
-  const [enemySkillActionIndex, setEnemySkillActionIndex] = React.useState(0)
+  const [enemyAttackAction, setEnemyAttackAction] = React.useState<any>(null)
+  const [enemySkillAction, setEnemySkillAction] = React.useState<any>(null)
+  // const [enemyAttackActions, setEnemyAttackActions] = React.useState<any[]>([])
+  // const [enemySkillActions, setEnemySkillActions] = React.useState<any[]>([])
+  // const [enemyAttackActionIndex, setEnemyAttackActionIndex] = React.useState(0)
+  // const [enemySkillActionIndex, setEnemySkillActionIndex] = React.useState(0)
 
   // general purpose counter to force a component rerender
   const [updateCounter, setUpdateCounter] = React.useState(0)
@@ -295,32 +298,37 @@ export const Arena: React.FC<Props> = ({
     refreshScore()
   }
 
-  const doEnemyTurn = () => {
+  const doNextEnemyHeroMoveAndAction = (nextRenderCount: number) => {
+    matchManager.moveNextEnemyHero()
+    setUpdateCounter(nextRenderCount)
+
+    const action = matchManager.doNextEnemyHeroAction()
     setTimeout(() => {
-      matchManager.moveEnemyHeroes()
-      setUpdateCounter(updateCounter + 1) // Force an update so the enemies move, wait, then attack
-      const attackActions = matchManager.doEnemyHeroAttacks()
-      if (attackActions.length > 0) {
-        setTimeout(() => {
-          setEnemyAttackActions(attackActions)
-        }, 1000)
-      } else {
-        // if there are no attack actions, check if there are any skill actions
-        const skillActions = matchManager.doEnemySkill()
-        if (skillActions.length > 0) {
-          setTimeout(() => {
-            setEnemySkillActions(skillActions)
-          }, 1000)
+      if (action) {
+        if (action.actionType === ActionTypes.ATTACK) {
+          setEnemyAttackAction(action)
         } else {
+          setEnemySkillAction(action)
+        }
+      } else {
+        if (matchManager.haveAllEnemyHeroesMoved()) {
           finishEnemyTurn()
+        } else {
+          doNextEnemyHeroMoveAndAction(nextRenderCount + 1)
         }
       }
-    }, 1000)
+    }, 250)
+  }
+
+  const doEnemyTurn = () => {
+    setTimeout(() => {
+      doNextEnemyHeroMoveAndAction(updateCounter + 1)
+    }, 500)
   }
 
   // Manage turn transitions
   const finishPlayerTurn = () => {
-    matchManager.postTurnActions('player')
+    matchManager.postPlayerTurnActions()
     setIsPlayerTurn(false)
     setTurnDisplaySide('Enemy')
     setTimeout(() => {
@@ -330,7 +338,7 @@ export const Arena: React.FC<Props> = ({
   }
 
   const finishEnemyTurn = () => {
-    matchManager.postTurnActions('enemy')
+    matchManager.postEnemyTurnActions()
     matchManager.resetPlayerMoves()
     setIsPlayerTurn(true)
     matchManager.decrementMatchTimer()
@@ -547,26 +555,18 @@ export const Arena: React.FC<Props> = ({
         <Portal>
           <EnemyAttackCutsceneModal
             matchManager={matchManager}
-            isOpen={enemyAttackActions.length > 0}
-            attackAction={
-              enemyAttackActions && enemyAttackActions[enemyAttackActionIndex]
-            }
+            isOpen={enemyAttackAction !== null}
+            attackAction={enemyAttackAction}
             onContinue={() => {
-              if (enemyAttackActionIndex === enemyAttackActions.length - 1) {
-                setEnemyAttackActions([])
-                setEnemyAttackActionIndex(0)
-
-                // do enemy skill needs to happen after do enemy attacks. Enemies might've died after attacking
-                const skillActions = matchManager.doEnemySkill()
-                if (skillActions.length > 0) {
-                  setEnemySkillActions(skillActions)
-                } else {
-                  finishEnemyTurn()
-                }
-              } else {
-                setEnemyAttackActionIndex(enemyAttackActionIndex + 1)
-              }
+              setEnemyAttackAction(null)
               refreshScore()
+              if (matchManager.haveAllEnemyHeroesMoved()) {
+                finishEnemyTurn()
+              } else {
+                setTimeout(() => {
+                  doNextEnemyHeroMoveAndAction(updateCounter + 1)
+                }, 250)
+              }
             }}
           />
         </Portal>
@@ -575,17 +575,16 @@ export const Arena: React.FC<Props> = ({
         <Portal>
           <EnemySkillCutsceneModal
             matchManager={matchManager}
-            isOpen={enemySkillActions.length > 0}
-            skillAction={
-              enemySkillActions && enemySkillActions[enemySkillActionIndex]
-            }
+            isOpen={enemySkillAction !== null}
+            skillAction={enemySkillAction}
             onContinue={() => {
-              if (enemySkillActionIndex === enemySkillActions.length - 1) {
-                setEnemySkillActions([])
-                setEnemySkillActionIndex(0)
+              setEnemySkillAction(null)
+              if (matchManager.haveAllEnemyHeroesMoved()) {
                 finishEnemyTurn()
               } else {
-                setEnemySkillActionIndex(enemySkillActionIndex + 1)
+                setTimeout(() => {
+                  doNextEnemyHeroMoveAndAction(updateCounter + 1)
+                }, 250)
               }
             }}
           />

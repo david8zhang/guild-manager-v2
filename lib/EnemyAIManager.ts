@@ -1,10 +1,8 @@
+import { ActionSheetIOS } from 'react-native'
 import { CPUHero } from './enemyAI/CPUHero'
-import { MatchManager } from './MatchManager'
 import { Arena } from './model/Arena'
 import { HeroType } from './model/Hero'
 import { HeroInMatch } from './model/HeroInMatch'
-import { Move } from './moves/Move'
-import { MoveFactory } from './moves/MoveFactory'
 
 interface EnemyAIManagerConfig {
   playerSpawnLocations: number[][]
@@ -16,6 +14,8 @@ interface EnemyAIManagerConfig {
 export class EnemyAIManager {
   public enemyHeroes: CPUHero[]
   public arena: Arena
+  public currEnemyToMove: number
+  public haveAllHeroesMoved: boolean
 
   constructor(config: EnemyAIManagerConfig) {
     this.enemyHeroes = config.enemyHeroes.map(
@@ -28,56 +28,45 @@ export class EnemyAIManager {
           config.playerHeroes
         )
     )
+    this.currEnemyToMove = 0
+    this.haveAllHeroesMoved = false
     this.arena = config.arena
   }
 
-  public moveEnemyHeroes() {
-    this.enemyHeroes.forEach((hero: CPUHero) => {
-      const { currPos, destination } = hero.getMovementAction()
-      this.arena.moveHero(
-        {
-          row: currPos[0],
-          col: currPos[1],
-        },
-        {
-          row: destination[0],
-          col: destination[1],
-        }
-      )
-    })
+  public resetEnemyMoves() {
+    this.currEnemyToMove = 0
+    this.haveAllHeroesMoved = false
   }
 
-  public doEnemySkills(): any[] {
-    const supportHeroes: CPUHero[] = this.enemyHeroes.filter(
-      (hero: CPUHero) => hero.heroType === HeroType.SUPPORT
-    )
-    const skillActions: any[] = []
-    supportHeroes.forEach((hero: CPUHero) => {
-      const postMoveAction = hero.getPostMoveAction()
-      if (postMoveAction) {
-        skillActions.push({
-          target: postMoveAction.target,
-          user: postMoveAction.user,
-          move: postMoveAction.data.move,
-        })
+  public moveNextEnemyHero(): void {
+    const enemyHero = this.enemyHeroes[this.currEnemyToMove]
+    const { currPos, destination } = enemyHero.getMovementAction()
+    this.arena.moveHero(
+      {
+        row: currPos[0],
+        col: currPos[1],
+      },
+      {
+        row: destination[0],
+        col: destination[1],
       }
-    })
-    return skillActions
+    )
   }
-  public doEnemyHeroAttacks(): any[] {
-    const attackHeroes: CPUHero[] = this.enemyHeroes.filter(
-      (hero: CPUHero) => hero.heroType !== HeroType.SUPPORT
-    )
-    const attackActions: any[] = []
-    attackHeroes.forEach((hero: CPUHero) => {
-      const postMoveAction = hero.getPostMoveAction()
-      if (postMoveAction) {
-        attackActions.push({
-          target: postMoveAction.target,
-          attacker: postMoveAction.user,
-        })
+
+  public doNextEnemyMove(): any {
+    this.haveAllHeroesMoved =
+      this.currEnemyToMove === this.enemyHeroes.length - 1
+    const enemyHeroToMove = this.enemyHeroes[this.currEnemyToMove]
+    this.currEnemyToMove++
+    const postMoveAction = enemyHeroToMove.getPostMoveAction()
+    if (postMoveAction) {
+      return {
+        target: postMoveAction.target,
+        user: postMoveAction.user,
+        move: postMoveAction.data ? postMoveAction.data.move : null,
+        actionType: postMoveAction.actionType,
       }
-    })
-    return attackActions
+    }
+    return null
   }
 }

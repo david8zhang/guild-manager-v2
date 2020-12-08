@@ -308,16 +308,16 @@ export class MatchManager {
     return heroWithBestStats
   }
 
-  public moveEnemyHeroes(): void {
-    return (this.enemyAIManager as EnemyAIManager).moveEnemyHeroes()
+  public moveNextEnemyHero(): any {
+    return (this.enemyAIManager as EnemyAIManager).moveNextEnemyHero()
   }
 
-  public doEnemyHeroAttacks(): any[] {
-    return (this.enemyAIManager as EnemyAIManager).doEnemyHeroAttacks()
+  public doNextEnemyHeroAction(): any {
+    return (this.enemyAIManager as EnemyAIManager).doNextEnemyMove()
   }
 
-  public doEnemySkill(): any[] {
-    return (this.enemyAIManager as EnemyAIManager).doEnemySkills()
+  public haveAllEnemyHeroesMoved(): boolean {
+    return (this.enemyAIManager as EnemyAIManager).haveAllHeroesMoved
   }
 
   // Do any actions that trigger after the turn is finished
@@ -326,6 +326,7 @@ export class MatchManager {
       side === 'enemy'
         ? this.getEnemyHeroesInMatch()
         : this.getPlayerHeroesInMatch()
+
     heroes.forEach((hero: HeroInMatch) => {
       if (!hero.isDead && hero.isUntargetable()) {
         hero.countdownUntargetTimer()
@@ -334,6 +335,15 @@ export class MatchManager {
       }
       hero.tickBuffTimer()
     })
+  }
+
+  public postEnemyTurnActions() {
+    ;(this.enemyAIManager as EnemyAIManager).resetEnemyMoves()
+    this.postTurnActions('enemy')
+  }
+
+  public postPlayerTurnActions() {
+    this.postTurnActions('player')
   }
 
   public isSpawnLocation(coordinates: string): boolean {

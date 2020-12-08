@@ -9,6 +9,11 @@ export class CPUHero {
   public behavior: CPUBehavior
   public heroType: HeroType
 
+  private playerSpawnLocations: number[][]
+  private arena: Arena
+  private enemyHeroes: HeroInMatch[]
+  private playerHeroes: HeroInMatch[]
+
   constructor(
     hero: HeroInMatch,
     playerSpawnLocations: number[][],
@@ -17,6 +22,10 @@ export class CPUHero {
     playerHeroes: HeroInMatch[]
   ) {
     this.heroType = hero.getHeroRef().heroType
+    this.playerSpawnLocations = playerSpawnLocations
+    this.arena = arena
+    this.enemyHeroes = enemyHeroes
+    this.playerHeroes = playerHeroes
     switch (hero.getHeroRef().heroType) {
       case HeroType.SUPPORT: {
         this.behavior = new SupportCPUBehavior(
