@@ -308,6 +308,10 @@ export class MatchManager {
     return heroWithBestStats
   }
 
+  public setNextEnemyHeroBehavior(): void {
+    return (this.enemyAIManager as EnemyAIManager).setNextHeroBehavior()
+  }
+
   public moveNextEnemyHero(): any {
     return (this.enemyAIManager as EnemyAIManager).moveNextEnemyHero()
   }

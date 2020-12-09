@@ -1,51 +1,21 @@
 import { Arena } from '../model/Arena'
 import { Hero, HeroType } from '../model/Hero'
 import { HeroInMatch } from '../model/HeroInMatch'
-import { AttackCPUBehavior } from './behaviors/AttackCPUBehavior'
-import { SupportCPUBehavior } from './behaviors/SupportCPUBehavior'
+import { BehaviorSelector } from './BehaviorSelector'
 import { CPUBehavior } from './CPUBehavior'
 
 export class CPUHero {
-  public behavior: CPUBehavior
+  public behaviorSelector: BehaviorSelector
   public heroType: HeroType
+  public behavior: any
 
-  private playerSpawnLocations: number[][]
-  private arena: Arena
-  private enemyHeroes: HeroInMatch[]
-  private playerHeroes: HeroInMatch[]
-
-  constructor(
-    hero: HeroInMatch,
-    playerSpawnLocations: number[][],
-    arena: Arena,
-    enemyHeroes: HeroInMatch[],
-    playerHeroes: HeroInMatch[]
-  ) {
+  constructor(hero: HeroInMatch, behaviorSelector: BehaviorSelector) {
+    this.behaviorSelector = behaviorSelector
     this.heroType = hero.getHeroRef().heroType
-    this.playerSpawnLocations = playerSpawnLocations
-    this.arena = arena
-    this.enemyHeroes = enemyHeroes
-    this.playerHeroes = playerHeroes
-    switch (hero.getHeroRef().heroType) {
-      case HeroType.SUPPORT: {
-        this.behavior = new SupportCPUBehavior(
-          playerSpawnLocations,
-          playerHeroes,
-          enemyHeroes,
-          arena,
-          hero
-        )
-        break
-      }
-      default:
-        this.behavior = new AttackCPUBehavior(
-          playerSpawnLocations,
-          playerHeroes,
-          enemyHeroes,
-          arena,
-          hero
-        )
-    }
+  }
+
+  public selectBehavior() {
+    this.behavior = this.behaviorSelector.getBehavior()
   }
 
   public getMovementAction() {

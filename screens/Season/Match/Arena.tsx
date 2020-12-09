@@ -68,10 +68,6 @@ export const Arena: React.FC<Props> = ({
   // Enemy Attack And Skill cutscenes
   const [enemyAttackAction, setEnemyAttackAction] = React.useState<any>(null)
   const [enemySkillAction, setEnemySkillAction] = React.useState<any>(null)
-  // const [enemyAttackActions, setEnemyAttackActions] = React.useState<any[]>([])
-  // const [enemySkillActions, setEnemySkillActions] = React.useState<any[]>([])
-  // const [enemyAttackActionIndex, setEnemyAttackActionIndex] = React.useState(0)
-  // const [enemySkillActionIndex, setEnemySkillActionIndex] = React.useState(0)
 
   // general purpose counter to force a component rerender
   const [updateCounter, setUpdateCounter] = React.useState(0)
@@ -299,6 +295,7 @@ export const Arena: React.FC<Props> = ({
   }
 
   const doNextEnemyHeroMoveAndAction = (nextRenderCount: number) => {
+    matchManager.setNextEnemyHeroBehavior()
     matchManager.moveNextEnemyHero()
     setUpdateCounter(nextRenderCount)
 
@@ -416,7 +413,6 @@ export const Arena: React.FC<Props> = ({
       setCancelMoveMenuCoords(moveSetMenuCoords)
 
       // Get the heroes that are valid targets for this move
-      // TODO: Add some kind of filtering logic, as some moves target allied heroes, whereas others target enemy heroes
       const heroesWithinRange = matchManager
         .getHeroesInRange(row, col, move.range)
         .reduce((acc, curr) => {

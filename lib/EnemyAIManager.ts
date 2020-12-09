@@ -1,7 +1,6 @@
-import { ActionSheetIOS } from 'react-native'
+import { BehaviorSelector } from './enemyAI/BehaviorSelector'
 import { CPUHero } from './enemyAI/CPUHero'
 import { Arena } from './model/Arena'
-import { HeroType } from './model/Hero'
 import { HeroInMatch } from './model/HeroInMatch'
 
 interface EnemyAIManagerConfig {
@@ -18,16 +17,16 @@ export class EnemyAIManager {
   public haveAllHeroesMoved: boolean
 
   constructor(config: EnemyAIManagerConfig) {
-    this.enemyHeroes = config.enemyHeroes.map(
-      (hero: HeroInMatch) =>
-        new CPUHero(
-          hero,
-          config.playerSpawnLocations,
-          config.arena,
-          config.enemyHeroes,
-          config.playerHeroes
-        )
-    )
+    this.enemyHeroes = config.enemyHeroes.map((hero: HeroInMatch) => {
+      const behaviorSelector = new BehaviorSelector(
+        config.playerSpawnLocations,
+        config.arena,
+        config.enemyHeroes,
+        config.playerHeroes,
+        hero
+      )
+      return new CPUHero(hero, behaviorSelector)
+    })
     this.currEnemyToMove = 0
     this.haveAllHeroesMoved = false
     this.arena = config.arena
@@ -38,8 +37,12 @@ export class EnemyAIManager {
     this.haveAllHeroesMoved = false
   }
 
+  public getNextHero() {
+    return this.enemyHeroes[this.currEnemyToMove]
+  }
+
   public moveNextEnemyHero(): void {
-    const enemyHero = this.enemyHeroes[this.currEnemyToMove]
+    const enemyHero = this.getNextHero()
     const { currPos, destination } = enemyHero.getMovementAction()
     this.arena.moveHero(
       {
@@ -53,10 +56,15 @@ export class EnemyAIManager {
     )
   }
 
+  public setNextHeroBehavior(): void {
+    const enemyHero = this.getNextHero()
+    enemyHero.selectBehavior()
+  }
+
   public doNextEnemyMove(): any {
     this.haveAllHeroesMoved =
       this.currEnemyToMove === this.enemyHeroes.length - 1
-    const enemyHeroToMove = this.enemyHeroes[this.currEnemyToMove]
+    const enemyHeroToMove = this.getNextHero()
     this.currEnemyToMove++
     const postMoveAction = enemyHeroToMove.getPostMoveAction()
     if (postMoveAction) {
