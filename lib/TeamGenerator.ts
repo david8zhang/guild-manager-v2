@@ -1,9 +1,13 @@
 import { Team } from './model/Team'
-import { RandomHeroGenerator } from './RandomHeroGenerator'
+import { RandomHeroGenerator } from './heroGenerator/RandomHeroGenerator'
 import { TEAM_NAMES } from './constants/fullTeamNames'
 import { TEAM_COLOR } from './constants/fullTeamColors'
+import { Hero } from './model/Hero'
+import { EnemyHeroGenerator } from './heroGenerator/EnemyHeroGenerator'
 
 export class TeamGenerator {
+  static HERO_GENERATOR: RandomHeroGenerator = new EnemyHeroGenerator()
+
   public static generateRandomTeams(config: {
     numTeams: number
     playerTeam: Team
@@ -15,10 +19,10 @@ export class TeamGenerator {
     const teams = []
     for (let i = 0; i < numTeams; i++) {
       const teamName = eligibleTeamNames[i]
-      const starters = RandomHeroGenerator.generateStarterHeroes(3)
-      const reserves = RandomHeroGenerator.generateReserveHeroes(3)
+      const starters = this.HERO_GENERATOR.generateStarterHeroes(3)
+      const reserves = this.HERO_GENERATOR.generateReserveHeroes(3)
       const roster = starters.concat(reserves)
-      const starterIds = starters.map((h) => h.heroId)
+      const starterIds = starters.map((h: Hero) => h.heroId)
       teams.push(
         new Team({
           roster,
