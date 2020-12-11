@@ -10,6 +10,7 @@ import { MatchupTeam } from './components/MatchupTeam'
 import { SeasonCalendar } from './components/SeasonCalendar'
 import { Match } from './Match/Match'
 import { Team } from '../../lib/model/Team'
+import { RosterPreview } from './components/RosterPreview'
 
 interface Props {
   guild: any
@@ -29,6 +30,7 @@ const Season: React.FC<Props> = ({
     setSeasonManager,
   ] = React.useState<SeasonManager | null>(null)
   const [showMatch, setShowMatch] = React.useState(false)
+  const [teamToShowRoster, setTeamToShowRoster] = React.useState<any>(null)
 
   React.useEffect(() => {
     const seasonManager = new SeasonManager(guild)
@@ -81,6 +83,15 @@ const Season: React.FC<Props> = ({
           applyTeamStatIncreases(outcome.statIncreases)
           updateTeamRecords(outcome)
         }}
+      />
+    )
+  }
+
+  if (teamToShowRoster) {
+    return (
+      <RosterPreview
+        team={teamToShowRoster}
+        onBack={() => setTeamToShowRoster(null)}
       />
     )
   }
@@ -138,7 +149,9 @@ const Season: React.FC<Props> = ({
                 <TeamRecord
                   key={t.teamId}
                   record={record}
-                  onPress={() => {}}
+                  onPress={() => {
+                    setTeamToShowRoster(t)
+                  }}
                   name={t.name}
                   abbrev={t.getNameAbbrev()}
                 />
