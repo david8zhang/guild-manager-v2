@@ -4,7 +4,6 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
-- View team rosters in main season screen
 - Save hero stats after the match
 
 ## Future Features (ordered by priority)

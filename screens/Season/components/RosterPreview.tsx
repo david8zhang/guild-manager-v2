@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { FontAwesome } from '@expo/vector-icons'
-import { Pressable, Text, View } from 'react-native'
+import { BackHandler, Pressable, Text, View } from 'react-native'
 import { Hero } from '../../../lib/model/Hero'
 import { Team } from '../../../lib/model/Team'
 import { HeroDrilldownModal, StarterHero } from '../../StarterHeroes/components'
@@ -14,6 +14,7 @@ interface Props {
 export const RosterPreview: React.FC<Props> = ({ team, onBack }) => {
   const [heroToDrilldown, setHeroToDrilldown] = React.useState<any>(null)
   const heroes = team.getStarters()
+
   return (
     <Portal.Host>
       <View
@@ -47,7 +48,7 @@ export const RosterPreview: React.FC<Props> = ({ team, onBack }) => {
               flex: 1,
             }}
           >
-            {team.name} Roster
+            {team.name}
           </Text>
         </View>
 

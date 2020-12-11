@@ -141,7 +141,7 @@ const Season: React.FC<Props> = ({
             <Text
               style={{ textAlign: 'center', fontSize: 12, marginBottom: 10 }}
             >
-              Tap a team to view their full roster
+              Tap a team to view their starting lineups
             </Text>
             {seasonManager.getAllTeams().map((t) => {
               const record = seasonManager.getTeamRecord(t.teamId)

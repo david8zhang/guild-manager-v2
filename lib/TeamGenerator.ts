@@ -20,12 +20,10 @@ export class TeamGenerator {
     for (let i = 0; i < numTeams; i++) {
       const teamName = eligibleTeamNames[i]
       const starters = this.HERO_GENERATOR.generateStarterHeroes(3)
-      const reserves = this.HERO_GENERATOR.generateReserveHeroes(3)
-      const roster = starters.concat(reserves)
       const starterIds = starters.map((h: Hero) => h.heroId)
       teams.push(
         new Team({
-          roster,
+          roster: starters,
           starterIds,
           name: teamName,
           teamColor: TEAM_COLOR[teamName],
