@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Text, View } from 'react-native'
+import { View } from 'react-native'
 import { MatchManager } from '../../../lib/MatchManager'
 import { Team } from '../../../lib/model/Team'
 import { Arena } from './Arena'
@@ -7,6 +7,7 @@ import { LineupConfirm } from './LineupConfirm'
 import { Portal } from 'react-native-paper'
 import { ScoreBoard } from './ScoreBoard'
 import { PostMatch } from './PostMatch'
+import { HeroStats } from '../../../lib/model/HeroStats'
 
 interface Props {
   playerTeam: Team
@@ -65,6 +66,9 @@ export const Match: React.FC<Props> = ({
           loser: string
           enemyId: string
           statIncreases: any
+          heroMatchStats: {
+            [heroId: string]: HeroStats
+          }
         }) => {
           onContinue(outcome)
         }}

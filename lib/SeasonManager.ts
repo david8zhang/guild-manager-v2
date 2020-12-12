@@ -5,6 +5,7 @@ import { TeamGenerator } from './TeamGenerator'
 import { Hero } from './model/Hero'
 import { shuffle } from 'lodash'
 import { TEAM_NAMES } from './constants/fullTeamNames'
+import { HeroStats } from './model/HeroStats'
 
 export class SeasonManager {
   public numGamesInSeason: number = 21
@@ -31,6 +32,10 @@ export class SeasonManager {
     this.teams.concat(this.playerTeam).forEach((t) => {
       this.teamRecords[t.teamId] = new Record()
     })
+  }
+
+  public setPlayerTeam(playerTeam: Team) {
+    this.playerTeam = playerTeam
   }
 
   public getPlayerSchedule(): Schedule {
@@ -171,9 +176,38 @@ export class SeasonManager {
   }
 
   public serialize() {
+    const serializedTeamRecords: any = {}
+    Object.keys(this.teamRecords).forEach((key: string) => {
+      const record: Record = this.teamRecords[key]
+      serializedTeamRecords[key] = record.serialize()
+    })
     return {
       teams: this.teams.map((t) => t.serialize()),
       schedule: this.playerSeasonSchedule.serialize(),
+      teamRecords: serializedTeamRecords,
+      playerTeam: this.playerTeam.serialize(),
     }
+  }
+
+  // Reconstruct the season manager state from a serialized object
+  public deserialize(serializedSeasonObj: any) {
+    const { teams, schedule, teamRecords, playerTeam } = serializedSeasonObj
+    this.teams = teams.map((t: any) => Team.deserializeObj(t))
+    this.playerSeasonSchedule = Schedule.deserializeObj(schedule, this.teams)
+    this.teamRecords = {}
+    Object.keys(teamRecords).forEach((key: string) => {
+      this.teamRecords[key] = Record.deserializeObj(teamRecords[key])
+    })
+    this.playerTeam = Team.deserializeObj(serializedSeasonObj.playerTeam)
+  }
+
+  public saveHeroMatchStats(heroMatchStats: {
+    [heroId: string]: HeroStats
+  }): void {
+    const playerStarterHeroes = this.playerTeam.getStarters()
+    playerStarterHeroes.forEach((hero: Hero) => {
+      const heroStats = heroMatchStats[hero.heroId]
+      hero.savePostMatchStats(heroStats)
+    })
   }
 }

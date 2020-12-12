@@ -93,11 +93,13 @@ export const PostMatch: React.FC<Props> = ({
             text='Continue'
             style={{ margin: 5 }}
             onPress={() => {
+              const heroMatchStats = matchManager.getHeroMatchStats()
               onContinue({
                 winner: winnerId,
                 loser: loserId,
                 enemyId: enemyTeamId,
                 statIncreases,
+                heroMatchStats,
               })
             }}
           />

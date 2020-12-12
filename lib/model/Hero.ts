@@ -1,3 +1,5 @@
+import { HeroStats } from './HeroStats'
+
 export enum HeroType {
   SUPPORT = 'support',
   RANGER = 'ranger',
@@ -15,6 +17,16 @@ export interface HeroImageData {
   hair: string
 }
 
+export interface SavedHeroStats {
+  totalDeaths: number
+  totalKills: number
+  totalPoints: number
+  averagePointsPerGame: number
+  averageKillsPerGame: number
+  averageDeathsPerGame: number
+  totalMatchesPlayed: number
+}
+
 export class Hero {
   public heroId: string
   public name: string
@@ -29,6 +41,7 @@ export class Hero {
   public heroType: HeroType
   public heroImageData: HeroImageData
   public attackRange: number
+  public matchStats: SavedHeroStats
 
   constructor(config: any) {
     this.heroId = config.heroId
@@ -47,6 +60,18 @@ export class Hero {
       typeof config.heroImageData === 'string'
         ? JSON.parse(config.heroImageData)
         : config.heroImageData
+    this.matchStats =
+      config.matchStats && typeof config.matchStats === 'string'
+        ? JSON.parse(config.matchStats)
+        : {
+            totalDeaths: 0,
+            totalKills: 0,
+            totalPoints: 0,
+            averagePointsPerGame: 0,
+            averageKillsPerGame: 0,
+            averageDeathsPerGame: 0,
+            totalMatchesPlayed: 0,
+          }
   }
 
   public serialize(): any {
@@ -62,6 +87,7 @@ export class Hero {
       moveSet: this.moveSet,
       heroType: this.heroType,
       heroImageData: JSON.stringify(this.heroImageData),
+      matchStats: JSON.stringify(this.matchStats),
     }
   }
 
@@ -71,6 +97,22 @@ export class Hero {
 
   public getOverall(): number {
     return Math.round((this.attack + this.defense + this.speed) / 3)
+  }
+
+  public savePostMatchStats(heroStats: HeroStats): void {
+    this.matchStats.totalDeaths += heroStats.numDeaths
+    this.matchStats.totalKills += heroStats.numKills
+    this.matchStats.totalPoints += heroStats.numPoints
+    this.matchStats.totalMatchesPlayed++
+
+    const totalMatchesPlayed = this.matchStats.totalMatchesPlayed
+
+    this.matchStats.averageDeathsPerGame =
+      this.matchStats.totalDeaths / totalMatchesPlayed
+    this.matchStats.averageKillsPerGame =
+      this.matchStats.totalKills / totalMatchesPlayed
+    this.matchStats.averagePointsPerGame =
+      this.matchStats.totalPoints / totalMatchesPlayed
   }
 
   public improveStats(stat: string, value: number) {

@@ -1,18 +1,27 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
-import * as guildActions from '../../redux/guildWidget'
+
+// UI Components
 import { Text, View } from 'react-native'
 import { Button, Navbar } from '../../components'
-import { SeasonManager } from '../../lib/SeasonManager'
 import { TeamRecord } from './components/TeamRecord'
-import { Schedule } from '../../lib/model/Schedule'
 import { MatchupTeam } from './components/MatchupTeam'
 import { SeasonCalendar } from './components/SeasonCalendar'
 import { Match } from './Match/Match'
-import { Team } from '../../lib/model/Team'
 import { RosterPreview } from './components/RosterPreview'
 
+// Game State
+import { Team } from '../../lib/model/Team'
+import { HeroStats } from '../../lib/model/HeroStats'
+import { Schedule } from '../../lib/model/Schedule'
+import { SeasonManager } from '../../lib/SeasonManager'
+
+// Redux
+import * as guildActions from '../../redux/guildWidget'
+import * as seasonActions from '../../redux/seasonWidget'
+import { connect } from 'react-redux'
+
 interface Props {
+  savedSeason: any
   guild: any
   navigation: any
   setOtherTeams: Function
@@ -22,6 +31,7 @@ interface Props {
 const Season: React.FC<Props> = ({
   navigation,
   guild,
+  savedSeason,
   setOtherTeams,
   setSchedule,
 }) => {
@@ -34,12 +44,14 @@ const Season: React.FC<Props> = ({
 
   React.useEffect(() => {
     const seasonManager = new SeasonManager(guild)
-    setSeasonManager(seasonManager)
     if (!guild.league || !guild.schedule) {
       const serializedState = seasonManager.serialize()
       setOtherTeams(serializedState.teams)
       setSchedule(serializedState.schedule)
+    } else if (savedSeason) {
+      seasonManager.deserialize(savedSeason)
     }
+    setSeasonManager(seasonManager)
   }, [])
 
   if (!seasonManager) {
@@ -67,6 +79,15 @@ const Season: React.FC<Props> = ({
     seasonManager.applyStatIncreases(statIncreases)
   }
 
+  const saveHeroMatchStats = (heroMatchStats: {
+    [heroId: string]: HeroStats
+  }) => {
+    seasonManager.saveHeroMatchStats(heroMatchStats)
+  }
+
+  // Save the season manager state within the redux store or persistent storage
+  const serializeSeasonManager = () => {}
+
   if (showMatch) {
     return (
       <Match
@@ -79,9 +100,14 @@ const Season: React.FC<Props> = ({
           loser: string
           enemyId: string
           statIncreases: any
+          heroMatchStats: {
+            [heroId: string]: HeroStats
+          }
         }) => {
+          saveHeroMatchStats(outcome.heroMatchStats)
           applyTeamStatIncreases(outcome.statIncreases)
           updateTeamRecords(outcome)
+          serializeSeasonManager()
         }}
       />
     )
@@ -166,6 +192,9 @@ const Season: React.FC<Props> = ({
 
 const mapStateToProps = (state: any) => ({
   guild: state.guild,
+  savedSeason: state.season,
 })
 
-export default connect(mapStateToProps, { ...guildActions })(Season)
+export default connect(mapStateToProps, { ...guildActions, ...seasonActions })(
+  Season
+)

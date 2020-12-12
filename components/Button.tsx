@@ -26,6 +26,8 @@ export const Button: React.FC<Props> = ({
         borderRadius: 4,
         borderWidth: 1,
         padding: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
         backgroundColor: isPressing ? 'gray' : 'white',
         ...style,
       }}

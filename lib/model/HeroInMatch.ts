@@ -1,4 +1,4 @@
-import { HeroStats } from '../constants/HeroStats'
+import { HeroStats } from './HeroStats'
 import { Hero } from './Hero'
 
 export interface AttackResult {

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import { Navbar } from '../../components/Navbar'
 import { ScrollView } from 'react-native-gesture-handler'
 import { MenuOption } from './components'
@@ -21,7 +21,13 @@ const HomeScreen: React.FC<Props> = ({ navigation, guild }) => {
     <View style={styles.root}>
       <Navbar title='Home' navigation={navigation} />
       <ScrollView horizontal style={{ paddingTop: 10, paddingLeft: 10 }}>
-        <MenuOption optionName='My Team' iconName='group' onPress={() => {}} />
+        <MenuOption
+          optionName='My Team'
+          iconName='group'
+          onPress={() => {
+            navigation.navigate('MyTeam')
+          }}
+        />
         <MenuOption
           optionName='Season'
           iconName='calendar'

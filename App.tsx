@@ -4,7 +4,13 @@ import * as ScreenOrientation from 'expo-screen-orientation'
 import 'react-native-gesture-handler'
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
-import { HomeScreen, CreateGuild, StarterHeroes, Season } from './screens'
+import {
+  HomeScreen,
+  CreateGuild,
+  StarterHeroes,
+  Season,
+  MyTeam,
+} from './screens'
 import { Provider } from 'react-redux'
 import { store } from './redux/store'
 
@@ -19,6 +25,7 @@ export default function App() {
           <Stack.Screen name='Home' component={HomeScreen} />
           <Stack.Screen name='StarterHeroes' component={StarterHeroes} />
           <Stack.Screen name='Season' component={Season} />
+          <Stack.Screen name='MyTeam' component={MyTeam} />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

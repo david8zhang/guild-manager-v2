@@ -3,6 +3,7 @@ export const ADD_STARTER_HEROES = 'ADD_STARTER_HEROES'
 export const ADD_RESERVE_HEROES = 'ADD_RESERVE_HEROES'
 export const SET_OTHER_TEAMS = 'SET_OTHER_TEAMS'
 export const SET_SCHEDULE = 'SET_SCHEDULE'
+export const SAVE_GUILD = 'SAVE_GUILD'
 
 export const createGuild = (payload: any) => ({
   type: CREATE_GUILD,
@@ -26,6 +27,11 @@ export const setOtherTeams = (payload: any) => ({
 
 export const setSchedule = (payload: any) => ({
   type: SET_SCHEDULE,
+  payload,
+})
+
+export const saveGuild = (payload: any) => ({
+  type: SAVE_GUILD,
   payload,
 })
 
@@ -64,6 +70,9 @@ export default (state = initialState, action: any) => {
         ...state,
         schedule: action.payload,
       }
+    }
+    case SAVE_GUILD: {
+      return action.payload
     }
     default:
       return state

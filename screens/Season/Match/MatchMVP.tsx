@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Text, View } from 'react-native'
 import { HeroImage } from '../../../components'
-import { HeroStats } from '../../../lib/constants/HeroStats'
+import { HeroStats } from '../../../lib/model/HeroStats'
 import { Hero } from '../../../lib/model/Hero'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
 

@@ -3,10 +3,10 @@ export class Record {
   public numLosses: number
   public winStreak: number
 
-  constructor() {
-    this.numWins = 0
-    this.numLosses = 0
-    this.winStreak = 0
+  constructor(config?: any) {
+    this.numWins = config ? config.numWins : 0
+    this.numLosses = config ? config.numLosses : 0
+    this.winStreak = config ? config.winStreak : 0
   }
 
   public getWinLossRatio(): number {
@@ -24,5 +24,17 @@ export class Record {
   public addLoss() {
     this.numLosses++
     this.winStreak = 0
+  }
+
+  public serialize() {
+    return {
+      numWins: this.numWins,
+      numLosses: this.numLosses,
+      winStreak: this.winStreak,
+    }
+  }
+
+  public static deserializeObj(recordObj: any) {
+    return new Record(recordObj)
   }
 }

@@ -1,5 +1,5 @@
 import { DEBUG_CONFIG } from './constants/debugConfig'
-import { HeroStats } from './constants/HeroStats'
+import { HeroStats } from './model/HeroStats'
 import { EnemyAIManager } from './EnemyAIManager'
 import { Arena } from './model/Arena'
 import { Hero } from './model/Hero'
@@ -469,5 +469,16 @@ export class MatchManager {
     [heroId: string]: any
   } {
     return (this.statGainManager as StatGainManager).getStatGains(mvpId)
+  }
+
+  public getHeroMatchStats() {
+    const heroMatchStats: any = {}
+    this.enemyHeroes.forEach((hero: HeroInMatch) => {
+      heroMatchStats[hero.getHeroRef().heroId] = hero.getHeroStats()
+    })
+    this.playerHeroes.forEach((hero: HeroInMatch) => {
+      heroMatchStats[hero.getHeroRef().heroId] = hero.getHeroStats()
+    })
+    return heroMatchStats
   }
 }
