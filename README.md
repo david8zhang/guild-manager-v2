@@ -4,13 +4,11 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
-- Save hero stats after the match
-- Team screen that shows player's current heroes and reserves
-- Hero stats shown in roster preview
+- Playoffs support (after every season match is finished)
 
 ## Future Features (ordered by priority)
 
-- Playoffs support (after every season match is finished)
+- Different map tiles
 - Smarter AIs randomly set for different enemy teams
 - Better animations for ranged attacks (Bow firing animation)
 - Respawn timer displayed

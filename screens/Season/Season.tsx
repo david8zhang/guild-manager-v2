@@ -24,6 +24,8 @@ interface Props {
   savedSeason: any
   guild: any
   navigation: any
+  saveSeason: Function
+  saveGuild: Function
   setOtherTeams: Function
   setSchedule: Function
 }
@@ -34,6 +36,8 @@ const Season: React.FC<Props> = ({
   savedSeason,
   setOtherTeams,
   setSchedule,
+  saveSeason,
+  saveGuild,
 }) => {
   const [
     seasonManager,
@@ -44,12 +48,12 @@ const Season: React.FC<Props> = ({
 
   React.useEffect(() => {
     const seasonManager = new SeasonManager(guild)
-    if (!guild.league || !guild.schedule) {
+    if (savedSeason) {
+      seasonManager.deserialize(savedSeason)
+    } else if (!guild.league || !guild.schedule) {
       const serializedState = seasonManager.serialize()
       setOtherTeams(serializedState.teams)
       setSchedule(serializedState.schedule)
-    } else if (savedSeason) {
-      seasonManager.deserialize(savedSeason)
     }
     setSeasonManager(seasonManager)
   }, [])
@@ -86,7 +90,13 @@ const Season: React.FC<Props> = ({
   }
 
   // Save the season manager state within the redux store or persistent storage
-  const serializeSeasonManager = () => {}
+  const serializeSeasonManager = () => {
+    const serializedSeason = seasonManager.serialize()
+    saveSeason(serializedSeason)
+
+    const serializedPlayerTeam = playerTeam.serialize()
+    saveGuild(serializedPlayerTeam)
+  }
 
   if (showMatch) {
     return (
