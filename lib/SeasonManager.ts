@@ -6,13 +6,17 @@ import { Hero } from './model/Hero'
 import { shuffle } from 'lodash'
 import { TEAM_NAMES } from './constants/fullTeamNames'
 import { HeroStats } from './model/HeroStats'
+import { PlayoffBracket } from './model/PlayoffBracket'
 
 export class SeasonManager {
-  public numGamesInSeason: number = 21
+  private static NUM_PLAYOFF_TEAMS = 4
+
+  public numGamesInSeason: number = 2
   public teamRecords: any = {}
   public teams: Team[] = []
   public playerTeam: Team
   public playerSeasonSchedule: Schedule
+  public playoffBracket: any
 
   constructor(playerObj: any) {
     this.playerTeam = Team.deserializeObj(playerObj)
@@ -32,6 +36,7 @@ export class SeasonManager {
     this.teams.concat(this.playerTeam).forEach((t) => {
       this.teamRecords[t.teamId] = new Record()
     })
+    this.playoffBracket = null
   }
 
   public setPlayerTeam(playerTeam: Team) {
@@ -134,7 +139,9 @@ export class SeasonManager {
   }
 
   public getTeam(teamId: string): Team | null {
-    const team = this.teams.find((t) => t.teamId === teamId)
+    const team = this.teams
+      .concat(this.playerTeam)
+      .find((t) => t.teamId === teamId)
     if (!team) {
       return null
     }
@@ -175,6 +182,14 @@ export class SeasonManager {
     })
   }
 
+  public didPlayerMakePlayoffs(): boolean {
+    const playoffTeams = this.getAllTeams().slice(0, 4)
+    return (
+      playoffTeams.find((a) => a.teamId === this.playerTeam.teamId) !==
+      undefined
+    )
+  }
+
   public serialize() {
     const serializedTeamRecords: any = {}
     Object.keys(this.teamRecords).forEach((key: string) => {
@@ -186,19 +201,57 @@ export class SeasonManager {
       schedule: this.playerSeasonSchedule.serialize(),
       teamRecords: serializedTeamRecords,
       playerTeam: this.playerTeam.serialize(),
+      playoffBracket: this.playoffBracket
+        ? this.playoffBracket.serialize()
+        : null,
     }
+  }
+
+  public createPlayoffBracket(): PlayoffBracket {
+    const playoffTeams = this.getAllTeams().slice(
+      0,
+      SeasonManager.NUM_PLAYOFF_TEAMS
+    )
+    this.playoffBracket = new PlayoffBracket(
+      playoffTeams,
+      this.teamRecords,
+      this.playerTeam
+    )
+    return this.playoffBracket
+  }
+
+  public getPlayoffBracket(): PlayoffBracket {
+    return this.playoffBracket
   }
 
   // Reconstruct the season manager state from a serialized object
   public deserialize(serializedSeasonObj: any) {
-    const { teams, schedule, teamRecords, playerTeam } = serializedSeasonObj
+    const {
+      teams,
+      schedule,
+      teamRecords,
+      playerTeam,
+      playoffBracket,
+    } = serializedSeasonObj
     this.teams = teams.map((t: any) => Team.deserializeObj(t))
     this.playerSeasonSchedule = Schedule.deserializeObj(schedule, this.teams)
     this.teamRecords = {}
     Object.keys(teamRecords).forEach((key: string) => {
       this.teamRecords[key] = Record.deserializeObj(teamRecords[key])
     })
-    this.playerTeam = Team.deserializeObj(serializedSeasonObj.playerTeam)
+    this.playerTeam = Team.deserializeObj(playerTeam)
+    if (playoffBracket) {
+      const playoffTeams = this.getAllTeams().slice(
+        0,
+        SeasonManager.NUM_PLAYOFF_TEAMS
+      )
+      this.playoffBracket = new PlayoffBracket(
+        playoffTeams,
+        this.teamRecords,
+        this.playerTeam
+      )
+      ;(this.playoffBracket as PlayoffBracket).deserialize(playoffBracket)
+    }
   }
 
   public saveHeroMatchStats(heroMatchStats: {

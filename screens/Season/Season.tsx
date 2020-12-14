@@ -19,6 +19,8 @@ import { SeasonManager } from '../../lib/SeasonManager'
 import * as guildActions from '../../redux/guildWidget'
 import * as seasonActions from '../../redux/seasonWidget'
 import { connect } from 'react-redux'
+import { SeasonOverModal } from './components/SeasonOverModal'
+import { Playoffs } from './components/Playoffs'
 
 interface Props {
   savedSeason: any
@@ -45,6 +47,8 @@ const Season: React.FC<Props> = ({
   ] = React.useState<SeasonManager | null>(null)
   const [showMatch, setShowMatch] = React.useState(false)
   const [teamToShowRoster, setTeamToShowRoster] = React.useState<any>(null)
+  const [showPlayoffs, setShowPlayoffs] = React.useState<boolean>(true)
+  const [showSeasonOver, setShowSeasonOver] = React.useState<boolean>(false)
 
   React.useEffect(() => {
     const seasonManager = new SeasonManager(guild)
@@ -75,7 +79,17 @@ const Season: React.FC<Props> = ({
     seasonManager.updateTeamRecord(winner, true)
     seasonManager.updateTeamRecord(loser, false)
     seasonManager.simulateMatchesAndUpdateRecords(enemyId)
-    schedule.advanceToNextMatch()
+    if (schedule.getIsRegularSeason()) {
+      schedule.advanceToNextMatch()
+    } else {
+      // If the regular season is over, check if the player made the playoffs. If so, show the playoffs UI. If not, show a model that just restarts with a new season
+      const madePlayoffs = seasonManager.didPlayerMakePlayoffs()
+      if (!madePlayoffs) {
+        setShowSeasonOver(true)
+      } else {
+        setShowPlayoffs(true)
+      }
+    }
     setShowMatch(false)
   }
 
@@ -132,8 +146,19 @@ const Season: React.FC<Props> = ({
     )
   }
 
+  if (showPlayoffs) {
+    return <Playoffs seasonManager={seasonManager} navigation={navigation} />
+  }
+
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
+      <SeasonOverModal
+        onContinue={() => {
+          schedule.resetSeason()
+          setShowSeasonOver(false)
+        }}
+        isOpen={showSeasonOver}
+      />
       <Navbar title='Season' navigation={navigation} />
       <View style={{ flexDirection: 'row' }}>
         <View style={{ flex: 1.4, flexDirection: 'column' }}>

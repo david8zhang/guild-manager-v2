@@ -44,21 +44,25 @@ export class Schedule {
   }[]
 
   private matchList: Matchup[]
-  private static NUM_MATCHUPS_IN_SCHEDULE: number = 21
+  private static NUM_MATCHUPS_IN_SCHEDULE: number = 2
   private currentMatchupIndex: number
+
+  private isRegularSeason: boolean
 
   constructor(config: {
     teams: Team[]
     currentMatchupIndex?: number
     matchList?: Matchup[]
+    isRegularSeason?: boolean
   }) {
-    const { teams, currentMatchupIndex, matchList } = config
+    const { teams, currentMatchupIndex, matchList, isRegularSeason } = config
     this.teamInfoList = teams.map((t: Team) => ({
       name: t.name,
       teamId: t.teamId,
     }))
     this.currentMatchupIndex = currentMatchupIndex || 0
     this.matchList = matchList || this.generateSchedule()
+    this.isRegularSeason = isRegularSeason || true
   }
 
   public getMatchupList(): Matchup[] {
@@ -91,8 +95,17 @@ export class Schedule {
     })
   }
 
+  public resetSeason(): void {
+    this.matchList = this.generateSchedule()
+    this.currentMatchupIndex = 0
+    this.isRegularSeason = true
+  }
+
   public advanceToNextMatch(): void {
     this.currentMatchupIndex++
+    if (this.currentMatchupIndex === this.matchList.length - 1) {
+      this.isRegularSeason = false
+    }
   }
 
   static deserializeObj(scheduleObj: any, teams: Team[]): Schedule {
@@ -107,6 +120,11 @@ export class Schedule {
     return {
       matchList: this.matchList.map((m) => m.serialize()),
       currentMatchupIndex: this.currentMatchupIndex,
+      isRegularSeason: this.isRegularSeason,
     }
+  }
+
+  public getIsRegularSeason(): boolean {
+    return this.isRegularSeason
   }
 }
