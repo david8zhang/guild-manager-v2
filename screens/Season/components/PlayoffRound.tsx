@@ -8,6 +8,8 @@ interface Props {
   matchups: PlayoffMatchup[]
   seasonManager: SeasonManager
   numBoxes: number
+  isFinal: boolean
+  side?: string
 }
 
 const roundComp = (numBoxes: number) => {
@@ -37,18 +39,27 @@ export const PlayoffRound: React.FC<Props> = ({
   matchups,
   seasonManager,
   numBoxes,
+  side,
+  isFinal,
 }) => {
   if (matchups.length === 0) {
     return roundComp(numBoxes)
   }
 
-  const renderMatchup = (matchup: PlayoffMatchup) => {
+  const renderMatchup = (matchup: PlayoffMatchup, index: number) => {
+    let teamIds: string[] = matchups.reduce((acc: string[], curr) => {
+      acc = acc.concat(curr.teamIds)
+      return acc
+    }, [])
+    if (isFinal) {
+      teamIds = side === 'left' ? teamIds.slice(0, 1) : teamIds.slice(1)
+    }
     return (
-      <View style={{ flexDirection: 'column' }}>
-        {matchup.teamIds.map((teamId: string) => {
+      <View key={`matchup-${index}`} style={{ flexDirection: 'column' }}>
+        {teamIds.map((teamId: string, index: number) => {
           const team = seasonManager.getTeam(teamId)
           if (!team) {
-            return <View />
+            return <View key={`teamMatchup-${index}`} />
           }
           return (
             <View
@@ -98,7 +109,9 @@ export const PlayoffRound: React.FC<Props> = ({
 
   return (
     <View style={{ flexDirection: 'column', alignItems: 'center', margin: 5 }}>
-      {matchups.map((m: PlayoffMatchup) => renderMatchup(m))}
+      {matchups.map((m: PlayoffMatchup, index: number) =>
+        renderMatchup(m, index)
+      )}
     </View>
   )
 }

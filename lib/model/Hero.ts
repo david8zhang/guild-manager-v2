@@ -86,6 +86,7 @@ export class Hero {
       magic: this.magic,
       moveSet: this.moveSet,
       heroType: this.heroType,
+      attackRange: this.attackRange,
       heroImageData: JSON.stringify(this.heroImageData),
       matchStats: JSON.stringify(this.matchStats),
     }

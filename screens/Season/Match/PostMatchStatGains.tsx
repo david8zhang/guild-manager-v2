@@ -46,7 +46,15 @@ export const PostMatchStatGains: React.FC<Props> = ({
     }
     const increasePayload = statIncreases[heroRef.heroId]
     return (
-      <View key={heroRef.heroId} style={{ flexDirection: 'row' }}>
+      <View
+        key={heroRef.heroId}
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: 35,
+        }}
+      >
         <Text style={{ ...styles.nameColumn, fontSize: 16 }}>
           {heroRef.name}
         </Text>
@@ -137,7 +145,11 @@ export const PostMatchStatGains: React.FC<Props> = ({
           {team.name}
         </Text>
       </View>
-      <View style={{ flexDirection: 'row' }}>
+      <View
+        style={{
+          flexDirection: 'row',
+        }}
+      >
         <Text style={styles.nameColumn}></Text>
         <Text style={styles.textRow}>Attack</Text>
         <Text style={styles.textRow}>Defense</Text>

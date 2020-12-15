@@ -7,6 +7,7 @@ import { shuffle } from 'lodash'
 import { TEAM_NAMES } from './constants/fullTeamNames'
 import { HeroStats } from './model/HeroStats'
 import { PlayoffBracket } from './model/PlayoffBracket'
+import { MatchSimulator } from './simulation/MatchSimulator'
 
 export class SeasonManager {
   private static NUM_PLAYOFF_TEAMS = 4
@@ -100,19 +101,11 @@ export class SeasonManager {
       const team1: Team | null = this.getTeam(matchup[0])
       const team2: Team | null = this.getTeam(matchup[1])
 
-      let team1WinPercentage: number = 50
       if (team1 && team2) {
-        // win percentage will differ by OVR difference * 2
-        const team1AvgOvr = this.getAverageTeamOverall(team1)
-        const team2AvgOvr = this.getAverageTeamOverall(team2)
-        const ovrDiff = team1AvgOvr - team2AvgOvr
-        team1WinPercentage + ovrDiff * 2
-
-        // Generate a random number between 1 and 100. If the number is <= team1's win percentage, then team1 has won.
-        const outcomeNum = Math.floor(Math.random() * 100) + 1
+        const matchOutcome = MatchSimulator.simulateMatchup(team1, team2)
         const team1Record = this.getTeamRecord(team1.teamId)
         const team2Record = this.getTeamRecord(team2.teamId)
-        if (outcomeNum <= team1WinPercentage) {
+        if (matchOutcome.winnerId === team1.teamId) {
           team1Record.addWin()
           team2Record.addLoss()
         } else {
@@ -121,17 +114,6 @@ export class SeasonManager {
         }
       }
     })
-  }
-
-  private getAverageTeamOverall(team: Team): number {
-    const teamRoster = team.roster
-    const avgOverall = Math.round(
-      teamRoster.reduce((acc: number, curr: Hero) => {
-        acc += curr.getOverall()
-        return acc
-      }, 0) / team.roster.length
-    )
-    return avgOverall
   }
 
   public getPlayer(): Team {

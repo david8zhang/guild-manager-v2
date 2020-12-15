@@ -35,18 +35,17 @@ export const AttackMatchupHero: React.FC<Props> = ({
         alignItems: 'center',
         justifyContent: 'center',
         height: '100%',
-        marginTop: 10,
         marginBottom: 10,
       }}
     >
-      <Text style={{ textAlign: 'center', fontSize: 18, marginBottom: 10 }}>
+      <Text style={{ textAlign: 'center', fontSize: 18, marginBottom: 5 }}>
         {name}
       </Text>
       <View
         style={{
           flex: 1,
           width: imageOptions ? imageOptions.width : 100,
-          marginBottom: 20,
+          marginBottom: 35,
         }}
       >
         <HeroImage
@@ -62,7 +61,7 @@ export const AttackMatchupHero: React.FC<Props> = ({
           predictedDmg={predictedDamageTaken}
           currHealth={currHealth}
           health={health}
-          style={{ marginBottom: 10 }}
+          style={{ marginBottom: 5 }}
         />
         <View
           style={{

@@ -21,6 +21,7 @@ import * as seasonActions from '../../redux/seasonWidget'
 import { connect } from 'react-redux'
 import { SeasonOverModal } from './components/SeasonOverModal'
 import { Playoffs } from './components/Playoffs'
+import { DEBUG_CONFIG } from '../../lib/constants/debugConfig'
 
 interface Props {
   savedSeason: any
@@ -47,7 +48,7 @@ const Season: React.FC<Props> = ({
   ] = React.useState<SeasonManager | null>(null)
   const [showMatch, setShowMatch] = React.useState(false)
   const [teamToShowRoster, setTeamToShowRoster] = React.useState<any>(null)
-  const [showPlayoffs, setShowPlayoffs] = React.useState<boolean>(true)
+  const [showPlayoffs, setShowPlayoffs] = React.useState<boolean>(false)
   const [showSeasonOver, setShowSeasonOver] = React.useState<boolean>(false)
 
   React.useEffect(() => {
@@ -90,7 +91,6 @@ const Season: React.FC<Props> = ({
         setShowPlayoffs(true)
       }
     }
-    setShowMatch(false)
   }
 
   const applyTeamStatIncreases = (statIncreases: any) => {
@@ -132,6 +132,7 @@ const Season: React.FC<Props> = ({
           applyTeamStatIncreases(outcome.statIncreases)
           updateTeamRecords(outcome)
           serializeSeasonManager()
+          setShowMatch(false)
         }}
       />
     )
@@ -147,7 +148,25 @@ const Season: React.FC<Props> = ({
   }
 
   if (showPlayoffs) {
-    return <Playoffs seasonManager={seasonManager} navigation={navigation} />
+    return (
+      <Playoffs
+        seasonManager={seasonManager}
+        navigation={navigation}
+        onMatchContinue={(outcome: {
+          winner: string
+          loser: string
+          enemyId: string
+          statIncreases: any
+          heroMatchStats: {
+            [heroId: string]: HeroStats
+          }
+        }) => {
+          saveHeroMatchStats(outcome.heroMatchStats)
+          applyTeamStatIncreases(outcome.statIncreases)
+          serializeSeasonManager()
+        }}
+      />
+    )
   }
 
   return (
@@ -189,9 +208,19 @@ const Season: React.FC<Props> = ({
           <Button
             style={{ alignSelf: 'center', marginTop: 10 }}
             onPress={() => {
-              setShowMatch(true)
+              if (DEBUG_CONFIG.autoWinGames) {
+                updateTeamRecords({
+                  winner: playerTeam.teamId,
+                  loser: currentMatchup.teamInfo.teamId,
+                  enemyId: currentMatchup.teamInfo.teamId,
+                })
+                serializeSeasonManager()
+                setShowMatch(false)
+              } else {
+                setShowMatch(true)
+              }
             }}
-            text='Start Game'
+            text={DEBUG_CONFIG.autoWinGames ? 'Auto Win' : 'Start Game'}
           />
         </View>
         <View style={{ flex: 1 }}>

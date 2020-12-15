@@ -1,6 +1,8 @@
 import { Record } from './Record'
 import { Team } from './Team'
 import { chunk } from 'lodash'
+import { MatchSimulator } from '../simulation/MatchSimulator'
+import { SeasonManager } from '../SeasonManager'
 
 export interface PlayoffMatchup {
   teamIds: string[]
@@ -17,6 +19,7 @@ export class PlayoffBracket {
   private roundResults: any
   private currentRound: number
   private numTotalRounds: number
+  private championId: string | null
 
   constructor(
     playoffTeams: Team[],
@@ -51,6 +54,7 @@ export class PlayoffBracket {
     }
     this.currentRound = 1
     this.numTotalRounds = numRounds
+    this.championId = null
   }
 
   generateMatchups(playoffTeams: Team[]): PlayoffMatchup[] {
@@ -77,7 +81,7 @@ export class PlayoffBracket {
   getPlayerMatchup(): PlayoffMatchup | null {
     const matchup =
       this.matchupList.find((matchup) => {
-        return Object.keys(matchup.score).includes(this.playerTeamId)
+        return matchup.teamIds.includes(this.playerTeamId)
       }) || null
     return matchup
   }
@@ -86,20 +90,21 @@ export class PlayoffBracket {
     const matchup = this.matchupList.find((matchup) => {
       return Object.keys(matchup.score).includes(winnerId)
     })
+
     if (matchup) {
       matchup.score[winnerId]++
 
       // If the winner has won the required number of games to progress to the next round, add them to qualifiers
       if (matchup.score[winnerId] === PlayoffBracket.WIN_THRESHOLD) {
-        const winningTeam = matchup.teamIds.find(
-          (teamId: string) => teamId === winnerId
-        )
-        matchup.winnerId == winningTeam
+        matchup.winnerId = winnerId
+        if (this.currentRound === this.numTotalRounds) {
+          this.championId = winnerId
+        }
       }
     }
   }
 
-  haveAllRoundsFinished(): boolean {
+  hasRoundFinished(): boolean {
     const numFinished = this.matchupList.reduce((acc, curr) => {
       if (curr.winnerId) {
         acc += 1
@@ -110,25 +115,30 @@ export class PlayoffBracket {
   }
 
   goToNextRound(): void {
-    // Partition the matchup list pairings into groups of 2. the winners out of the groupings will become the new matchup
-    const groupings = chunk(this.matchupList, 2)
-    const newMatchupList: PlayoffMatchup[] = []
-    groupings.forEach((group: PlayoffMatchup[]) => {
-      const groupWinner1: string = group[0].winnerId as string
-      const groupWinner2: string = group[1].winnerId as string
-      newMatchupList.push({
-        teamIds: [groupWinner1, groupWinner2],
-        score: {
-          [groupWinner1]: 0,
-          [groupWinner2]: 0,
-        },
+    if (this.currentRound < this.numTotalRounds) {
+      const groupings = chunk(this.matchupList, 2)
+      const newMatchupList: PlayoffMatchup[] = []
+      groupings.forEach((group: PlayoffMatchup[]) => {
+        const groupWinner1: string = group[0].winnerId as string
+        const groupWinner2: string = group[1].winnerId as string
+        newMatchupList.push({
+          teamIds: [groupWinner1, groupWinner2],
+          score: {
+            [groupWinner1]: 0,
+            [groupWinner2]: 0,
+          },
+        })
       })
-    })
-    this.roundResults[`round-${this.currentRound}`].matchups = [
-      ...this.matchupList,
-    ]
-    this.currentRound++
-    this.matchupList = newMatchupList
+      this.currentRound++
+      this.roundResults[`round-${this.currentRound}`].matchups = [
+        ...newMatchupList,
+      ]
+      this.matchupList = newMatchupList
+    }
+  }
+
+  getChampionId(): string | null {
+    return this.championId
   }
 
   getMatchupList(): PlayoffMatchup[] {
@@ -145,6 +155,20 @@ export class PlayoffBracket {
 
   getNumTotalRounds(): number {
     return this.numTotalRounds
+  }
+
+  // Simulate all the matchups that don't involve the player
+  simulateGames(seasonManager: SeasonManager) {
+    this.matchupList.forEach((matchup) => {
+      if (!matchup.teamIds.includes(this.playerTeamId)) {
+        const team1Id = matchup.teamIds[0]
+        const team2Id = matchup.teamIds[1]
+        const team1 = seasonManager.getTeam(team1Id) as Team
+        const team2 = seasonManager.getTeam(team2Id) as Team
+        const matchOutcome = MatchSimulator.simulateMatchup(team1, team2)
+        this.updateScore(matchOutcome.winnerId)
+      }
+    })
   }
 
   public serialize(): any {
