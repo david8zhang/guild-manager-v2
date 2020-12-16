@@ -13,17 +13,18 @@ import {
 import { Team } from '../../../lib/model/Team'
 import { SeasonManager } from '../../../lib/SeasonManager'
 import { DEBUG_CONFIG } from '../../../lib/constants/debugConfig'
+import { ChampionshipResultsModal } from './ChampionshipResultsModal'
 
 interface Props {
-  navigation: any
   seasonManager: SeasonManager
   onMatchContinue: Function
+  proceedToOffseason: Function
 }
 
 export const Playoffs: React.FC<Props> = ({
-  navigation,
   seasonManager,
   onMatchContinue,
+  proceedToOffseason,
 }) => {
   const [
     playoffBracket,
@@ -31,15 +32,13 @@ export const Playoffs: React.FC<Props> = ({
   ] = React.useState<PlayoffBracket | null>(null)
   const [showMatch, setShowMatch] = React.useState<boolean>(false)
   const [isWinner, setIsWinner] = React.useState<boolean>(false)
+  const [playoffsOutcome, setPlayoffsOutcome] = React.useState<string>('')
 
   // Auto win simulation
   const [counter, setCounter] = React.useState(0)
 
   React.useEffect(() => {
-    let bracket = seasonManager.getPlayoffBracket()
-    if (!bracket) {
-      bracket = seasonManager.createPlayoffBracket()
-    }
+    const bracket = seasonManager.getPlayoffBracket()
     setPlayoffBracket(bracket)
   }, [])
 
@@ -51,10 +50,8 @@ export const Playoffs: React.FC<Props> = ({
     if (playoffBracket.hasRoundFinished()) {
       const championId = playoffBracket.getChampionId()
       if (championId) {
-        alert(
-          championId === seasonManager.getPlayer().teamId
-            ? 'Player Won!'
-            : 'Player lost...'
+        setPlayoffsOutcome(
+          championId === seasonManager.getPlayer().teamId ? 'win' : 'loss'
         )
       } else {
         playoffBracket.goToNextRound()
@@ -77,9 +74,7 @@ export const Playoffs: React.FC<Props> = ({
       if (matchup.winnerId === seasonManager.getPlayer().teamId) {
         setIsWinner(true)
       } else {
-        // Player lost the playoffs!
-        // TODO: Handle this logic
-        alert('player lost')
+        setPlayoffsOutcome('loss')
       }
     }
   }
@@ -171,6 +166,12 @@ export const Playoffs: React.FC<Props> = ({
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
       <Navbar title='Playoffs' />
+      <ChampionshipResultsModal
+        isOpen={playoffsOutcome !== ''}
+        didWin={playoffsOutcome === 'win'}
+        seasonManager={seasonManager}
+        onContinue={() => proceedToOffseason()}
+      />
       {renderBracket()}
       <View
         style={{

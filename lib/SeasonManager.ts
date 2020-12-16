@@ -18,6 +18,7 @@ export class SeasonManager {
   public playerTeam: Team
   public playerSeasonSchedule: Schedule
   public playoffBracket: any
+  public isOffseason: boolean
 
   constructor(playerObj: any) {
     this.playerTeam = Team.deserializeObj(playerObj)
@@ -38,6 +39,7 @@ export class SeasonManager {
       this.teamRecords[t.teamId] = new Record()
     })
     this.playoffBracket = null
+    this.isOffseason = false
   }
 
   public setPlayerTeam(playerTeam: Team) {
@@ -186,6 +188,7 @@ export class SeasonManager {
       playoffBracket: this.playoffBracket
         ? this.playoffBracket.serialize()
         : null,
+      isOffseason: this.isOffseason,
     }
   }
 
@@ -214,6 +217,7 @@ export class SeasonManager {
       teamRecords,
       playerTeam,
       playoffBracket,
+      isOffseason,
     } = serializedSeasonObj
     this.teams = teams.map((t: any) => Team.deserializeObj(t))
     this.playerSeasonSchedule = Schedule.deserializeObj(schedule, this.teams)
@@ -222,6 +226,7 @@ export class SeasonManager {
       this.teamRecords[key] = Record.deserializeObj(teamRecords[key])
     })
     this.playerTeam = Team.deserializeObj(playerTeam)
+    this.isOffseason = isOffseason
     if (playoffBracket) {
       const playoffTeams = this.getAllTeams().slice(
         0,
@@ -244,5 +249,14 @@ export class SeasonManager {
       const heroStats = heroMatchStats[hero.heroId]
       hero.savePostMatchStats(heroStats)
     })
+  }
+
+  public startOffseason() {
+    this.playoffBracket = null
+    this.isOffseason = true
+  }
+
+  public getIsOffseason() {
+    return this.isOffseason
   }
 }

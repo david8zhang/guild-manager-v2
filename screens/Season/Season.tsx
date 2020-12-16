@@ -22,6 +22,8 @@ import { connect } from 'react-redux'
 import { SeasonOverModal } from './components/SeasonOverModal'
 import { Playoffs } from './components/Playoffs'
 import { DEBUG_CONFIG } from '../../lib/constants/debugConfig'
+import { Offseason } from './components/Offseason'
+import { ChampionshipResultsModal } from './components/ChampionshipResultsModal'
 
 interface Props {
   savedSeason: any
@@ -50,6 +52,7 @@ const Season: React.FC<Props> = ({
   const [teamToShowRoster, setTeamToShowRoster] = React.useState<any>(null)
   const [showPlayoffs, setShowPlayoffs] = React.useState<boolean>(false)
   const [showSeasonOver, setShowSeasonOver] = React.useState<boolean>(false)
+  const [isOffseason, setIsOffseason] = React.useState<boolean>(false)
 
   React.useEffect(() => {
     const seasonManager = new SeasonManager(guild)
@@ -61,6 +64,8 @@ const Season: React.FC<Props> = ({
       setSchedule(serializedState.schedule)
     }
     setSeasonManager(seasonManager)
+    setShowPlayoffs(seasonManager.getPlayoffBracket() !== null)
+    setIsOffseason(seasonManager.getIsOffseason())
   }, [])
 
   if (!seasonManager) {
@@ -88,9 +93,19 @@ const Season: React.FC<Props> = ({
       if (!madePlayoffs) {
         setShowSeasonOver(true)
       } else {
+        seasonManager.createPlayoffBracket()
         setShowPlayoffs(true)
       }
+      serializeSeasonManager()
     }
+  }
+
+  const startOffseason = () => {
+    seasonManager.startOffseason()
+    setShowPlayoffs(false)
+    setShowMatch(false)
+    setIsOffseason(true)
+    serializeSeasonManager()
   }
 
   const applyTeamStatIncreases = (statIncreases: any) => {
@@ -147,11 +162,14 @@ const Season: React.FC<Props> = ({
     )
   }
 
+  if (isOffseason) {
+    return <Offseason />
+  }
+
   if (showPlayoffs) {
     return (
       <Playoffs
         seasonManager={seasonManager}
-        navigation={navigation}
         onMatchContinue={(outcome: {
           winner: string
           loser: string
@@ -165,6 +183,9 @@ const Season: React.FC<Props> = ({
           applyTeamStatIncreases(outcome.statIncreases)
           serializeSeasonManager()
         }}
+        proceedToOffseason={() => {
+          startOffseason()
+        }}
       />
     )
   }
@@ -173,8 +194,8 @@ const Season: React.FC<Props> = ({
     <View style={{ flex: 1, backgroundColor: 'white' }}>
       <SeasonOverModal
         onContinue={() => {
-          schedule.resetSeason()
           setShowSeasonOver(false)
+          startOffseason()
         }}
         isOpen={showSeasonOver}
       />
