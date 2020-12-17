@@ -85,9 +85,8 @@ const Season: React.FC<Props> = ({
     seasonManager.updateTeamRecord(winner, true)
     seasonManager.updateTeamRecord(loser, false)
     seasonManager.simulateMatchesAndUpdateRecords(enemyId)
-    if (schedule.getIsRegularSeason()) {
-      schedule.advanceToNextMatch()
-    } else {
+    schedule.advanceToNextMatch()
+    if (!schedule.getIsRegularSeason()) {
       // If the regular season is over, check if the player made the playoffs. If so, show the playoffs UI. If not, show a model that just restarts with a new season
       const madePlayoffs = seasonManager.didPlayerMakePlayoffs()
       if (!madePlayoffs) {
@@ -105,6 +104,12 @@ const Season: React.FC<Props> = ({
     setShowPlayoffs(false)
     setShowMatch(false)
     setIsOffseason(true)
+    serializeSeasonManager()
+  }
+
+  const restartSeason = () => {
+    seasonManager.restartSeason()
+    setIsOffseason(false)
     serializeSeasonManager()
   }
 
@@ -163,7 +168,14 @@ const Season: React.FC<Props> = ({
   }
 
   if (isOffseason) {
-    return <Offseason />
+    return (
+      <Offseason
+        seasonManager={seasonManager}
+        onRestartSeason={() => {
+          restartSeason()
+        }}
+      />
+    )
   }
 
   if (showPlayoffs) {

@@ -100,6 +100,23 @@ export class Hero {
     return Math.round((this.attack + this.defense + this.speed) / 3)
   }
 
+  public getStat(stat: string): number {
+    switch (stat) {
+      case 'attack':
+        return this.attack
+      case 'defense':
+        return this.defense
+      case 'speed':
+        return this.speed
+      case 'health':
+        return this.health
+      case 'magic':
+        return this.magic
+      default:
+        return 0
+    }
+  }
+
   public savePostMatchStats(heroStats: HeroStats): void {
     this.matchStats.totalDeaths += heroStats.numDeaths
     this.matchStats.totalKills += heroStats.numKills

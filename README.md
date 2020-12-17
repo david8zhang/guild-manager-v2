@@ -4,7 +4,7 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
-- Playoffs support (after every season match is finished)
+- Offseason training
 - Different map tiles
 
 ## Future Features (ordered by priority)

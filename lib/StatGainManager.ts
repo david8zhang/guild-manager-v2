@@ -19,7 +19,10 @@ export class StatGainManager {
       if (this.didStatIncrease(potential) || heroRef.heroId === mvpId) {
         // If the hero is the MVP, they should guarantee a stat increase
         const stat = this.getStatsToIncrease(heroRef.heroType)
-        const amountToIncrease = this.statIncreaseAmount(potential, stat)
+        const amountToIncrease = StatGainManager.statIncreaseAmount(
+          potential,
+          stat
+        )
         statGains[hero.getHeroRef().heroId] = {
           statToIncrease: stat,
           amountToIncrease,
@@ -50,7 +53,11 @@ export class StatGainManager {
     return increasableStats[Math.floor(Math.random() * increasableStats.length)]
   }
 
-  public statIncreaseAmount(potential: number, stat: string) {
+  public static statIncreaseAmount(
+    potential: number,
+    stat: string,
+    statIncreaseAmounts: number[] = [1, 2, 3]
+  ) {
     const statIncreaseAmountPercentages = [
       [0.8, 0.15, 0.05], // At potential = 1, probability to increase by 1 = 80%, increase by 2 = 15%, ...
       [0.6, 0.3, 0.1],
@@ -66,14 +73,14 @@ export class StatGainManager {
     const number = Math.floor(Math.random() * 100) + 1
     let statIncreaseAmount = 0
     if (number >= 0 && number < increaseBy1Threshold) {
-      statIncreaseAmount = 1
+      statIncreaseAmount = statIncreaseAmounts[0]
     } else if (
       number >= increaseBy1Threshold &&
       number < increaseBy2Threshold
     ) {
-      statIncreaseAmount = 2
+      statIncreaseAmount = statIncreaseAmounts[1]
     } else if (number >= increaseBy2Threshold) {
-      statIncreaseAmount = 3
+      statIncreaseAmount = statIncreaseAmounts[2]
     }
     if (stat === 'health') {
       statIncreaseAmount *= 10

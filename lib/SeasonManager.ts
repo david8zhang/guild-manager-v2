@@ -8,6 +8,7 @@ import { TEAM_NAMES } from './constants/fullTeamNames'
 import { HeroStats } from './model/HeroStats'
 import { PlayoffBracket } from './model/PlayoffBracket'
 import { MatchSimulator } from './simulation/MatchSimulator'
+import { StatGainManager } from './StatGainManager'
 
 export class SeasonManager {
   private static NUM_PLAYOFF_TEAMS = 4
@@ -61,6 +62,14 @@ export class SeasonManager {
       if (increasePayload) {
         const { statToIncrease, amountToIncrease } = increasePayload
         hero.improveStats(statToIncrease, amountToIncrease)
+      }
+
+      // If the hero had gains in multiple different stats
+      if (Array.isArray(increasePayload)) {
+        increasePayload.forEach((payload) => {
+          const { statToIncrease, amountToIncrease } = payload
+          hero.improveStats(statToIncrease, amountToIncrease)
+        })
       }
     })
   }
@@ -251,6 +260,12 @@ export class SeasonManager {
     })
   }
 
+  public restartSeason() {
+    this.playoffBracket = null
+    this.isOffseason = false
+    this.playerSeasonSchedule.resetSeason()
+  }
+
   public startOffseason() {
     this.playoffBracket = null
     this.isOffseason = true
@@ -258,5 +273,48 @@ export class SeasonManager {
 
   public getIsOffseason() {
     return this.isOffseason
+  }
+
+  // Maybe need to move this to its own manager (Offseason manager) at some point
+  public getPlayerTeamAverageStat(stat: string) {
+    const statAvg =
+      this.playerTeam.roster.reduce((acc: number, curr: Hero) => {
+        return acc + curr.getStat(stat.toLowerCase())
+      }, 0) / this.playerTeam.roster.length
+    return Math.round(statAvg)
+  }
+
+  // Train a set of specific stats
+  public trainStats(
+    statsToTrain: string[]
+  ): { trainingResult: any; statIncreases: any } {
+    const statIncreases: any = {}
+    const statTrainingResult: any = {}
+
+    statsToTrain
+      .map((s) => s.toLowerCase())
+      .forEach((stat: string) => {
+        if (!statTrainingResult[stat]) statTrainingResult[stat] = []
+        this.playerTeam.roster.forEach((hero: Hero) => {
+          const amountToIncrease = StatGainManager.statIncreaseAmount(
+            hero.potential,
+            stat,
+            [3, 5, 7]
+          )
+          if (!statIncreases[hero.heroId]) statIncreases[hero.heroId] = []
+          statIncreases[hero.heroId].push({
+            statToIncrease: stat,
+            amountToIncrease,
+          })
+          statTrainingResult[stat].push({
+            heroId: hero.heroId,
+            amountToIncrease,
+          })
+        })
+      })
+    return {
+      trainingResult: statTrainingResult,
+      statIncreases,
+    }
   }
 }

@@ -102,18 +102,28 @@ export class Schedule {
   }
 
   public advanceToNextMatch(): void {
-    this.currentMatchupIndex++
-    if (this.currentMatchupIndex === this.matchList.length - 1) {
+    if (this.currentMatchupIndex < this.matchList.length - 1) {
+      this.currentMatchupIndex++
+    } else {
       this.isRegularSeason = false
     }
   }
 
+  public getCurrentMatchupIndex(): number {
+    return this.currentMatchupIndex
+  }
+
   static deserializeObj(scheduleObj: any, teams: Team[]): Schedule {
-    const { matchList, currentMatchupIndex } = scheduleObj
+    const { matchList, currentMatchupIndex, isRegularSeason } = scheduleObj
     const dsMatchList = matchList.map((m: any) => {
       return Matchup.deserializeObj(m)
     })
-    return new Schedule({ teams, matchList: dsMatchList, currentMatchupIndex })
+    return new Schedule({
+      teams,
+      matchList: dsMatchList,
+      currentMatchupIndex,
+      isRegularSeason,
+    })
   }
 
   public serialize() {

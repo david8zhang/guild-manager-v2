@@ -52,7 +52,9 @@ export const SubstitutionScreen: React.FC<Props> = ({
         <StarterHero
           hero={heroToSwap}
           {...heroToSwap}
-          onShowDetails={() => {}}
+          onShowDetails={() => {
+            setHeroToDrilldown(heroToSwap)
+          }}
           teamColor={playerTeam.color}
           button={<View />}
         />
