@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Pressable, View } from 'react-native'
+import { Image, Pressable, View } from 'react-native'
 import { Portal } from 'react-native-paper'
 import { MatchManager } from '../../../lib/MatchManager'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
@@ -17,19 +17,22 @@ import { HeroInArenaDetails } from './HeroInArenaDetailsModal'
 import { ActionTypes } from '../../../lib/enemyAI/CPUBehavior'
 import { Tile } from './Tile'
 import { TileHighlight } from './TileHighlight'
+import { ArenaTileMapUnderlay } from './ArenaTileMapUnderlay'
 
 interface Props {
   matchManager: MatchManager
   refreshScore: Function
   refreshTimer: Function
+  isHome: boolean
 }
 
 export const Arena: React.FC<Props> = ({
   matchManager,
   refreshScore,
   refreshTimer,
+  isHome,
 }) => {
-  const { map, rows, cols } = matchManager?.getArena()
+  const { map, rows, cols, tileMap } = matchManager?.getArena()
   const highlightedSquares = matchManager.getHighlightedSquares()
 
   // When the player long presses on a hero, show an info modal that displays the hero and their buffs
@@ -220,7 +223,10 @@ export const Arena: React.FC<Props> = ({
     const hero: HeroInMatch = map[coordinates]
     const isSelected = hero && selectedHeroId === hero.getHeroRef().heroId
     const highlightColor = highlightedSquares[coordinates]
-    const isSpawnLocation = matchManager.isSpawnLocation(coordinates)
+    const isPlayerSpawnLocation = matchManager.isPlayerSpawnLocation(
+      coordinates
+    )
+    const isEnemySpawnLocation = matchManager.isEnemySpawnLocation(coordinates)
 
     if (isSelected) {
       return '#ffe599'
@@ -228,8 +234,11 @@ export const Arena: React.FC<Props> = ({
     if (!hero && highlightColor) {
       return highlightColor
     }
-    if (isSpawnLocation) {
-      return '#ddd'
+    if (isPlayerSpawnLocation) {
+      return matchManager.getPlayerTeamInfo().color
+    }
+    if (isEnemySpawnLocation) {
+      return matchManager.getEnemyTeamInfo().color
     }
     if (hero) {
       return 'white'
@@ -271,13 +280,13 @@ export const Arena: React.FC<Props> = ({
           style={{
             position: 'relative',
             overflow: 'visible',
+            backgroundColor: 'transparent',
             borderColor: 'rgba(0, 0, 0, 0.4)',
             borderLeftWidth: 1,
             borderBottomWidth: 1,
             zIndex: 1,
           }}
           cols={cols}
-          image={require('../../../assets/arena_tiles/grass-tile.png')}
         >
           <TileHighlight backgroundColor={squareColor} />
           <HeroInArena
@@ -510,10 +519,12 @@ export const Arena: React.FC<Props> = ({
         style={{
           marginLeft: 15,
           marginRight: 15,
-          borderTopWidth: 1,
-          borderRightWidth: 1,
-          marginTop: 10,
-          borderColor: '#ccc',
+          borderTopWidth: 5,
+          borderRightWidth: 5,
+          borderBottomWidth: 4,
+          borderLeftWidth: 4,
+          marginTop: 5,
+          borderColor: 'rgba(0, 0, 0, 0.4)',
           flexDirection: 'row',
           flexWrap: 'wrap',
           backgroundColor: '#ddd',
@@ -521,6 +532,19 @@ export const Arena: React.FC<Props> = ({
           justifyContent: 'center',
         }}
       >
+        {/* Arena tile map underlay beneath grid */}
+        <ArenaTileMapUnderlay
+          teamName={
+            isHome
+              ? matchManager.getPlayerTeamInfo().name
+              : matchManager.getEnemyTeamInfo().name
+          }
+          tileMap={tileMap}
+          rows={rows}
+          cols={cols}
+        />
+
+        {/* Render actual interactable grid cells */}
         {renderGrid()}
 
         {/* If all player heroes are dead, show a popup and let them skip their turn */}

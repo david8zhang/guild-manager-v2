@@ -7,7 +7,7 @@ interface Props {
   cols: number
   children: any
   style?: any
-  image?: any
+  pointerEvents?: any
 }
 
 export const Tile: React.FC<Props> = ({
@@ -16,7 +16,7 @@ export const Tile: React.FC<Props> = ({
   style,
   children,
   cols,
-  image,
+  pointerEvents,
 }) => {
   const WIDTH = `${100 / cols - 0.01}%`
   const HEIGHT = 58
@@ -27,26 +27,16 @@ export const Tile: React.FC<Props> = ({
     ...style,
   }
 
-  const imageBg = image ? (
-    <Image
-      source={image}
-      style={{ width: '100%', height: '100%', zIndex: 0, position: 'absolute' }}
-      resizeMode='cover'
-    />
-  ) : (
-    <View />
-  )
-
   if (!onLongPress && !onPress) {
     return (
-      <View style={defaultStyle}>
-        {imageBg}
+      <View pointerEvents={pointerEvents || 'auto'} style={defaultStyle}>
         {children}
       </View>
     )
   }
   return (
     <Pressable
+      pointerEvents={pointerEvents || 'auto'}
       onLongPress={() => {
         if (onLongPress) onLongPress()
       }}
@@ -55,7 +45,6 @@ export const Tile: React.FC<Props> = ({
       }}
       style={defaultStyle}
     >
-      {imageBg}
       {children}
     </Pressable>
   )

@@ -14,6 +14,7 @@ import { Team } from '../../../lib/model/Team'
 import { SeasonManager } from '../../../lib/SeasonManager'
 import { DEBUG_CONFIG } from '../../../lib/constants/debugConfig'
 import { ChampionshipResultsModal } from './ChampionshipResultsModal'
+import { Record } from '../../../lib/model/Record'
 
 interface Props {
   seasonManager: SeasonManager
@@ -79,6 +80,23 @@ export const Playoffs: React.FC<Props> = ({
     }
   }
 
+  const getIsHome = (matchup: PlayoffMatchup) => {
+    const playerTeamId = seasonManager.getPlayer().teamId
+    const opponentId = matchup.teamIds.find(
+      (id) => id !== seasonManager.getPlayer().teamId
+    ) as string
+    const opponentRecord = seasonManager.getTeamRecord(opponentId) as Record
+    const playerRecord = seasonManager.getTeamRecord(playerTeamId) as Record
+    const playerBetterRecord =
+      playerRecord.getWinLossRatio() > opponentRecord.getWinLossRatio()
+
+    if (matchup.gameNumber % 2 !== 0) {
+      return playerBetterRecord
+    } else {
+      return !playerBetterRecord
+    }
+  }
+
   if (showMatch) {
     const matchup = playoffBracket.getPlayerMatchup() as PlayoffMatchup
     const opponentId = matchup.teamIds.find(
@@ -87,6 +105,7 @@ export const Playoffs: React.FC<Props> = ({
 
     return (
       <Match
+        isHome={getIsHome(matchup)}
         playerTeam={seasonManager.getPlayer()}
         enemyTeam={seasonManager.getTeam(opponentId) as Team}
         onContinue={(outcome: {

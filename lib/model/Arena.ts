@@ -1,4 +1,4 @@
-import { Hero } from './Hero'
+import { ARENA_MAP } from '../constants/arenaTiles'
 import { HeroInMatch } from './HeroInMatch'
 
 export class Arena {
@@ -12,6 +12,7 @@ export class Arena {
   public highlightedSquares: {
     [key: string]: string
   }
+  public tileMap: number[][] = ARENA_MAP
 
   constructor(playerHeroes: HeroInMatch[], enemyHeroes: HeroInMatch[]) {
     this.playerHeroes = playerHeroes

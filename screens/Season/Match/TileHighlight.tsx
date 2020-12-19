@@ -13,7 +13,7 @@ export const TileHighlight: React.FC<Props> = ({ backgroundColor }) => {
         height: '100%',
         position: 'absolute',
         backgroundColor,
-        opacity: backgroundColor === 'white' ? 0 : 1,
+        opacity: backgroundColor === 'white' ? 0 : 0.7,
       }}
     ></View>
   )

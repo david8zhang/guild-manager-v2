@@ -17,14 +17,18 @@ class Matchup {
     opponentPoints: number
   } | null = null
 
+  public isHome: boolean
+
   constructor(teamInfo: any) {
     this.teamInfo = teamInfo
+    this.isHome = Math.floor(Math.random() * 2) == 1
   }
 
   public static deserializeObj(obj: any): Matchup {
     const matchup: Matchup = new Matchup(obj.teamInfo)
     matchup.matchResult = obj.matchResult === null ? null : obj.matchResult
     matchup.score = obj.score
+    matchup.isHome = obj.isHome
     return matchup
   }
 
@@ -33,6 +37,7 @@ class Matchup {
       teamInfo: this.teamInfo,
       matchResult: this.matchResult !== null ? this.matchResult : null,
       score: this.score,
+      isHome: this.isHome,
     }
   }
 }

@@ -57,6 +57,7 @@ export const SkillTargetOverlay: React.FC<Props> = ({
             alignItems: 'center',
             justifyContent: 'center',
             position: 'relative',
+            backgroundColor: 'transparent',
             padding: 5,
           }}
           onPress={() => {
@@ -70,7 +71,7 @@ export const SkillTargetOverlay: React.FC<Props> = ({
         >
           {shouldShowMenu ? (
             <Button
-              style={{ width: 80, marginBottom: 5, padding: 2 }}
+              style={{ width: 80, marginBottom: 5, padding: 5 }}
               textStyle={{ fontSize: 10 }}
               text='Cancel'
               onPress={() => {

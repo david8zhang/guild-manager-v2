@@ -117,6 +117,7 @@ export class MatchManager {
       map: this.arena.getMap(),
       rows: Arena.NUM_ROWS,
       cols: Arena.NUM_COLS,
+      tileMap: this.arena.tileMap,
     }
   }
 
@@ -356,6 +357,28 @@ export class MatchManager {
     )
     for (let i = 0; i < allSpawnLocations.length; i++) {
       const coord = allSpawnLocations[i]
+      const stringified = `${coord[0]},${coord[1]}`
+      if (stringified === coordinates) {
+        return true
+      }
+    }
+    return false
+  }
+
+  public isPlayerSpawnLocation(coordinates: string): boolean {
+    for (let i = 0; i < this.playerSpawnLocations.length; i++) {
+      const coord = this.playerSpawnLocations[i]
+      const stringified = `${coord[0]},${coord[1]}`
+      if (stringified === coordinates) {
+        return true
+      }
+    }
+    return false
+  }
+
+  public isEnemySpawnLocation(coordinates: string): boolean {
+    for (let i = 0; i < this.enemySpawnLocations.length; i++) {
+      const coord = this.enemySpawnLocations[i]
       const stringified = `${coord[0]},${coord[1]}`
       if (stringified === coordinates) {
         return true

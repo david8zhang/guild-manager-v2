@@ -13,12 +13,14 @@ interface Props {
   playerTeam: Team
   enemyTeam: Team
   onContinue: Function
+  isHome: boolean
 }
 
 export const Match: React.FC<Props> = ({
   playerTeam,
   enemyTeam,
   onContinue,
+  isHome,
 }) => {
   const [matchManager, setMatchManager] = React.useState<MatchManager | null>(
     null
@@ -91,6 +93,7 @@ export const Match: React.FC<Props> = ({
         />
         <View style={{ flex: 1 }}>
           <Arena
+            isHome={isHome}
             matchManager={matchManager}
             refreshScore={() => {
               setScore({ ...matchManager.getScore() })

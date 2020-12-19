@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { Button } from '../../../components'
 import { MatchManager } from '../../../lib/MatchManager'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
@@ -41,76 +41,53 @@ export const SkillSetOverlayMenu: React.FC<Props> = ({
     moveSet.length > 0
       ? moveSet.map((move: string) => MoveFactory.getMove(move))
       : []
-
-  const renderGrid = () => {
-    const grid = []
-    const totalNumCells = rows * cols
-    const { row, col } = menuToShowCoords
-    for (let i = 0; i < totalNumCells; i++) {
-      const coordinates = `${Math.floor(i / cols)},${i % cols}`
-      const shouldShowMenu = coordinates === `${row},${col}`
-      grid.push(
-        <View
-          key={`menu-${coordinates}`}
-          style={{
-            width: `${100 / cols - 0.01}%`,
-            height: 58,
-            alignItems: 'center',
-            justifyContent: 'center',
-            position: 'relative',
-            padding: 5,
-          }}
-        >
-          {shouldShowMenu && (
-            <View>
-              {moveObjects.map((move: Move | null) => {
-                if (!move) {
-                  return <View />
-                }
-                return (
-                  <Button
-                    key={move.name}
-                    style={{ width: 90, marginBottom: 5, padding: 2 }}
-                    textStyle={{ fontSize: 10 }}
-                    text={move.name}
-                    onPress={() => {
-                      onUseSkill(move)
-                    }}
-                  />
-                )
-              })}
-              <Button
-                key='cancel'
-                style={{ width: 90, marginBottom: 5, padding: 2 }}
-                textStyle={{ fontSize: 10 }}
-                text='Cancel'
-                onPress={() => {
-                  onCancel()
-                }}
-              />
-            </View>
-          )}
-        </View>
-      )
-    }
-    return grid
-  }
   return (
     <View
       style={{
-        left: 0,
-        right: 0,
-        borderColor: 'gray',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        justifyContent: 'center',
         position: 'absolute',
         top: 0,
         zIndex: 1,
+        left: 0,
+        opacity: 0.7,
+        backgroundColor: 'gray',
       }}
     >
-      {renderGrid()}
+      <View>
+        {moveObjects.map((move: Move | null) => {
+          if (!move) {
+            return <View />
+          }
+          return (
+            <Button
+              key={move.name}
+              style={styles.buttonStyle}
+              textStyle={{ fontSize: 15 }}
+              text={move.name}
+              onPress={() => {
+                onUseSkill(move)
+              }}
+            />
+          )
+        })}
+        <Button
+          key='cancel'
+          style={styles.buttonStyle}
+          textStyle={{ fontSize: 15 }}
+          text='Cancel'
+          onPress={() => {
+            onCancel()
+          }}
+        />
+      </View>
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  buttonStyle: {
+    width: 150,
+    marginBottom: 1,
+    padding: 5,
+    backgroundColor: 'white',
+  },
+})

@@ -226,17 +226,33 @@ const Season: React.FC<Props> = ({
               justifyContent: 'center',
             }}
           >
-            <MatchupTeam
-              team={playerTeam}
-              record={seasonManager.getTeamRecord(playerTeam.teamId)}
-            />
+            {currentMatchup.isHome ? (
+              <MatchupTeam
+                team={playerTeam}
+                record={seasonManager.getTeamRecord(playerTeam.teamId)}
+              />
+            ) : (
+              <MatchupTeam
+                team={currentMatchup.teamInfo}
+                record={seasonManager.getTeamRecord(
+                  currentMatchup.teamInfo.teamId
+                )}
+              />
+            )}
             <Text style={{ fontSize: 20, textAlign: 'center' }}>@</Text>
-            <MatchupTeam
-              team={currentMatchup.teamInfo}
-              record={seasonManager.getTeamRecord(
-                currentMatchup.teamInfo.teamId
-              )}
-            />
+            {currentMatchup.isHome ? (
+              <MatchupTeam
+                team={currentMatchup.teamInfo}
+                record={seasonManager.getTeamRecord(
+                  currentMatchup.teamInfo.teamId
+                )}
+              />
+            ) : (
+              <MatchupTeam
+                team={playerTeam}
+                record={seasonManager.getTeamRecord(playerTeam.teamId)}
+              />
+            )}
           </View>
           <Button
             style={{ alignSelf: 'center', marginTop: 10 }}

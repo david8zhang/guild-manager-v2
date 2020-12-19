@@ -10,6 +10,7 @@ export interface PlayoffMatchup {
     [teamId: string]: number
   }
   winnerId?: string
+  gameNumber: number
 }
 
 export class PlayoffBracket {
@@ -73,6 +74,7 @@ export class PlayoffBracket {
           [team.teamId]: 0,
           [opponent.teamId]: 0,
         },
+        gameNumber: 1,
       })
     })
     return matchupList
@@ -100,6 +102,8 @@ export class PlayoffBracket {
         if (this.currentRound === this.numTotalRounds) {
           this.championId = winnerId
         }
+      } else {
+        matchup.gameNumber++
       }
     }
   }
@@ -127,6 +131,7 @@ export class PlayoffBracket {
             [groupWinner1]: 0,
             [groupWinner2]: 0,
           },
+          gameNumber: 1,
         })
       })
       this.currentRound++
