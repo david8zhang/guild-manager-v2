@@ -6,6 +6,6 @@ export const DEBUG_CONFIG: any = {
   // enemyOneShotRate: 1.0,
   // enemyCritRate: 0.2,
   numTurnsInMatch: 3,
-  autoWinGames: true,
+  // autoWinGames: true,
   // disableOvertime: true,
 }

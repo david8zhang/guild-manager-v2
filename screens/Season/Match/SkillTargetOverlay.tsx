@@ -6,6 +6,7 @@ import { MatchManager } from '../../../lib/MatchManager'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
 import { Move } from '../../../lib/moves/Move'
 import { SkillCutsceneModal } from './SkillCutsceneModal'
+import { Tile } from './Tile'
 
 interface Props {
   rows: number
@@ -49,11 +50,10 @@ export const SkillTargetOverlay: React.FC<Props> = ({
           `${cancelMoveMenuCoords.row},${cancelMoveMenuCoords.col}`
 
       grid.push(
-        <Pressable
+        <Tile
           key={`menu-${coordinates}`}
+          cols={cols}
           style={{
-            width: `${100 / cols}%`,
-            height: 50,
             alignItems: 'center',
             justifyContent: 'center',
             position: 'relative',
@@ -68,7 +68,7 @@ export const SkillTargetOverlay: React.FC<Props> = ({
             }
           }}
         >
-          {shouldShowMenu && (
+          {shouldShowMenu ? (
             <Button
               style={{ width: 80, marginBottom: 5, padding: 2 }}
               textStyle={{ fontSize: 10 }}
@@ -79,8 +79,10 @@ export const SkillTargetOverlay: React.FC<Props> = ({
                 }
               }}
             />
+          ) : (
+            <View />
           )}
-        </Pressable>
+        </Tile>
       )
     }
     return grid

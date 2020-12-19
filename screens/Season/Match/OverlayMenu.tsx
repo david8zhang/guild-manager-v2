@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { View } from 'react-native'
 import { Button } from '../../../components'
+import { Tile } from './Tile'
 
 interface Props {
   rows: number
@@ -36,22 +37,22 @@ export const OverlayMenu: React.FC<Props> = ({
       const coordinates = `${Math.floor(i / cols)},${i % cols}`
       const shouldShowMenu = coordinates === `${row},${col}`
       grid.push(
-        <View
+        <Tile
           key={`menu-${coordinates}`}
+          cols={cols}
           style={{
-            width: `${100 / cols}%`,
-            height: 50,
             alignItems: 'center',
             justifyContent: 'center',
             position: 'relative',
             padding: 5,
+            backgroundColor: 'transparent',
           }}
         >
-          {shouldShowMenu && (
+          {shouldShowMenu ? (
             <View>
               {canAttack && (
                 <Button
-                  style={{ width: 90, marginBottom: 5, padding: 2 }}
+                  style={{ width: 90, marginBottom: 2, padding: 2 }}
                   textStyle={{ fontSize: 10 }}
                   text='Attack'
                   onPress={() => {
@@ -61,7 +62,7 @@ export const OverlayMenu: React.FC<Props> = ({
               )}
               {canUseSkill && (
                 <Button
-                  style={{ width: 90, marginBottom: 5, padding: 2 }}
+                  style={{ width: 90, marginBottom: 2, padding: 2 }}
                   textStyle={{ fontSize: 10 }}
                   text='Use Skill'
                   onPress={() => {
@@ -70,7 +71,7 @@ export const OverlayMenu: React.FC<Props> = ({
                 />
               )}
               <Button
-                style={{ width: 90, marginBottom: 5, padding: 2 }}
+                style={{ width: 90, marginBottom: 2, padding: 2 }}
                 textStyle={{ fontSize: 10 }}
                 text='Wait'
                 onPress={() => {
@@ -78,7 +79,7 @@ export const OverlayMenu: React.FC<Props> = ({
                 }}
               />
               <Button
-                style={{ width: 90, marginBottom: 5, padding: 2 }}
+                style={{ width: 90, marginBottom: 2, padding: 2 }}
                 textStyle={{ fontSize: 10 }}
                 text='Cancel Move'
                 onPress={() => {
@@ -86,8 +87,10 @@ export const OverlayMenu: React.FC<Props> = ({
                 }}
               />
             </View>
+          ) : (
+            <View />
           )}
-        </View>
+        </Tile>
       )
     }
     return grid

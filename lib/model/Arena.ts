@@ -2,8 +2,8 @@ import { Hero } from './Hero'
 import { HeroInMatch } from './HeroInMatch'
 
 export class Arena {
-  public static NUM_COLS = 13
-  public static NUM_ROWS = 6
+  public static NUM_COLS = 10
+  public static NUM_ROWS = 5
   public map: {
     [key: string]: HeroInMatch | null
   }

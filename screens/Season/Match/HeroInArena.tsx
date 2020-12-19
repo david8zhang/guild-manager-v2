@@ -6,10 +6,10 @@ import { AnimatedHealthBar } from './AnimatedHealthBar'
 import { HeroImage } from '../../../components'
 
 interface Props {
-  hero: HeroInMatch
   teamColor: string
   style?: any
   highlightColor?: string
+  hero?: HeroInMatch
 }
 
 export const HeroInArena: React.FC<Props> = ({
@@ -23,27 +23,27 @@ export const HeroInArena: React.FC<Props> = ({
   }
   const heroRef = hero.getHeroRef()
   return (
-    <View>
+    <View style={{ height: '100%', width: '100%' }}>
       {hero.isDead && (
         <View
           style={{
             position: 'absolute',
+            zIndex: 1,
             top: 0,
             left: 0,
             right: 0,
             bottom: 0,
             justifyContent: 'center',
             alignItems: 'center',
-            zIndex: 1,
           }}
         >
           <FontAwesome name='times' size={55} color='red' />
         </View>
       )}
       <HeroImage
-        width={48}
-        height={48}
-        style={{ width: 48, height: 48, alignSelf: 'center' }}
+        width={55}
+        height={55}
+        style={{ width: 55, height: 55, alignSelf: 'center' }}
         hero={hero.getHeroRef()}
         teamColor={teamColor}
         hideOverlay
@@ -59,6 +59,7 @@ export const HeroInArena: React.FC<Props> = ({
           padding: 1,
           marginTop: 2,
           position: 'absolute',
+          zIndex: 1,
           top: 2,
         }}
       />
@@ -66,8 +67,9 @@ export const HeroInArena: React.FC<Props> = ({
         <View
           style={{
             position: 'absolute',
-            height: 60,
-            width: 60,
+            zIndex: 1,
+            height: '100%',
+            width: '100%',
             backgroundColor: '#DAA520',
             opacity: 0.4,
           }}
@@ -77,8 +79,9 @@ export const HeroInArena: React.FC<Props> = ({
         <View
           style={{
             position: 'absolute',
-            height: 60,
-            width: 60,
+            zIndex: 1,
+            height: '100%',
+            width: '100%',
             backgroundColor: 'black',
             opacity: 0.2,
           }}
@@ -88,8 +91,9 @@ export const HeroInArena: React.FC<Props> = ({
         <View
           style={{
             position: 'absolute',
-            height: 60,
-            width: 60,
+            zIndex: 1,
+            height: '100%',
+            width: '100%',
             backgroundColor: highlightColor,
             opacity: 0.4,
           }}

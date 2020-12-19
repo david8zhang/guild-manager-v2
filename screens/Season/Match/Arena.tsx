@@ -15,6 +15,8 @@ import { TurnDisplayModal } from './TurnDisplayModal'
 import { EnemySkillCutsceneModal } from './EnemySkillCutsceneModal'
 import { HeroInArenaDetails } from './HeroInArenaDetailsModal'
 import { ActionTypes } from '../../../lib/enemyAI/CPUBehavior'
+import { Tile } from './Tile'
+import { TileHighlight } from './TileHighlight'
 
 interface Props {
   matchManager: MatchManager
@@ -31,9 +33,10 @@ export const Arena: React.FC<Props> = ({
   const highlightedSquares = matchManager.getHighlightedSquares()
 
   // When the player long presses on a hero, show an info modal that displays the hero and their buffs
-  const [showHeroInArenaDetails, setShowHeroInArenaDetails] = React.useState<
-    any
-  >(null)
+  const [
+    showHeroInArenaDetails,
+    setShowHeroInArenaDetails,
+  ] = React.useState<any>(null)
   const [heroInArenaDetailsColor, setHeroInArenaDetailsColor] = React.useState(
     ''
   )
@@ -41,7 +44,7 @@ export const Arena: React.FC<Props> = ({
   // Where to show the overlay menu with 'wait', 'cancel move', and 'attack'
   const [menuToShowCoords, setMenuToShowCoords] = React.useState<any>(null)
   const [moveSetMenuCoords, setMoveSetMenuCoords] = React.useState<any>(null) // coordinates for showing the move set menu
-  const [pendingMove, setPendingMove] = React.useState<any>(null) // store a reference to move so that it can be reversed
+  const [moveToUndo, setMoveToUndo] = React.useState<any>(null) // store a reference to move so that it can be reversed
 
   // Check if it's the player's turn, also show a turn display modal
   const [isPlayerTurn, setIsPlayerTurn] = React.useState(true)
@@ -51,14 +54,16 @@ export const Arena: React.FC<Props> = ({
   const [showAttackButton, setShowAttackButton] = React.useState(false)
   const [targetableHeroesMap, setTargetHeroesMap] = React.useState(null)
   const [attackerHero, setAttackerHero] = React.useState<any>(null)
-  const [cancelAttackMenuCoords, setCancelAttackMenuCoords] = React.useState<
-    any
-  >(null)
+  const [
+    cancelAttackMenuCoords,
+    setCancelAttackMenuCoords,
+  ] = React.useState<any>(null)
 
   // Manage skill actions for player (i.e, support moves like buffs and heals)
-  const [heroesWithinSkillRange, setHeroesWithinSkillRange] = React.useState<
-    any
-  >(null)
+  const [
+    heroesWithinSkillRange,
+    setHeroesWithinSkillRange,
+  ] = React.useState<any>(null)
   const [moveToUse, setMoveToUse] = React.useState<any>(null)
   const [heroUsingSkill, setHeroUsingSkill] = React.useState<any>(null)
   const [cancelMoveMenuCoords, setCancelMoveMenuCoords] = React.useState<any>(
@@ -102,7 +107,7 @@ export const Arena: React.FC<Props> = ({
         col: parseInt(targetCol, 10),
       },
     })
-    setPendingMove({
+    setMoveToUndo({
       origin: [startRow, startCol],
       dest: [targetRow, targetCol],
     })
@@ -246,8 +251,9 @@ export const Arena: React.FC<Props> = ({
           : enemyTeamColor
       }
 
+      const squareColor = getSquareColor(coordinates)
       grid.push(
-        <Pressable
+        <Tile
           key={`hero-${coordinates}`}
           onLongPress={() => {
             if (hero) {
@@ -263,23 +269,23 @@ export const Arena: React.FC<Props> = ({
             onSquarePress(hero, coordinates)
           }}
           style={{
+            position: 'relative',
             overflow: 'visible',
-            width: `${100 / cols}%`,
-            borderColor: 'gray',
+            borderColor: 'rgba(0, 0, 0, 0.4)',
             borderLeftWidth: 1,
             borderBottomWidth: 1,
-            height: 50,
-            backgroundColor: getSquareColor(coordinates),
-            position: 'relative',
             zIndex: 1,
           }}
+          cols={cols}
+          image={require('../../../assets/arena_tiles/grass-tile.png')}
         >
+          <TileHighlight backgroundColor={squareColor} />
           <HeroInArena
             hero={hero}
             teamColor={teamColor}
             highlightColor={highlightedSquares[coordinates]}
           />
-        </Pressable>
+        </Tile>
       )
     }
     return grid
@@ -447,7 +453,7 @@ export const Arena: React.FC<Props> = ({
     setMenuToShowCoords(null)
     setSelectedHeroAndCoordinates(null)
     setShowAttackButton(false)
-    setPendingMove(null)
+    setMoveToUndo(null)
 
     setTargetHeroesMap(null)
     setMoveToUse(null)
@@ -462,8 +468,8 @@ export const Arena: React.FC<Props> = ({
     )
     if (hero) {
       hero.hasMoved = false
-      if (pendingMove) {
-        const { origin, dest } = pendingMove
+      if (moveToUndo) {
+        const { origin, dest } = moveToUndo
         matchManager.moveHero({
           start: {
             row: dest[0],
@@ -506,7 +512,8 @@ export const Arena: React.FC<Props> = ({
           marginRight: 15,
           borderTopWidth: 1,
           borderRightWidth: 1,
-          borderColor: 'gray',
+          marginTop: 10,
+          borderColor: '#ccc',
           flexDirection: 'row',
           flexWrap: 'wrap',
           backgroundColor: '#ddd',

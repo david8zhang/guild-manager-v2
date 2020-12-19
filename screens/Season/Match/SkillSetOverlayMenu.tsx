@@ -53,8 +53,8 @@ export const SkillSetOverlayMenu: React.FC<Props> = ({
         <View
           key={`menu-${coordinates}`}
           style={{
-            width: `${100 / cols}%`,
-            height: 50,
+            width: `${100 / cols - 0.01}%`,
+            height: 58,
             alignItems: 'center',
             justifyContent: 'center',
             position: 'relative',

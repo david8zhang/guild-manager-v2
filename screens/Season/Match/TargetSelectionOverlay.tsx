@@ -6,6 +6,7 @@ import { MatchManager } from '../../../lib/MatchManager'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
 import { AttackCutsceneModal } from './AttackCutsceneModal'
 import { AttackMatchupModal } from './AttackMatchupModal'
+import { Tile } from './Tile'
 
 interface Props {
   rows: number
@@ -43,23 +44,23 @@ export const TargetSelectionOverlay: React.FC<Props> = ({
         coordinates ===
           `${cancelAttackMenuCoords.row},${cancelAttackMenuCoords.col}`
       grid.push(
-        <Pressable
+        <Tile
           key={`menu-${coordinates}`}
           style={{
-            width: `${100 / cols}%`,
-            height: 50,
             alignItems: 'center',
             justifyContent: 'center',
             position: 'relative',
             padding: 5,
+            backgroundColor: 'transparent',
           }}
           onPress={() => {
             if (selectableHero) {
               setTargetToAttack(selectableHero)
             }
           }}
+          cols={cols}
         >
-          {shouldShowMenu && (
+          {shouldShowMenu ? (
             <Button
               style={{ width: 80, marginBottom: 5, padding: 2 }}
               textStyle={{ fontSize: 10 }}
@@ -70,8 +71,10 @@ export const TargetSelectionOverlay: React.FC<Props> = ({
                 }
               }}
             />
+          ) : (
+            <View />
           )}
-        </Pressable>
+        </Tile>
       )
     }
     return grid
