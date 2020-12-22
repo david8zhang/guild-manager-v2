@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { Text, View } from 'react-native'
 import { Button, Navbar } from '../../../components'
+import { Hero } from '../../../lib/model/Hero'
 import { SeasonManager } from '../../../lib/SeasonManager'
+import { DetailedRoster } from '../../MyTeam/DetailedRoster'
+import { OffseasonTrainingRoster } from './OffseasonTrainingRoster'
+import { OffseasonStatPicker } from './OffseasonStatPicker'
 import { TrainingCamp } from './TrainingCamp'
 
 interface Props {
@@ -14,7 +18,9 @@ export const Offseason: React.FC<Props> = ({
   onRestartSeason,
 }) => {
   const [statsToTrain, setStatsToTrain] = React.useState<string[]>([])
+  const [heroesToTrain, setHeroesToTrain] = React.useState<any[]>([])
   const [campStarted, setCampStarted] = React.useState<boolean>(false)
+  const [selectStage, setSelectStage] = React.useState<string>('hero')
 
   const selectStatToTrain = (stat: string) => {
     if (statsToTrain.length < 2) {
@@ -27,18 +33,29 @@ export const Offseason: React.FC<Props> = ({
     setStatsToTrain(newStatsToTrain)
   }
 
-  const isStatSelected = (stat: string): boolean => {
-    return statsToTrain.includes(stat)
-  }
-
   const startTrainingCamp = () => {
     setCampStarted(true)
+  }
+
+  const selectHeroToTrain = (hero: Hero) => {
+    if (heroesToTrain.length < 3) {
+      const newHeroesToTrain = heroesToTrain.concat(hero)
+      setHeroesToTrain(newHeroesToTrain)
+    }
+  }
+
+  const deselectHeroToTrain = (hero: Hero) => {
+    const newHeroesToTrain = heroesToTrain.filter(
+      (h) => h.heroId !== hero.heroId
+    )
+    setHeroesToTrain(newHeroesToTrain)
   }
 
   if (campStarted) {
     return (
       <TrainingCamp
         seasonManager={seasonManager}
+        heroesToTrain={heroesToTrain}
         statsToTrain={statsToTrain}
         onFinishTrainingCamp={() => {
           setCampStarted(false)
@@ -48,75 +65,88 @@ export const Offseason: React.FC<Props> = ({
     )
   }
 
-  const stats = ['Attack', 'Defense', 'Speed', 'Magic', 'Health']
+  const renderContent = () => {
+    const stats = ['Attack', 'Defense', 'Speed', 'Magic', 'Health']
+
+    if (selectStage === 'hero') {
+      return (
+        <OffseasonTrainingRoster
+          heroes={seasonManager.getPlayer().roster}
+          onHeroSelect={(hero: Hero, isHeroSelected: boolean) => {
+            if (isHeroSelected) {
+              deselectHeroToTrain(hero)
+            } else {
+              selectHeroToTrain(hero)
+            }
+          }}
+          selectedHeroIds={heroesToTrain.map((h: Hero) => h.heroId)}
+        />
+      )
+    } else {
+      return (
+        <OffseasonStatPicker
+          statsToTrain={statsToTrain}
+          stats={stats}
+          getPlayerTeamAverageStat={(stat: string) =>
+            SeasonManager.getPlayerTeamAverageStat(stat, heroesToTrain)
+          }
+          onSelectStat={(stat: string, isStatSelected: boolean) => {
+            if (isStatSelected) {
+              deselectStatToTrain(stat)
+            } else {
+              selectStatToTrain(stat)
+            }
+          }}
+        />
+      )
+    }
+  }
+
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
       <Navbar title='Offseason' />
-      <View style={{ margin: 15, flexDirection: 'row', alignItems: 'center' }}>
+      <View
+        style={{
+          margin: 15,
+          flexDirection: 'row',
+          alignItems: 'flex-start',
+          justifyContent: 'center',
+        }}
+      >
         <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 25 }}>Offseason Training Camp</Text>
+          <Text style={{ fontSize: 22 }}>Offseason Training Camp</Text>
           <Text style={{ fontSize: 16 }}>
-            Select 2 areas to focus on during training camp
+            {selectStage === 'hero'
+              ? 'Select up to 3 heroes to train in camp'
+              : 'Select up to 2 stats to focus on'}
           </Text>
         </View>
-        <View>
-          {statsToTrain.length === 2 ? (
+        <View style={{ alignSelf: 'center', flexDirection: 'row' }}>
+          {selectStage === 'stat' && (
             <Button
-              text='Start Camp'
+              style={{ marginRight: 10 }}
+              text='Back'
               onPress={() => {
-                startTrainingCamp()
+                setSelectStage('hero')
               }}
             />
-          ) : (
-            <View />
+          )}
+          {((selectStage === 'hero' && heroesToTrain.length >= 1) ||
+            (selectStage === 'stat' && statsToTrain.length >= 1)) && (
+            <Button
+              text='Continue'
+              onPress={() => {
+                if (selectStage === 'stat') {
+                  startTrainingCamp()
+                } else {
+                  setSelectStage('stat')
+                }
+              }}
+            />
           )}
         </View>
       </View>
-      <View style={{ flexDirection: 'row' }}>
-        {stats.map((stat) => {
-          const averageStatValue = seasonManager.getPlayerTeamAverageStat(stat)
-          const statSelected = isStatSelected(stat)
-          return (
-            <View
-              key={stat}
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: 20,
-                flex: 1,
-                height: 210,
-                borderWidth: 1,
-                borderColor: 'black',
-                margin: 5,
-              }}
-            >
-              <Text style={{ fontSize: 20, marginBottom: 5 }}>{stat}</Text>
-              <Text style={{ fontSize: 40 }}>{averageStatValue}</Text>
-              <Text
-                style={{ fontSize: 14, textAlign: 'center', marginBottom: 15 }}
-              >
-                Avg. {stat}
-              </Text>
-              <Button
-                style={{
-                  backgroundColor: statSelected ? '#444' : 'white',
-                }}
-                textStyle={{
-                  color: statSelected ? 'white' : '#444',
-                }}
-                text={statSelected ? 'Deselect' : 'Select'}
-                onPress={() => {
-                  if (statSelected) {
-                    deselectStatToTrain(stat)
-                  } else {
-                    selectStatToTrain(stat)
-                  }
-                }}
-              />
-            </View>
-          )
-        })}
-      </View>
+      {renderContent()}
     </View>
   )
 }

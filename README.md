@@ -4,8 +4,7 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
-- Offseason training
-- Different map tiles
+- Pick heroes for offseason training
 
 ## Future Features (ordered by priority)
 

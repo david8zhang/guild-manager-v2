@@ -135,6 +135,7 @@ const Season: React.FC<Props> = ({
   if (showMatch) {
     return (
       <Match
+        isHome={currentMatchup.isHome}
         playerTeam={playerTeam}
         enemyTeam={
           seasonManager.getTeam(currentMatchup.teamInfo.teamId) as Team

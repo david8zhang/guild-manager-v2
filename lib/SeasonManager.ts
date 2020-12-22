@@ -264,6 +264,9 @@ export class SeasonManager {
     this.playoffBracket = null
     this.isOffseason = false
     this.playerSeasonSchedule.resetSeason()
+    Object.keys(this.teamRecords).forEach((key: string) => {
+      this.teamRecords[key] = new Record()
+    })
   }
 
   public startOffseason() {
@@ -276,17 +279,18 @@ export class SeasonManager {
   }
 
   // Maybe need to move this to its own manager (Offseason manager) at some point
-  public getPlayerTeamAverageStat(stat: string) {
+  public static getPlayerTeamAverageStat(stat: string, heroes: Hero[]) {
     const statAvg =
-      this.playerTeam.roster.reduce((acc: number, curr: Hero) => {
+      heroes.reduce((acc: number, curr: Hero) => {
         return acc + curr.getStat(stat.toLowerCase())
-      }, 0) / this.playerTeam.roster.length
+      }, 0) / heroes.length
     return Math.round(statAvg)
   }
 
   // Train a set of specific stats
   public trainStats(
-    statsToTrain: string[]
+    statsToTrain: string[],
+    heroesToTrain: Hero[]
   ): { trainingResult: any; statIncreases: any } {
     const statIncreases: any = {}
     const statTrainingResult: any = {}
@@ -295,7 +299,7 @@ export class SeasonManager {
       .map((s) => s.toLowerCase())
       .forEach((stat: string) => {
         if (!statTrainingResult[stat]) statTrainingResult[stat] = []
-        this.playerTeam.roster.forEach((hero: Hero) => {
+        heroesToTrain.forEach((hero: Hero) => {
           const amountToIncrease = StatGainManager.statIncreaseAmount(
             hero.potential,
             stat,

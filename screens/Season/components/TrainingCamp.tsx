@@ -9,17 +9,19 @@ interface Props {
   statsToTrain: string[]
   seasonManager: SeasonManager
   onFinishTrainingCamp: Function
+  heroesToTrain: Hero[]
 }
 
 export const TrainingCamp: React.FC<Props> = ({
   statsToTrain,
   seasonManager,
   onFinishTrainingCamp,
+  heroesToTrain,
 }) => {
   const [trainingResult, setTrainingResult] = React.useState<any>(null)
   const [trainedStatIndex, setTrainedStatIndex] = React.useState<number>(0)
   React.useEffect(() => {
-    const result = seasonManager.trainStats(statsToTrain)
+    const result = seasonManager.trainStats(statsToTrain, heroesToTrain)
     const { trainingResult, statIncreases } = result
     seasonManager.applyStatIncreases(statIncreases)
     setTrainingResult(trainingResult)
@@ -33,7 +35,7 @@ export const TrainingCamp: React.FC<Props> = ({
     value: number
   ) => {
     let statNumber = `${value}`
-    if (trainingResult && trainedStat.toLowerCase() === stat) {
+    if (trainingResult && trainedStat.toLowerCase() === stat.toLowerCase()) {
       const heroStatIncrease = trainingResult[stat].find(
         (payload: any) => payload.heroId === heroId
       )
@@ -71,10 +73,10 @@ export const TrainingCamp: React.FC<Props> = ({
           {formatStatIncreaseText('defense', heroId, heroRef.defense)}
         </Text>
         <Text style={styles.textRow}>
-          {formatStatIncreaseText('magic', heroId, heroRef.magic)}
+          {formatStatIncreaseText('speed', heroId, heroRef.speed)}
         </Text>
         <Text style={styles.textRow}>
-          {formatStatIncreaseText('speed', heroId, heroRef.speed)}
+          {formatStatIncreaseText('magic', heroId, heroRef.magic)}
         </Text>
         <Text style={styles.textRow}>
           {formatStatIncreaseText('health', heroId, heroRef.health)}
@@ -106,7 +108,6 @@ export const TrainingCamp: React.FC<Props> = ({
     )
   }
 
-  const playerHeroes: Hero[] = seasonManager.getPlayer().roster
   return (
     <View
       style={{ flexDirection: 'column', flex: 1, backgroundColor: 'white' }}
@@ -175,7 +176,7 @@ export const TrainingCamp: React.FC<Props> = ({
         <Text style={styles.textRow}>Potential</Text>
         <Text style={styles.textRow}>Type</Text>
       </View>
-      {playerHeroes.map((hero: Hero) => {
+      {heroesToTrain.map((hero: Hero) => {
         return renderRow(hero.heroId)
       })}
     </View>
