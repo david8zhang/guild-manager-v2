@@ -1,5 +1,5 @@
 import { TEAM_NAMES } from './constants/fullTeamNames'
-import { Hero } from './model/Hero'
+import { Hero, Contract } from './model/Hero'
 import { Team } from './model/Team'
 import { TeamGenerator } from './TeamGenerator'
 
@@ -55,7 +55,7 @@ export class FrontOfficeManager {
     const durationMultiplier = 1.46429 - 0.0714286 * (duration + currDuration)
     askingAmount *= durationMultiplier
 
-    return Math.floor(askingAmount)
+    return Math.max(Math.floor(askingAmount), 40)
   }
 
   public getTotalSalary(): number {
@@ -65,7 +65,16 @@ export class FrontOfficeManager {
     }, 0)
   }
 
-  public extendContract(heroId: string) {}
+  public extendContract(heroId: string, newContract: Contract) {
+    const hero: Hero = this.playerTeam.getHero(heroId) as Hero
+    hero.setContract(newContract)
+  }
 
-  public releasePlayer(heroId: string) {}
+  public releaseHero(heroId: string) {
+    this.playerTeam.releaseHero(heroId)
+  }
+
+  public getPlayer() {
+    return this.playerTeam
+  }
 }

@@ -47,6 +47,10 @@ export class Team {
     return reserveHeroes
   }
 
+  public releaseHero(heroId: string): void {
+    this.roster = this.roster.filter((h: Hero) => h.heroId !== heroId)
+  }
+
   public swapOutStarter(toSwapId: string, replacementId: string) {
     this.starterIds = this.starterIds.filter((id: string) => id !== toSwapId)
     this.starterIds = this.starterIds.concat(replacementId)

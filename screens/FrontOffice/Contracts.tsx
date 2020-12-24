@@ -5,7 +5,7 @@ import { HeroFactory } from '../../lib/factory/HeroFactory'
 import { FrontOfficeManager } from '../../lib/FrontOfficeManager'
 import { Hero } from '../../lib/model/Hero'
 import { FontAwesome } from '@expo/vector-icons'
-import { ContractDrilldown } from './ContractDrilldown'
+import { default as ContractDrilldown } from './ContractDrilldown'
 import { Portal } from 'react-native-paper'
 
 interface Props {
@@ -23,12 +23,14 @@ export const Contracts: React.FC<Props> = ({ frontOfficeManager }) => {
       stars.push(<FontAwesome key={`star-${i}`} name='star' size={15} />)
     }
     const contract = hero.getContract()
+    const overall = hero.getOverall()
     return (
       <View
         key={hero.heroId}
         style={{ flexDirection: 'row', height: 34, alignItems: 'center' }}
       >
         <Text style={{ ...styles.nameColumn, fontSize: 14 }}>{hero.name}</Text>
+        <Text style={styles.textRow}>{overall}</Text>
         <Text style={styles.textRow}>{hero.attack}</Text>
         <Text style={styles.textRow}>{hero.defense}</Text>
         <Text style={styles.textRow}>{hero.speed}</Text>
@@ -83,6 +85,7 @@ export const Contracts: React.FC<Props> = ({ frontOfficeManager }) => {
             <View style={{ flexDirection: 'row', alignItems: 'center' }}></View>
             <View style={{ flexDirection: 'row' }}>
               <Text style={styles.nameColumn}></Text>
+              <Text style={styles.headerText}>OVR</Text>
               <Text style={styles.headerText}>ATK</Text>
               <Text style={styles.headerText}>DEF</Text>
               <Text style={styles.headerText}>SPD</Text>
@@ -108,6 +111,7 @@ export const Contracts: React.FC<Props> = ({ frontOfficeManager }) => {
     } else {
       return (
         <ContractDrilldown
+          frontOfficeManager={frontOfficeManager}
           hero={selectedHero}
           onBack={() => {
             setSelectedHero(null)
@@ -153,7 +157,7 @@ const styles = StyleSheet.create({
   headerText: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 'bold',
   },
   nameColumn: {

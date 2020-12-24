@@ -6,15 +6,40 @@ import { HeroFactory } from '../../lib/factory/HeroFactory'
 import { Button } from '../../components'
 import { ContractExtensionModal } from './ContractExtensionModal'
 import { Portal } from 'react-native-paper'
+import { FrontOfficeManager } from '../../lib/FrontOfficeManager'
+import { connect } from 'react-redux'
+import * as guildActions from '../../redux/guildWidget'
+import { ReleaseHeroConfirmModal } from './ReleaseHeroConfirmModal'
 
 interface Props {
   hero: Hero
   onBack: Function
+  frontOfficeManager: FrontOfficeManager
+  saveGuild: Function
 }
 
-export const ContractDrilldown: React.FC<Props> = ({ hero, onBack }) => {
+const ContractDrilldown: React.FC<Props> = ({
+  hero,
+  onBack,
+  frontOfficeManager,
+  saveGuild,
+}) => {
   const contract = hero.getContract()
   const [isExtendingContract, setIsExtendingContract] = React.useState(false)
+  const [isReleasingHero, setIsReleasingHero] = React.useState(false)
+
+  const extendContract = (newContract: any) => {
+    frontOfficeManager.extendContract(hero.heroId, newContract)
+    const serializedPlayerTeam = frontOfficeManager.getPlayer().serialize()
+    saveGuild(serializedPlayerTeam)
+  }
+
+  const releaseHero = () => {
+    frontOfficeManager.releaseHero(hero.heroId)
+    const serializedPlayerTeam = frontOfficeManager.getPlayer().serialize()
+    saveGuild(serializedPlayerTeam)
+    onBack()
+  }
 
   const stars = []
   for (let i = 0; i < hero.potential; i++) {
@@ -29,9 +54,23 @@ export const ContractDrilldown: React.FC<Props> = ({ hero, onBack }) => {
           onClose={() => {
             setIsExtendingContract(false)
           }}
+          onAccept={(newContract: any) => {
+            extendContract(newContract)
+          }}
         />
       </Portal>
-
+      <Portal>
+        <ReleaseHeroConfirmModal
+          isOpen={isReleasingHero}
+          hero={hero}
+          onClose={() => {
+            setIsReleasingHero(false)
+          }}
+          onConfirm={() => {
+            releaseHero()
+          }}
+        />
+      </Portal>
       <View
         style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}
       >
@@ -91,7 +130,7 @@ export const ContractDrilldown: React.FC<Props> = ({ hero, onBack }) => {
         <Text style={styles.textRow}>{contract.amount}G</Text>
       </View>
       <View style={{ flexDirection: 'row', marginTop: 30 }}>
-        {contract.duration <= 2 && (
+        {contract.duration <= 3 && (
           <Button
             text='Extend Contract'
             style={{ width: 200, marginRight: 10 }}
@@ -106,13 +145,17 @@ export const ContractDrilldown: React.FC<Props> = ({ hero, onBack }) => {
             text='Release'
             style={{ width: 200 }}
             textStyle={{ fontSize: 13 }}
-            onPress={() => {}}
+            onPress={() => {
+              setIsReleasingHero(true)
+            }}
           />
         )}
       </View>
     </View>
   )
 }
+
+export default connect(null, { ...guildActions })(ContractDrilldown)
 
 const styles = StyleSheet.create({
   headerText: {

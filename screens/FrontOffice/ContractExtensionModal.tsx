@@ -1,21 +1,23 @@
 import * as React from 'react'
 import { Text, View } from 'react-native'
-import { Button, CustomModal, Input } from '../../components'
+import { Button, CustomModal } from '../../components'
 import Slider from '@react-native-community/slider'
 import { Hero } from '../../lib/model/Hero'
-import { TextInput } from 'react-native-paper'
+import { connect } from 'react-redux'
 import { FrontOfficeManager } from '../../lib/FrontOfficeManager'
 
 interface Props {
   isOpen: boolean
   onClose: Function
   hero: Hero
+  onAccept: Function
 }
 
 export const ContractExtensionModal: React.FC<Props> = ({
   isOpen,
   onClose,
   hero,
+  onAccept,
 }) => {
   const [duration, setDuration] = React.useState(2)
 
@@ -52,15 +54,26 @@ export const ContractExtensionModal: React.FC<Props> = ({
           <Text style={{ fontWeight: 'bold' }}>
             {durationAmount} gold per year
           </Text>{' '}
-          ({durationAmount * duration} Gold total contract)
+          (cap room after extension: )
         </Text>
         <View style={{ flexDirection: 'row' }}>
           <Button
             style={{ marginRight: 10 }}
-            onPress={() => {}}
+            onPress={() => {
+              onAccept({
+                amount: durationAmount,
+                duration,
+              })
+              onClose()
+            }}
             text='Accept'
           />
-          <Button onPress={() => {}} text='Deny' />
+          <Button
+            onPress={() => {
+              onClose()
+            }}
+            text='Deny'
+          />
         </View>
       </View>
     </CustomModal>

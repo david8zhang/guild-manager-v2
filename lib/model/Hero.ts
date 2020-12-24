@@ -6,7 +6,7 @@ export enum HeroType {
   TANK = 'tank',
 }
 
-interface Contract {
+export interface Contract {
   amount: number
   duration: number
 }

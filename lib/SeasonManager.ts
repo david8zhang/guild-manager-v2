@@ -193,7 +193,6 @@ export class SeasonManager {
       teams: this.teams.map((t) => t.serialize()),
       schedule: this.playerSeasonSchedule.serialize(),
       teamRecords: serializedTeamRecords,
-      playerTeam: this.playerTeam.serialize(),
       playoffBracket: this.playoffBracket
         ? this.playoffBracket.serialize()
         : null,
@@ -234,7 +233,6 @@ export class SeasonManager {
     Object.keys(teamRecords).forEach((key: string) => {
       this.teamRecords[key] = Record.deserializeObj(teamRecords[key])
     })
-    this.playerTeam = Team.deserializeObj(playerTeam)
     this.isOffseason = isOffseason
     if (playoffBracket) {
       const playoffTeams = this.getAllTeams().slice(
