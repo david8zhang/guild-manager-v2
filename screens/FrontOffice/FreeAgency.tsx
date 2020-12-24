@@ -2,27 +2,45 @@ import * as React from 'react'
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { Button, Navbar } from '../../components'
 import { HeroFactory } from '../../lib/factory/HeroFactory'
-import { FrontOfficeManager } from '../../lib/FrontOfficeManager'
+import { FrontOfficeManager, FreeAgent } from '../../lib/FrontOfficeManager'
 import { Hero } from '../../lib/model/Hero'
 import { FontAwesome } from '@expo/vector-icons'
-import { default as ContractDrilldown } from './ContractDrilldown'
+import ContractDrilldown from './ContractDrilldown'
 import { Portal } from 'react-native-paper'
+
+import * as guildActions from '../../redux/guildWidget'
+import * as frontOfficeActions from '../../redux/frontOfficeWidget'
+import { connect } from 'react-redux'
 
 interface Props {
   frontOfficeManager: FrontOfficeManager
-  onBack: Function
+  saveFrontOffice: Function
+  saveGuild: Function
 }
 
-export const Contracts: React.FC<Props> = ({ frontOfficeManager }) => {
+const FreeAgency: React.FC<Props> = ({
+  frontOfficeManager,
+  saveFrontOffice,
+  saveGuild,
+}) => {
   const [selectedHero, setSelectedHero] = React.useState<any>(null)
-  const playerHeroes: Hero[] = frontOfficeManager.getPlayerHeroes()
+
+  const freeAgents = frontOfficeManager.getFreeAgents()
+
+  const signFreeAgent = (newContract: any) => {
+    frontOfficeManager.signFreeAgent(selectedHero, newContract)
+    const serializedTeam = frontOfficeManager.getPlayer().serialize()
+    saveGuild(serializedTeam)
+
+    const serializedFrontOffice = frontOfficeManager.serialize()
+    saveFrontOffice(serializedFrontOffice)
+  }
 
   const renderRow = (hero: Hero) => {
     const stars = []
     for (let i = 0; i < hero.potential; i++) {
       stars.push(<FontAwesome key={`star-${i}`} name='star' size={15} />)
     }
-    const contract = hero.getContract()
     const overall = hero.getOverall()
     return (
       <View
@@ -59,10 +77,6 @@ export const Contracts: React.FC<Props> = ({ frontOfficeManager }) => {
             source={HeroFactory.getIcon(hero.heroType)}
           ></Image>
         </View>
-        <Text style={styles.textRow}>
-          {contract.duration === 0 ? 'Expiring' : `${contract.duration} Yrs.`}
-        </Text>
-        <Text style={styles.textRow}>{contract.amount}G</Text>
         <View style={{ flex: 1.5 }}>
           <Button
             onPress={() => {
@@ -70,7 +84,7 @@ export const Contracts: React.FC<Props> = ({ frontOfficeManager }) => {
             }}
             style={{ padding: 5, width: '80%' }}
             textStyle={{ fontSize: 10 }}
-            text='Manage'
+            text='Sign'
           />
         </View>
       </View>
@@ -79,6 +93,21 @@ export const Contracts: React.FC<Props> = ({ frontOfficeManager }) => {
 
   const renderContent = () => {
     if (!selectedHero) {
+      if (freeAgents.length == 0) {
+        return (
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: 50,
+            }}
+          >
+            <Text style={{ fontSize: 30, fontStyle: 'italic', color: '#ddd' }}>
+              No Free Agents yet!
+            </Text>
+          </View>
+        )
+      }
       return (
         <View style={{ flexDirection: 'row', marginTop: 20 }}>
           <View style={{ flexDirection: 'column', flex: 1 }}>
@@ -92,16 +121,14 @@ export const Contracts: React.FC<Props> = ({ frontOfficeManager }) => {
               <Text style={styles.headerText}>HP</Text>
               <Text style={styles.headerText}>Pot.</Text>
               <Text style={styles.headerText}>Type</Text>
-              <Text style={styles.headerText}>Contract</Text>
-              <Text style={styles.headerText}>Salary</Text>
               <Text style={{ flex: 1.5 }} />
             </View>
             <ScrollView
               showsVerticalScrollIndicator
               contentContainerStyle={{ paddingBottom: 20 }}
             >
-              {playerHeroes.map((hero: Hero) => {
-                return renderRow(hero)
+              {freeAgents.map((freeAgent: FreeAgent) => {
+                return renderRow(freeAgent.hero)
               })}
             </ScrollView>
           </View>
@@ -110,9 +137,14 @@ export const Contracts: React.FC<Props> = ({ frontOfficeManager }) => {
     } else {
       return (
         <ContractDrilldown
+          isFreeAgent={true}
           frontOfficeManager={frontOfficeManager}
           hero={selectedHero}
           onBack={() => {
+            setSelectedHero(null)
+          }}
+          onSign={(newContract: any) => {
+            signFreeAgent(newContract)
             setSelectedHero(null)
           }}
         />
@@ -125,7 +157,7 @@ export const Contracts: React.FC<Props> = ({ frontOfficeManager }) => {
 
   return (
     <Portal.Host>
-      <Navbar title='Contracts' />
+      <Navbar title='Free Agents' />
       <View
         style={{
           flexDirection: 'row',
@@ -147,6 +179,11 @@ export const Contracts: React.FC<Props> = ({ frontOfficeManager }) => {
     </Portal.Host>
   )
 }
+
+export default connect(null, { ...frontOfficeActions, ...guildActions })(
+  FreeAgency
+)
+
 const styles = StyleSheet.create({
   textRow: {
     flex: 1,

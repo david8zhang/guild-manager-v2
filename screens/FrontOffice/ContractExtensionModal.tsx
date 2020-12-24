@@ -28,10 +28,10 @@ export const ContractExtensionModal: React.FC<Props> = ({
     amount: durationAmount,
     duration,
   }
-  const { projectedSalary, diff } = frontOfficeManager.getProjectedSalaryCap(
-    hero,
-    newContract
-  )
+  const {
+    projectedSalary,
+    capSpace,
+  } = frontOfficeManager.getProjectedSalaryCap(hero, newContract)
 
   return (
     <CustomModal
@@ -75,11 +75,14 @@ export const ContractExtensionModal: React.FC<Props> = ({
           }}
         >
           <Text style={{ flex: 1, textAlign: 'center' }}>
-            Cap room change:{' '}
+            Cap space:{' '}
             <Text
-              style={{ fontWeight: 'bold', color: diff > 0 ? 'red' : 'green' }}
+              style={{
+                fontWeight: 'bold',
+                color: capSpace < 0 ? 'red' : 'green',
+              }}
             >
-              {diff > 0 ? `-${diff}` : `+${diff}`}G
+              {capSpace < 0 ? `${capSpace}` : `+${capSpace}`}G
             </Text>
           </Text>
           <Text style={{ flex: 1, textAlign: 'center' }}>
@@ -92,8 +95,12 @@ export const ContractExtensionModal: React.FC<Props> = ({
           <Button
             style={{ marginRight: 10 }}
             onPress={() => {
-              onAccept(newContract)
-              onClose()
+              if (frontOfficeManager.isHardCapped(hero, newContract)) {
+                alert('You do not have enough cap space!')
+              } else {
+                onAccept(newContract)
+                onClose()
+              }
             }}
             text='Accept'
           />

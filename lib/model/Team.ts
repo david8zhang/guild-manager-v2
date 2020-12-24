@@ -60,8 +60,15 @@ export class Team {
       const sortedByOVR = this.getReserves().sort(
         (a, b) => b.getOverall() - a.getOverall()
       )
-      this.starterIds.push(sortedByOVR[0].heroId)
+      if (sortedByOVR.length > 0) {
+        this.starterIds.push(sortedByOVR[0].heroId)
+      }
     }
+  }
+
+  public addHero(hero: Hero) {
+    this.roster.push(hero)
+    this.autofillStarter()
   }
 
   public swapOutStarter(toSwapId: string, replacementId: string) {

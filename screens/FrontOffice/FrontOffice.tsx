@@ -1,25 +1,32 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
 import { View } from 'react-native'
-import { saveGuild } from '../../redux/guildWidget'
 import { MenuOption } from '../Home/components'
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
 import { Navbar } from '../../components'
 import { FrontOfficeManager } from '../../lib/FrontOfficeManager'
 import { Contracts } from './Contracts'
 import { Trades } from './Trades'
+import { default as FreeAgency } from './FreeAgency'
+
+// Redux
+import { connect } from 'react-redux'
+import { saveGuild } from '../../redux/guildWidget'
 
 interface Props {
   guild: any
+  frontOffice: any
 }
 
-const FrontOffice: React.FC<Props> = ({ guild }) => {
+const FrontOffice: React.FC<Props> = ({ guild, frontOffice }) => {
   const [frontOfficeManager, setFrontOfficeManager] = React.useState<any>(null)
   const [currPage, setCurrPage] = React.useState<string>('')
 
   React.useEffect(() => {
     if (guild) {
       const foManager: FrontOfficeManager = new FrontOfficeManager(guild)
+      if (frontOffice) {
+        foManager.deserializeObj(frontOffice)
+      }
       setFrontOfficeManager(foManager)
     }
   }, [])
@@ -40,7 +47,7 @@ const FrontOffice: React.FC<Props> = ({ guild }) => {
   }
 
   if (currPage === 'Free Agents') {
-    return <View />
+    return <FreeAgency frontOfficeManager={frontOfficeManager} />
   }
 
   return (
@@ -87,6 +94,7 @@ const FrontOffice: React.FC<Props> = ({ guild }) => {
 
 const mapStateToProps = (state: any) => ({
   guild: state.guild,
+  frontOffice: state.frontOffice,
 })
 
 export default connect(mapStateToProps, { ...saveGuild })(FrontOffice)

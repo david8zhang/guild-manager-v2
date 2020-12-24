@@ -8,14 +8,19 @@ import { ContractExtensionModal } from './ContractExtensionModal'
 import { Portal } from 'react-native-paper'
 import { FrontOfficeManager } from '../../lib/FrontOfficeManager'
 import { connect } from 'react-redux'
-import * as guildActions from '../../redux/guildWidget'
 import { ReleaseHeroConfirmModal } from './ReleaseHeroConfirmModal'
+
+import * as guildActions from '../../redux/guildWidget'
+import * as frontOfficeActions from '../../redux/frontOfficeWidget'
 
 interface Props {
   hero: Hero
   onBack: Function
   frontOfficeManager: FrontOfficeManager
   saveGuild: Function
+  saveFrontOffice: Function
+  isFreeAgent?: boolean
+  onSign?: Function
 }
 
 const ContractDrilldown: React.FC<Props> = ({
@@ -23,6 +28,9 @@ const ContractDrilldown: React.FC<Props> = ({
   onBack,
   frontOfficeManager,
   saveGuild,
+  saveFrontOffice,
+  isFreeAgent,
+  onSign,
 }) => {
   const contract = hero.getContract()
   const [isExtendingContract, setIsExtendingContract] = React.useState(false)
@@ -30,14 +38,22 @@ const ContractDrilldown: React.FC<Props> = ({
 
   const extendContract = (newContract: any) => {
     frontOfficeManager.extendContract(hero.heroId, newContract)
+
     const serializedPlayerTeam = frontOfficeManager.getPlayer().serialize()
     saveGuild(serializedPlayerTeam)
+    saveFO()
+  }
+
+  const saveFO = () => {
+    const frontOfficeObj = (frontOfficeManager as FrontOfficeManager).serialize()
+    saveFrontOffice(frontOfficeObj)
   }
 
   const releaseHero = () => {
     frontOfficeManager.releaseHero(hero.heroId)
     const serializedPlayerTeam = frontOfficeManager.getPlayer().serialize()
     saveGuild(serializedPlayerTeam)
+    saveFO()
     onBack()
   }
 
@@ -56,7 +72,11 @@ const ContractDrilldown: React.FC<Props> = ({
             setIsExtendingContract(false)
           }}
           onAccept={(newContract: any) => {
-            extendContract(newContract)
+            if (onSign) {
+              onSign(newContract)
+            } else {
+              extendContract(newContract)
+            }
           }}
         />
       </Portal>
@@ -133,9 +153,9 @@ const ContractDrilldown: React.FC<Props> = ({
         <Text style={styles.textRow}>{contract.amount}G</Text>
       </View>
       <View style={{ flexDirection: 'row', marginTop: 30 }}>
-        {contract.duration <= 3 && (
+        {(contract.duration <= 3 || isFreeAgent) && (
           <Button
-            text='Extend Contract'
+            text={isFreeAgent ? 'Sign' : 'Extend Contract'}
             style={{ width: 200, marginRight: 10 }}
             textStyle={{ fontSize: 13 }}
             onPress={() => {
@@ -143,7 +163,7 @@ const ContractDrilldown: React.FC<Props> = ({
             }}
           />
         )}
-        {contract.duration === 0 && (
+        {!isFreeAgent && contract.duration === 0 && (
           <Button
             text='Release'
             style={{ width: 200 }}
@@ -158,7 +178,9 @@ const ContractDrilldown: React.FC<Props> = ({
   )
 }
 
-export default connect(null, { ...guildActions })(ContractDrilldown)
+export default connect(null, { ...guildActions, ...frontOfficeActions })(
+  ContractDrilldown
+)
 
 const styles = StyleSheet.create({
   headerText: {
