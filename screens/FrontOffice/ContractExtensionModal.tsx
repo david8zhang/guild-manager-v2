@@ -11,6 +11,7 @@ interface Props {
   onClose: Function
   hero: Hero
   onAccept: Function
+  frontOfficeManager: FrontOfficeManager
 }
 
 export const ContractExtensionModal: React.FC<Props> = ({
@@ -18,18 +19,28 @@ export const ContractExtensionModal: React.FC<Props> = ({
   onClose,
   hero,
   onAccept,
+  frontOfficeManager,
 }) => {
   const [duration, setDuration] = React.useState(2)
 
   const durationAmount = FrontOfficeManager.getExtensionEstimate(hero, duration)
+  const newContract = {
+    amount: durationAmount,
+    duration,
+  }
+  const { projectedSalary, diff } = frontOfficeManager.getProjectedSalaryCap(
+    hero,
+    newContract
+  )
+
   return (
     <CustomModal
       isOpen={isOpen}
       onClose={() => {
         onClose()
       }}
-      customWidth={350}
-      customHeight={275}
+      customWidth={400}
+      customHeight={300}
     >
       <View
         style={{
@@ -49,21 +60,39 @@ export const ContractExtensionModal: React.FC<Props> = ({
           minimumValue={2}
           maximumValue={5}
         />
-        <Text style={{ textAlign: 'center', marginBottom: 20 }}>
+        <Text style={{ textAlign: 'center', marginBottom: 10, fontSize: 16 }}>
           For a {duration} year extension, {hero.name} is asking for{' '}
           <Text style={{ fontWeight: 'bold' }}>
             {durationAmount} gold per year
           </Text>{' '}
-          (cap room after extension: )
         </Text>
+        <View
+          style={{
+            marginBottom: 20,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Text style={{ flex: 1, textAlign: 'center' }}>
+            Cap room change:{' '}
+            <Text
+              style={{ fontWeight: 'bold', color: diff > 0 ? 'red' : 'green' }}
+            >
+              {diff > 0 ? `-${diff}` : `+${diff}`}G
+            </Text>
+          </Text>
+          <Text style={{ flex: 1, textAlign: 'center' }}>
+            Total salary after:{' '}
+            <Text style={{ fontWeight: 'bold' }}>{projectedSalary}G</Text>
+          </Text>
+        </View>
+
         <View style={{ flexDirection: 'row' }}>
           <Button
             style={{ marginRight: 10 }}
             onPress={() => {
-              onAccept({
-                amount: durationAmount,
-                duration,
-              })
+              onAccept(newContract)
               onClose()
             }}
             text='Accept'

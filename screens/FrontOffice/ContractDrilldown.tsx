@@ -49,6 +49,7 @@ const ContractDrilldown: React.FC<Props> = ({
     <View style={{ padding: 15 }}>
       <Portal>
         <ContractExtensionModal
+          frontOfficeManager={frontOfficeManager}
           isOpen={isExtendingContract}
           hero={hero}
           onClose={() => {
@@ -85,6 +86,7 @@ const ContractDrilldown: React.FC<Props> = ({
         <Text style={{ fontSize: 25, marginLeft: 10 }}>{hero.name}</Text>
       </View>
       <View style={{ flexDirection: 'row' }}>
+        <Text style={styles.headerText}>OVR</Text>
         <Text style={styles.headerText}>ATK</Text>
         <Text style={styles.headerText}>DEF</Text>
         <Text style={styles.headerText}>SPD</Text>
@@ -96,6 +98,7 @@ const ContractDrilldown: React.FC<Props> = ({
         <Text style={styles.headerText}>Salary</Text>
       </View>
       <View style={{ flexDirection: 'row' }}>
+        <Text style={styles.textRow}>{hero.getOverall()}</Text>
         <Text style={styles.textRow}>{hero.attack}</Text>
         <Text style={styles.textRow}>{hero.defense}</Text>
         <Text style={styles.textRow}>{hero.speed}</Text>

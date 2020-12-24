@@ -25,6 +25,7 @@ import { DEBUG_CONFIG } from '../../lib/constants/debugConfig'
 import { Offseason } from './components/Offseason'
 import { ChampionshipResultsModal } from './components/ChampionshipResultsModal'
 import { FrontOfficeManager } from '../../lib/FrontOfficeManager'
+import { Portal } from 'react-native-paper'
 
 interface Props {
   savedSeason: any
@@ -80,7 +81,7 @@ const Season: React.FC<Props> = ({
     setFrontOfficeManager(frontOfficeManager)
     setShowPlayoffs(seasonManager.getPlayoffBracket() !== null)
     setIsOffseason(seasonManager.getIsOffseason())
-  }, [])
+  }, [guild])
 
   if (!seasonManager || !frontOfficeManager) {
     return <View />
@@ -186,6 +187,8 @@ const Season: React.FC<Props> = ({
   if (isOffseason) {
     return (
       <Offseason
+        navigation={navigation}
+        frontOfficeManager={frontOfficeManager}
         seasonManager={seasonManager}
         onRestartSeason={() => {
           restartSeason()
@@ -219,103 +222,105 @@ const Season: React.FC<Props> = ({
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'white' }}>
-      <SeasonOverModal
-        onContinue={() => {
-          setShowSeasonOver(false)
-          startOffseason()
-        }}
-        isOpen={showSeasonOver}
-      />
-      <Navbar title='Season' navigation={navigation} />
-      <View style={{ flexDirection: 'row' }}>
-        <View style={{ flex: 1.4, flexDirection: 'column' }}>
-          <SeasonCalendar
-            currentMatchIndex={schedule.getCurrentMatchIndex()}
-            matchList={schedule.getMatchupList()}
-          />
-          <View
-            style={{
-              flex: 5,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            {currentMatchup.isHome ? (
-              <MatchupTeam
-                team={playerTeam}
-                record={seasonManager.getTeamRecord(playerTeam.teamId)}
-              />
-            ) : (
-              <MatchupTeam
-                team={currentMatchup.teamInfo}
-                record={seasonManager.getTeamRecord(
-                  currentMatchup.teamInfo.teamId
-                )}
-              />
-            )}
-            <Text style={{ fontSize: 20, textAlign: 'center' }}>@</Text>
-            {currentMatchup.isHome ? (
-              <MatchupTeam
-                team={currentMatchup.teamInfo}
-                record={seasonManager.getTeamRecord(
-                  currentMatchup.teamInfo.teamId
-                )}
-              />
-            ) : (
-              <MatchupTeam
-                team={playerTeam}
-                record={seasonManager.getTeamRecord(playerTeam.teamId)}
-              />
-            )}
-          </View>
-          <Button
-            style={{ alignSelf: 'center', marginTop: 10 }}
-            onPress={() => {
-              if (DEBUG_CONFIG.autoWinGames) {
-                updateTeamRecords({
-                  winner: playerTeam.teamId,
-                  loser: currentMatchup.teamInfo.teamId,
-                  enemyId: currentMatchup.teamInfo.teamId,
-                })
-                serializeSeasonManager()
-                setShowMatch(false)
-              } else {
-                setShowMatch(true)
-              }
-            }}
-            text={DEBUG_CONFIG.autoWinGames ? 'Auto Win' : 'Start Game'}
-          />
-        </View>
-        <View style={{ flex: 1 }}>
-          <View style={{ padding: 10 }}>
-            <Text style={{ textAlign: 'center', fontSize: 24 }}>
-              Season Rankings
-            </Text>
-            <Text
-              style={{ textAlign: 'center', fontSize: 12, marginBottom: 10 }}
+    <Portal.Host>
+      <View style={{ flex: 1, backgroundColor: 'white' }}>
+        <SeasonOverModal
+          onContinue={() => {
+            setShowSeasonOver(false)
+            startOffseason()
+          }}
+          isOpen={showSeasonOver}
+        />
+        <Navbar title='Season' navigation={navigation} />
+        <View style={{ flexDirection: 'row' }}>
+          <View style={{ flex: 1.4, flexDirection: 'column' }}>
+            <SeasonCalendar
+              currentMatchIndex={schedule.getCurrentMatchIndex()}
+              matchList={schedule.getMatchupList()}
+            />
+            <View
+              style={{
+                flex: 5,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
             >
-              Tap a team to view their starting lineups
-            </Text>
-            {seasonManager.getAllTeams().map((t) => {
-              const record = seasonManager.getTeamRecord(t.teamId)
-              return (
-                <TeamRecord
-                  key={t.teamId}
-                  record={record}
-                  onPress={() => {
-                    setTeamToShowRoster(t)
-                  }}
-                  name={t.name}
-                  abbrev={t.getNameAbbrev()}
+              {currentMatchup.isHome ? (
+                <MatchupTeam
+                  team={playerTeam}
+                  record={seasonManager.getTeamRecord(playerTeam.teamId)}
                 />
-              )
-            })}
+              ) : (
+                <MatchupTeam
+                  team={currentMatchup.teamInfo}
+                  record={seasonManager.getTeamRecord(
+                    currentMatchup.teamInfo.teamId
+                  )}
+                />
+              )}
+              <Text style={{ fontSize: 20, textAlign: 'center' }}>@</Text>
+              {currentMatchup.isHome ? (
+                <MatchupTeam
+                  team={currentMatchup.teamInfo}
+                  record={seasonManager.getTeamRecord(
+                    currentMatchup.teamInfo.teamId
+                  )}
+                />
+              ) : (
+                <MatchupTeam
+                  team={playerTeam}
+                  record={seasonManager.getTeamRecord(playerTeam.teamId)}
+                />
+              )}
+            </View>
+            <Button
+              style={{ alignSelf: 'center', marginTop: 10 }}
+              onPress={() => {
+                if (DEBUG_CONFIG.autoWinGames) {
+                  updateTeamRecords({
+                    winner: playerTeam.teamId,
+                    loser: currentMatchup.teamInfo.teamId,
+                    enemyId: currentMatchup.teamInfo.teamId,
+                  })
+                  serializeSeasonManager()
+                  setShowMatch(false)
+                } else {
+                  setShowMatch(true)
+                }
+              }}
+              text={DEBUG_CONFIG.autoWinGames ? 'Auto Win' : 'Start Game'}
+            />
+          </View>
+          <View style={{ flex: 1 }}>
+            <View style={{ padding: 10 }}>
+              <Text style={{ textAlign: 'center', fontSize: 24 }}>
+                Season Rankings
+              </Text>
+              <Text
+                style={{ textAlign: 'center', fontSize: 12, marginBottom: 10 }}
+              >
+                Tap a team to view their starting lineups
+              </Text>
+              {seasonManager.getAllTeams().map((t) => {
+                const record = seasonManager.getTeamRecord(t.teamId)
+                return (
+                  <TeamRecord
+                    key={t.teamId}
+                    record={record}
+                    onPress={() => {
+                      setTeamToShowRoster(t)
+                    }}
+                    name={t.name}
+                    abbrev={t.getNameAbbrev()}
+                  />
+                )
+              })}
+            </View>
           </View>
         </View>
       </View>
-    </View>
+    </Portal.Host>
   )
 }
 

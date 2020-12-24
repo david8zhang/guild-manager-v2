@@ -35,7 +35,7 @@ export const CustomModal: React.FC<Props> = ({
         position: 'absolute',
         backgroundColor: 'white',
         borderWidth: 1,
-        zIndex: 1,
+        zIndex: 100,
         height,
         width,
         padding: 10,

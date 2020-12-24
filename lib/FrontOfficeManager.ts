@@ -42,10 +42,28 @@ export class FrontOfficeManager {
     })
   }
 
+  public static getAskingAmount(hero: Hero) {
+    const ovr = hero.getOverall()
+    let askingAmount = 5
+    if (ovr > 60 && ovr <= 70) {
+      askingAmount = 10
+    }
+    if (ovr > 70 && ovr <= 80) {
+      askingAmount = 15
+    }
+    if (ovr >= 80) {
+      askingAmount = 20
+    }
+    return askingAmount
+  }
+
   public static getExtensionEstimate(hero: Hero, duration: number) {
     const contract = hero.getContract()
     const currDuration = contract.duration
-    let askingAmount = contract.amount
+    let askingAmount = Math.max(
+      contract.amount,
+      FrontOfficeManager.getAskingAmount(hero)
+    )
 
     // Factor in potentials
     const potentialMultiplier = 0.15 * hero.potential + 0.8
@@ -55,7 +73,7 @@ export class FrontOfficeManager {
     const durationMultiplier = 1.46429 - 0.0714286 * (duration + currDuration)
     askingAmount *= durationMultiplier
 
-    return Math.max(Math.floor(askingAmount), 40)
+    return Math.min(Math.floor(askingAmount), 40)
   }
 
   public getTotalSalary(): number {
@@ -72,6 +90,24 @@ export class FrontOfficeManager {
 
   public releaseHero(heroId: string) {
     this.playerTeam.releaseHero(heroId)
+  }
+
+  public getProjectedSalaryCap(hero: Hero, newContract: Contract) {
+    const currContract = hero.getContract()
+    const diff = newContract.amount - currContract.amount
+    return {
+      projectedSalary: this.getTotalSalary() + diff,
+      diff,
+    }
+  }
+
+  public hasContractsExpiring(): boolean {
+    return (
+      this.playerTeam.roster.find((hero: Hero) => {
+        const contract = hero.getContract()
+        return contract.duration === 0
+      }) !== undefined
+    )
   }
 
   public getPlayer() {

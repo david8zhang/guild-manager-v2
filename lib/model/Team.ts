@@ -49,6 +49,19 @@ export class Team {
 
   public releaseHero(heroId: string): void {
     this.roster = this.roster.filter((h: Hero) => h.heroId !== heroId)
+    this.starterIds = this.starterIds.filter(
+      (starterId: string) => starterId !== heroId
+    )
+    this.autofillStarter()
+  }
+
+  public autofillStarter(): void {
+    if (this.starterIds.length < 3) {
+      const sortedByOVR = this.getReserves().sort(
+        (a, b) => b.getOverall() - a.getOverall()
+      )
+      this.starterIds.push(sortedByOVR[0].heroId)
+    }
   }
 
   public swapOutStarter(toSwapId: string, replacementId: string) {

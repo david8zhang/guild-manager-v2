@@ -28,6 +28,7 @@ export const OffseasonTrainingRoster: React.FC<Props> = ({
         style={{ flexDirection: 'row', height: 35, alignItems: 'center' }}
       >
         <Text style={{ ...styles.nameColumn, fontSize: 13 }}>{hero.name}</Text>
+        <Text style={styles.textRow}>{hero.getOverall()}</Text>
         <Text style={styles.textRow}>{hero.attack}</Text>
         <Text style={styles.textRow}>{hero.defense}</Text>
         <Text style={styles.textRow}>{hero.magic}</Text>
@@ -57,7 +58,7 @@ export const OffseasonTrainingRoster: React.FC<Props> = ({
           ></Image>
         </View>
         {onHeroSelect && (
-          <View style={{ flex: 1.5 }}>
+          <View style={{ flex: 1.75 }}>
             <Button
               style={{
                 backgroundColor: isHeroSelected ? '#444' : 'white',
@@ -84,6 +85,7 @@ export const OffseasonTrainingRoster: React.FC<Props> = ({
         <View style={{ flexDirection: 'row', alignItems: 'center' }}></View>
         <View style={{ flexDirection: 'row' }}>
           <Text style={styles.nameColumn}></Text>
+          <Text style={styles.textRow}>OVR</Text>
           <Text style={styles.textRow}>ATK</Text>
           <Text style={styles.textRow}>DEF</Text>
           <Text style={styles.textRow}>SPD</Text>
@@ -91,7 +93,7 @@ export const OffseasonTrainingRoster: React.FC<Props> = ({
           <Text style={styles.textRow}>HP</Text>
           <Text style={styles.textRow}>Pot.</Text>
           <Text style={styles.textRow}>Type</Text>
-          {onHeroSelect && <Text style={{ flex: 1.5 }} />}
+          {onHeroSelect && <Text style={{ flex: 1.75 }} />}
         </View>
         <ScrollView
           showsVerticalScrollIndicator
