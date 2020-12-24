@@ -28,8 +28,8 @@ export class RandomHeroGenerator {
         minStat,
         maxStat,
         contract: {
-          duration: 5,
-          amount: 200,
+          duration: 1,
+          amount: 20,
         },
       })
       heroes = heroes.concat(factory.getHeroes(1))
@@ -39,8 +39,8 @@ export class RandomHeroGenerator {
 
   generateReserveHeroes(numHeroes: number) {
     const defaultContract = {
-      duration: 5,
-      amount: 50,
+      duration: 1,
+      amount: 5,
     }
     const minStat = 59
     const maxStat = 70

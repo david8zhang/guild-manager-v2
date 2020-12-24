@@ -5,13 +5,15 @@ import { FontAwesome } from '@expo/vector-icons'
 interface Props {
   onPress: Function
   optionName: string
-  iconName: string
+  iconName?: string
+  icon?: any
 }
 
 export const MenuOption: React.FC<Props> = ({
   onPress,
   optionName,
   iconName,
+  icon,
 }) => {
   return (
     <Pressable
@@ -29,7 +31,7 @@ export const MenuOption: React.FC<Props> = ({
         borderColor: 'gray',
       }}
     >
-      <FontAwesome name={iconName} size={80} />
+      {icon || <FontAwesome name={iconName || ''} size={80} />}
       <Text style={{ fontSize: 20, marginTop: 20 }}>{optionName}</Text>
     </Pressable>
   )

@@ -94,7 +94,7 @@ export class HeroFactory {
       LAST_NAMES[this.generateNumberWithinRange(0, LAST_NAMES.length - 1)]
     return `${firstName.slice(0, 1)}${firstName
       .slice(1)
-      .toLowerCase()} ${lastName}`
+      .toLowerCase()} ${lastName.slice(0, 1)}${lastName.slice(1).toLowerCase()}`
   }
 
   generateNumberWithinRange(min: number, max: number) {

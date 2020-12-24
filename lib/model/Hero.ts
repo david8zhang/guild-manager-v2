@@ -6,6 +6,11 @@ export enum HeroType {
   TANK = 'tank',
 }
 
+interface Contract {
+  amount: number
+  duration: number
+}
+
 // The hero image data encodes path to each image
 // encoding will also include gender information, i.e. 'male/eyes16.png'
 export interface HeroImageData {
@@ -52,10 +57,10 @@ export class Hero {
     this.health = config.health
     this.speed = config.speed
     this.magic = config.magic
-    this.contract = config.contract
     this.moveSet = config.moveSet
     this.heroType = config.heroType
     this.attackRange = config.attackRange || 2
+    this.contract = config.contract
     this.heroImageData =
       typeof config.heroImageData === 'string'
         ? JSON.parse(config.heroImageData)
@@ -89,6 +94,7 @@ export class Hero {
       attackRange: this.attackRange,
       heroImageData: JSON.stringify(this.heroImageData),
       matchStats: JSON.stringify(this.matchStats),
+      contract: this.contract,
     }
   }
 
@@ -153,5 +159,16 @@ export class Hero {
       default:
         break
     }
+  }
+
+  public getContract(): Contract {
+    return {
+      amount: this.contract.amount,
+      duration: this.contract.duration,
+    }
+  }
+
+  public setContract(contract: Contract) {
+    this.contract = contract
   }
 }

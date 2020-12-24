@@ -269,6 +269,7 @@ export class SeasonManager {
     })
   }
 
+  // Officially end the season, all contract logic should also go through here
   public startOffseason() {
     this.playoffBracket = null
     this.isOffseason = true

@@ -38,7 +38,9 @@ const HomeScreen: React.FC<Props> = ({ navigation, guild }) => {
         <MenuOption
           optionName='Front Office'
           iconName='address-book-o'
-          onPress={() => {}}
+          onPress={() => {
+            navigation.navigate('FrontOffice')
+          }}
         />
         <MenuOption
           optionName='News Headlines'

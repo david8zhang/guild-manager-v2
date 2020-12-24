@@ -10,6 +10,7 @@ import {
   StarterHeroes,
   Season,
   MyTeam,
+  FrontOffice,
 } from './screens'
 import { Provider } from 'react-redux'
 import { store } from './redux/store'
@@ -26,6 +27,7 @@ export default function App() {
           <Stack.Screen name='StarterHeroes' component={StarterHeroes} />
           <Stack.Screen name='Season' component={Season} />
           <Stack.Screen name='MyTeam' component={MyTeam} />
+          <Stack.Screen name='FrontOffice' component={FrontOffice} />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

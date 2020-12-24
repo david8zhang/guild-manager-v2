@@ -24,6 +24,7 @@ import { Playoffs } from './components/Playoffs'
 import { DEBUG_CONFIG } from '../../lib/constants/debugConfig'
 import { Offseason } from './components/Offseason'
 import { ChampionshipResultsModal } from './components/ChampionshipResultsModal'
+import { FrontOfficeManager } from '../../lib/FrontOfficeManager'
 
 interface Props {
   savedSeason: any
@@ -48,6 +49,12 @@ const Season: React.FC<Props> = ({
     seasonManager,
     setSeasonManager,
   ] = React.useState<SeasonManager | null>(null)
+
+  const [
+    frontOfficeManager,
+    setFrontOfficeManager,
+  ] = React.useState<FrontOfficeManager | null>(null)
+
   const [showMatch, setShowMatch] = React.useState(false)
   const [teamToShowRoster, setTeamToShowRoster] = React.useState<any>(null)
   const [showPlayoffs, setShowPlayoffs] = React.useState<boolean>(false)
@@ -56,6 +63,12 @@ const Season: React.FC<Props> = ({
 
   React.useEffect(() => {
     const seasonManager = new SeasonManager(guild)
+    const frontOfficeManager = new FrontOfficeManager(guild)
+
+    // Point the front office manager team references to the season manager ones
+    frontOfficeManager.setPlayerTeamReference(seasonManager.getPlayer())
+    frontOfficeManager.setTeamReference(seasonManager.getAllTeams())
+
     if (savedSeason) {
       seasonManager.deserialize(savedSeason)
     } else if (!guild.league || !guild.schedule) {
@@ -64,11 +77,12 @@ const Season: React.FC<Props> = ({
       setSchedule(serializedState.schedule)
     }
     setSeasonManager(seasonManager)
+    setFrontOfficeManager(frontOfficeManager)
     setShowPlayoffs(seasonManager.getPlayoffBracket() !== null)
     setIsOffseason(seasonManager.getIsOffseason())
   }, [])
 
-  if (!seasonManager) {
+  if (!seasonManager || !frontOfficeManager) {
     return <View />
   }
 
@@ -101,6 +115,7 @@ const Season: React.FC<Props> = ({
 
   const startOffseason = () => {
     seasonManager.startOffseason()
+    frontOfficeManager.decrementContractDuration()
     setShowPlayoffs(false)
     setShowMatch(false)
     setIsOffseason(true)
