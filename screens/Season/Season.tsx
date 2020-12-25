@@ -125,6 +125,7 @@ const Season: React.FC<Props> = ({
 
   const restartSeason = () => {
     seasonManager.restartSeason()
+    frontOfficeManager.onSeasonStart()
     setIsOffseason(false)
     serializeSeasonManager()
   }
@@ -200,6 +201,7 @@ const Season: React.FC<Props> = ({
   if (showPlayoffs) {
     return (
       <Playoffs
+        navigation={navigation}
         seasonManager={seasonManager}
         onMatchContinue={(outcome: {
           winner: string

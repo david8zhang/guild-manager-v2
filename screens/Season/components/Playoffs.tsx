@@ -15,17 +15,20 @@ import { SeasonManager } from '../../../lib/SeasonManager'
 import { DEBUG_CONFIG } from '../../../lib/constants/debugConfig'
 import { ChampionshipResultsModal } from './ChampionshipResultsModal'
 import { Record } from '../../../lib/model/Record'
+import { Portal } from 'react-native-paper'
 
 interface Props {
   seasonManager: SeasonManager
   onMatchContinue: Function
   proceedToOffseason: Function
+  navigation: any
 }
 
 export const Playoffs: React.FC<Props> = ({
   seasonManager,
   onMatchContinue,
   proceedToOffseason,
+  navigation,
 }) => {
   const [
     playoffBracket,
@@ -183,41 +186,43 @@ export const Playoffs: React.FC<Props> = ({
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'white' }}>
-      <Navbar title='Playoffs' />
-      <ChampionshipResultsModal
-        isOpen={playoffsOutcome !== ''}
-        didWin={playoffsOutcome === 'win'}
-        seasonManager={seasonManager}
-        onContinue={() => proceedToOffseason()}
-      />
-      {renderBracket()}
-      <View
-        style={{
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: 20,
-        }}
-      >
-        <Button
-          text={isWinner ? 'Simulate Match' : 'Play Match'}
-          onPress={() => {
-            if (isWinner) {
-              simulatePlayoffBracketGames()
-            } else {
-              if (DEBUG_CONFIG.autoWinGames) {
-                updatePlayoffBracketScores(seasonManager.getPlayer().teamId)
-                simulatePlayoffBracketGames()
-                checkIsWinner()
-                setCounter(counter + 1)
-              } else {
-                setShowMatch(true)
-              }
-            }
-          }}
-          style={{ width: 200 }}
+    <Portal.Host>
+      <View style={{ flex: 1, backgroundColor: 'white' }}>
+        <Navbar title='Playoffs' navigation={navigation} />
+        <ChampionshipResultsModal
+          isOpen={playoffsOutcome !== ''}
+          didWin={playoffsOutcome === 'win'}
+          seasonManager={seasonManager}
+          onContinue={() => proceedToOffseason()}
         />
+        {renderBracket()}
+        <View
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 20,
+          }}
+        >
+          <Button
+            text={isWinner ? 'Simulate Match' : 'Play Match'}
+            onPress={() => {
+              if (isWinner) {
+                simulatePlayoffBracketGames()
+              } else {
+                if (DEBUG_CONFIG.autoWinGames) {
+                  updatePlayoffBracketScores(seasonManager.getPlayer().teamId)
+                  simulatePlayoffBracketGames()
+                  checkIsWinner()
+                  setCounter(counter + 1)
+                } else {
+                  setShowMatch(true)
+                }
+              }
+            }}
+            style={{ width: 200 }}
+          />
+        </View>
       </View>
-    </View>
+    </Portal.Host>
   )
 }

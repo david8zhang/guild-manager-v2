@@ -16,12 +16,14 @@ interface Props {
   frontOfficeManager: FrontOfficeManager
   saveFrontOffice: Function
   saveGuild: Function
+  navigation: any
 }
 
 const FreeAgency: React.FC<Props> = ({
   frontOfficeManager,
   saveFrontOffice,
   saveGuild,
+  navigation,
 }) => {
   const [selectedHero, setSelectedHero] = React.useState<any>(null)
 
@@ -157,7 +159,7 @@ const FreeAgency: React.FC<Props> = ({
 
   return (
     <Portal.Host>
-      <Navbar title='Free Agents' />
+      <Navbar title='Free Agents' navigation={navigation} />
       <View
         style={{
           flexDirection: 'row',

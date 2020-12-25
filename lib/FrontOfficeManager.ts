@@ -55,19 +55,21 @@ export class FrontOfficeManager {
 
     this.teams.forEach((team: Team) => {
       team.roster.forEach((h: Hero) => {
-        const contract = h.getContract()
-        contract.duration--
+        if (team.teamId !== this.playerTeam.teamId) {
+          const contract = h.getContract()
+          contract.duration--
 
-        // If CPU controlled hero contract expires, make them a free agent.
-        // If the player does not sign them after offseason, then all CPU free agents are resigned to their original team
-        if (contract.duration == 0) {
-          team.releaseHero(h.heroId)
-          this.freeAgents.push({
-            hero: h,
-            previousTeamId: team.teamId,
-          })
+          // If CPU controlled hero contract expires, make them a free agent.
+          // If the player does not sign them after offseason, then all CPU free agents are resigned to their original team
+          if (contract.duration == 0) {
+            team.releaseHero(h.heroId)
+            this.freeAgents.push({
+              hero: h,
+              previousTeamId: team.teamId,
+            })
+          }
+          h.setContract(contract)
         }
-        h.setContract(contract)
       })
     })
   }

@@ -4,6 +4,7 @@ import { View, StyleSheet } from 'react-native'
 import { Navbar } from '../../components/Navbar'
 import { ScrollView } from 'react-native-gesture-handler'
 import { MenuOption } from './components'
+import { Portal } from 'react-native-paper'
 
 interface Props {
   navigation: any
@@ -18,42 +19,44 @@ const HomeScreen: React.FC<Props> = ({ navigation, guild }) => {
   }, [])
 
   return (
-    <View style={styles.root}>
-      <Navbar title='Home' navigation={navigation} />
-      <ScrollView horizontal style={{ paddingTop: 10, paddingLeft: 10 }}>
-        <MenuOption
-          optionName='My Team'
-          iconName='group'
-          onPress={() => {
-            navigation.navigate('MyTeam')
-          }}
-        />
-        <MenuOption
-          optionName='Season'
-          iconName='calendar'
-          onPress={() => {
-            navigation.navigate('Season')
-          }}
-        />
-        <MenuOption
-          optionName='Front Office'
-          iconName='address-book-o'
-          onPress={() => {
-            navigation.navigate('FrontOffice')
-          }}
-        />
-        <MenuOption
-          optionName='News Headlines'
-          iconName='newspaper-o'
-          onPress={() => {}}
-        />
-        <MenuOption
-          optionName='Trophy Case'
-          iconName='trophy'
-          onPress={() => {}}
-        />
-      </ScrollView>
-    </View>
+    <Portal.Host>
+      <View style={styles.root}>
+        <Navbar title='Home' navigation={navigation} />
+        <ScrollView horizontal style={{ paddingTop: 10, paddingLeft: 10 }}>
+          <MenuOption
+            optionName='My Team'
+            iconName='group'
+            onPress={() => {
+              navigation.navigate('MyTeam')
+            }}
+          />
+          <MenuOption
+            optionName='Season'
+            iconName='calendar'
+            onPress={() => {
+              navigation.navigate('Season')
+            }}
+          />
+          <MenuOption
+            optionName='Front Office'
+            iconName='address-book-o'
+            onPress={() => {
+              navigation.navigate('FrontOffice')
+            }}
+          />
+          <MenuOption
+            optionName='News Headlines'
+            iconName='newspaper-o'
+            onPress={() => {}}
+          />
+          <MenuOption
+            optionName='Trophy Case'
+            iconName='trophy'
+            onPress={() => {}}
+          />
+        </ScrollView>
+      </View>
+    </Portal.Host>
   )
 }
 

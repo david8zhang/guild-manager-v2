@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { View } from 'react-native'
+import { Portal } from 'react-native-paper'
+
 import { MenuOption } from '../Home/components'
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
 import { Navbar } from '../../components'
@@ -15,9 +17,10 @@ import { saveGuild } from '../../redux/guildWidget'
 interface Props {
   guild: any
   frontOffice: any
+  navigation: any
 }
 
-const FrontOffice: React.FC<Props> = ({ guild, frontOffice }) => {
+const FrontOffice: React.FC<Props> = ({ guild, frontOffice, navigation }) => {
   const [frontOfficeManager, setFrontOfficeManager] = React.useState<any>(null)
   const [currPage, setCurrPage] = React.useState<string>('')
 
@@ -34,6 +37,7 @@ const FrontOffice: React.FC<Props> = ({ guild, frontOffice }) => {
   if (currPage === 'Contracts') {
     return (
       <Contracts
+        navigation={navigation}
         frontOfficeManager={frontOfficeManager}
         onBack={() => {
           setCurrPage('')
@@ -47,12 +51,17 @@ const FrontOffice: React.FC<Props> = ({ guild, frontOffice }) => {
   }
 
   if (currPage === 'Free Agents') {
-    return <FreeAgency frontOfficeManager={frontOfficeManager} />
+    return (
+      <FreeAgency
+        navigation={navigation}
+        frontOfficeManager={frontOfficeManager}
+      />
+    )
   }
 
   return (
-    <View>
-      <Navbar title='Front Office' />
+    <Portal.Host>
+      <Navbar title='Front Office' navigation={navigation} />
       <View
         style={{
           flexDirection: 'row',
@@ -88,7 +97,7 @@ const FrontOffice: React.FC<Props> = ({ guild, frontOffice }) => {
           }}
         />
       </View>
-    </View>
+    </Portal.Host>
   )
 }
 

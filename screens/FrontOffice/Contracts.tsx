@@ -11,9 +11,13 @@ import { Portal } from 'react-native-paper'
 interface Props {
   frontOfficeManager: FrontOfficeManager
   onBack: Function
+  navigation: any
 }
 
-export const Contracts: React.FC<Props> = ({ frontOfficeManager }) => {
+export const Contracts: React.FC<Props> = ({
+  frontOfficeManager,
+  navigation,
+}) => {
   const [selectedHero, setSelectedHero] = React.useState<any>(null)
   const playerHeroes: Hero[] = frontOfficeManager.getPlayerHeroes()
 
@@ -125,7 +129,7 @@ export const Contracts: React.FC<Props> = ({ frontOfficeManager }) => {
 
   return (
     <Portal.Host>
-      <Navbar title='Contracts' />
+      <Navbar title='Contracts' navigation={navigation} />
       <View
         style={{
           flexDirection: 'row',

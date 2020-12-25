@@ -30,6 +30,7 @@ export const Offseason: React.FC<Props> = ({
   const [hasContractsExpiring, setHasContractsExpiring] = React.useState(false)
 
   React.useEffect(() => {
+    console.log('Went here')
     const isExpiring = frontOfficeManager.hasContractsExpiring()
     setHasContractsExpiring(isExpiring)
   }, [])
@@ -123,7 +124,7 @@ export const Offseason: React.FC<Props> = ({
   return (
     <Portal.Host>
       <View style={{ flex: 1, backgroundColor: 'white' }}>
-        <Navbar title='Offseason' />
+        <Navbar title='Offseason' navigation={navigation} />
         <OffseasonContractExpireModal
           isOpen={hasContractsExpiring}
           onClose={() => {

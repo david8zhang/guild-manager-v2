@@ -1,9 +1,9 @@
 import React from 'react'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, BackHandler } from 'react-native'
 import * as ScreenOrientation from 'expo-screen-orientation'
 import 'react-native-gesture-handler'
 import { NavigationContainer } from '@react-navigation/native'
-import { createStackNavigator } from '@react-navigation/stack'
+import { createDrawerNavigator } from '@react-navigation/drawer'
 import {
   HomeScreen,
   CreateGuild,
@@ -17,18 +17,31 @@ import { store } from './redux/store'
 
 export default function App() {
   ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT)
-  const Stack = createStackNavigator()
+  const Drawer = createDrawerNavigator()
+
+  React.useEffect(() => {
+    const unsubscribe = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => {
+        return true
+      }
+    )
+  }, [])
+
   return (
     <Provider store={store}>
       <NavigationContainer>
-        <Stack.Navigator headerMode='none' initialRouteName='Home'>
-          <Stack.Screen name='Create' component={CreateGuild} />
-          <Stack.Screen name='Home' component={HomeScreen} />
-          <Stack.Screen name='StarterHeroes' component={StarterHeroes} />
-          <Stack.Screen name='Season' component={Season} />
-          <Stack.Screen name='MyTeam' component={MyTeam} />
-          <Stack.Screen name='FrontOffice' component={FrontOffice} />
-        </Stack.Navigator>
+        <Drawer.Navigator
+          initialRouteName='Home'
+          screenOptions={{ gestureEnabled: false }}
+        >
+          <Drawer.Screen name='Create' component={CreateGuild} />
+          <Drawer.Screen name='Home' component={HomeScreen} />
+          <Drawer.Screen name='StarterHeroes' component={StarterHeroes} />
+          <Drawer.Screen name='Season' component={Season} />
+          <Drawer.Screen name='MyTeam' component={MyTeam} />
+          <Drawer.Screen name='FrontOffice' component={FrontOffice} />
+        </Drawer.Navigator>
       </NavigationContainer>
     </Provider>
   )

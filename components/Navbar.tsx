@@ -1,6 +1,15 @@
 import * as React from 'react'
-import { Pressable, Text, View } from 'react-native'
+import {
+  Animated,
+  Dimensions,
+  Easing,
+  Pressable,
+  Text,
+  View,
+} from 'react-native'
 import { FontAwesome } from '@expo/vector-icons'
+import { Portal } from 'react-native-paper'
+import { Button } from './Button'
 
 interface Props {
   title: string
@@ -9,6 +18,7 @@ interface Props {
 }
 
 export const Navbar: React.FC<Props> = ({ title, style, navigation }) => {
+  const [sideNavPos, setSideNavWidth] = React.useState(new Animated.Value(-200))
   const navStyle: any = {
     padding: 20,
     flexDirection: 'row',
@@ -16,9 +26,95 @@ export const Navbar: React.FC<Props> = ({ title, style, navigation }) => {
     alignItems: 'center',
     ...style,
   }
+
+  const closeMenu = () => {
+    Animated.timing(sideNavPos, {
+      toValue: -200,
+      duration: 500,
+      useNativeDriver: true,
+    }).start()
+  }
+
+  const openMenu = () => {
+    Animated.timing(sideNavPos, {
+      toValue: 0,
+      duration: 500,
+      useNativeDriver: true,
+    }).start()
+  }
+
+  const navOptions = [
+    {
+      name: 'Home',
+      value: 'Home',
+    },
+    {
+      name: 'Front Office',
+      value: 'FrontOffice',
+    },
+    {
+      name: 'My Team',
+      value: 'MyTeam',
+    },
+    {
+      name: 'Season',
+      value: 'Season',
+    },
+  ]
   return (
     <View style={navStyle}>
-      <Pressable onPress={() => {}}>
+      <Portal>
+        <Animated.View
+          style={{
+            position: 'absolute',
+            width: 200,
+            transform: [
+              {
+                translateX: sideNavPos,
+              },
+            ],
+            height: '100%',
+            zIndex: 3,
+            backgroundColor: 'white',
+            borderRightColor: 'black',
+            borderRightWidth: 1,
+          }}
+        >
+          <Pressable
+            onPress={() => {
+              closeMenu()
+            }}
+            style={{ padding: 10 }}
+          >
+            <FontAwesome
+              style={{ alignSelf: 'flex-end' }}
+              name='times'
+              size={20}
+            />
+          </Pressable>
+          {navOptions.map((navOption: any) => {
+            return (
+              <Pressable
+                style={{ padding: 10 }}
+                key={navOption.name}
+                onPress={() => {
+                  navigation.navigate(navOption.value)
+                  closeMenu()
+                }}
+              >
+                <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
+                  {navOption.name}
+                </Text>
+              </Pressable>
+            )
+          })}
+        </Animated.View>
+      </Portal>
+      <Pressable
+        onPress={() => {
+          openMenu()
+        }}
+      >
         <FontAwesome name='bars' size={20} color='gray' />
       </Pressable>
       <View style={{ flex: 1, marginLeft: 10 }}>
