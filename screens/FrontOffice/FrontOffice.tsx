@@ -12,27 +12,30 @@ import { default as FreeAgency } from './FreeAgency'
 
 // Redux
 import { connect } from 'react-redux'
-import { saveGuild } from '../../redux/guildWidget'
 
 interface Props {
   guild: any
+  league: any
   frontOffice: any
   navigation: any
 }
 
-const FrontOffice: React.FC<Props> = ({ guild, frontOffice, navigation }) => {
+const FrontOffice: React.FC<Props> = ({
+  guild,
+  league,
+  frontOffice,
+  navigation,
+}) => {
   const [frontOfficeManager, setFrontOfficeManager] = React.useState<any>(null)
   const [currPage, setCurrPage] = React.useState<string>('')
 
   React.useEffect(() => {
-    if (guild) {
-      const foManager: FrontOfficeManager = new FrontOfficeManager(guild)
-      if (frontOffice) {
-        foManager.deserializeObj(frontOffice)
-      }
-      setFrontOfficeManager(foManager)
+    const foManager: FrontOfficeManager = new FrontOfficeManager(guild, league)
+    if (frontOffice) {
+      foManager.deserializeObj(frontOffice)
     }
-  }, [])
+    setFrontOfficeManager(foManager)
+  }, [frontOffice])
 
   if (currPage === 'Contracts') {
     return (
@@ -55,6 +58,9 @@ const FrontOffice: React.FC<Props> = ({ guild, frontOffice, navigation }) => {
       <FreeAgency
         navigation={navigation}
         frontOfficeManager={frontOfficeManager}
+        onBack={() => {
+          setCurrPage('')
+        }}
       />
     )
   }
@@ -103,7 +109,8 @@ const FrontOffice: React.FC<Props> = ({ guild, frontOffice, navigation }) => {
 
 const mapStateToProps = (state: any) => ({
   guild: state.guild,
+  league: state.league,
   frontOffice: state.frontOffice,
 })
 
-export default connect(mapStateToProps, { ...saveGuild })(FrontOffice)
+export default connect(mapStateToProps, null)(FrontOffice)

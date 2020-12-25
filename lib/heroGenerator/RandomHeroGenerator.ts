@@ -9,9 +9,25 @@ export class RandomHeroGenerator {
     TankHeroFactory,
     RangedHeroFactory,
   ]
-  constructor(factories?: any[]) {
+  private starterContract: any = {
+    duration: 1,
+    amount: 20,
+  }
+
+  private reserveContract: any = {
+    duration: 1,
+    amount: 5,
+  }
+  constructor(factories?: any[], starterContract?: any, reserveContract?: any) {
     if (factories) {
       this.factories = factories
+    }
+    if (starterContract) {
+      this.starterContract = starterContract
+    }
+
+    if (reserveContract) {
+      this.reserveContract = reserveContract
     }
   }
 
@@ -27,10 +43,7 @@ export class RandomHeroGenerator {
       const factory = new RandomHeroFactory({
         minStat,
         maxStat,
-        contract: {
-          duration: 1,
-          amount: 20,
-        },
+        contract: this.starterContract,
       })
       heroes = heroes.concat(factory.getHeroes(1))
     }
@@ -38,10 +51,6 @@ export class RandomHeroGenerator {
   }
 
   generateReserveHeroes(numHeroes: number) {
-    const defaultContract = {
-      duration: 1,
-      amount: 5,
-    }
     const minStat = 59
     const maxStat = 70
     const minPotential = 2
@@ -55,7 +64,7 @@ export class RandomHeroGenerator {
         minStat,
         maxStat,
         minPotential,
-        contract: defaultContract,
+        contract: this.reserveContract,
       })
       heroes = heroes.concat(factory.getHeroes(1))
     }

@@ -5,7 +5,7 @@ import { TeamGenerator } from './TeamGenerator'
 
 export interface FreeAgent {
   hero: Hero
-  previousTeamId: String
+  previousTeamId: string
 }
 
 export class FrontOfficeManager {
@@ -15,20 +15,34 @@ export class FrontOfficeManager {
   public teams: Team[]
   public freeAgents: FreeAgent[] = []
 
-  public constructor(playerObj: any) {
+  public constructor(playerObj: any, leagueObj: any) {
     this.playerTeam = Team.deserializeObj(playerObj)
-    this.teams = playerObj.league
-      ? playerObj.league.map((t: Team) => Team.deserializeObj(t))
-      : TeamGenerator.generateRandomTeams({
-          numTeams: TEAM_NAMES.length - 1,
-          playerTeam: this.playerTeam,
-        })
-
+    this.teams = []
+    this.configureOtherTeams(leagueObj)
     this.playerTeam.roster.forEach((hero: Hero) => {
       if (hero.getContract().duration == 0) {
         this.expiringHeroes.push(hero)
       }
     })
+  }
+
+  public configureOtherTeams(serializedLeagueObj: any): void {
+    if (!serializedLeagueObj) {
+      this.teams = TeamGenerator.generateRandomTeams({
+        numTeams: TEAM_NAMES.length - 1,
+        playerTeam: this.playerTeam,
+      })
+    } else {
+      this.teams = serializedLeagueObj.map((team: any) =>
+        Team.deserializeObj(team)
+      )
+    }
+  }
+
+  public getSerializedNonPlayerTeams(): any[] {
+    return this.teams
+      .filter((team: Team) => team.teamId !== this.playerTeam.teamId)
+      .map((team: Team) => team.serialize())
   }
 
   public setPlayerTeamReference(playerTeam: Team) {
@@ -54,24 +68,42 @@ export class FrontOfficeManager {
     })
 
     this.teams.forEach((team: Team) => {
-      team.roster.forEach((h: Hero) => {
-        if (team.teamId !== this.playerTeam.teamId) {
+      if (team.teamId !== this.playerTeam.teamId) {
+        team.roster.forEach((h: Hero) => {
           const contract = h.getContract()
           contract.duration--
-
-          // If CPU controlled hero contract expires, make them a free agent.
-          // If the player does not sign them after offseason, then all CPU free agents are resigned to their original team
-          if (contract.duration == 0) {
-            team.releaseHero(h.heroId)
-            this.freeAgents.push({
-              hero: h,
-              previousTeamId: team.teamId,
-            })
-          }
           h.setContract(contract)
+        })
+        // Pick an eligible free agent at random and release them to free agency for the player to sign
+        this.cpuReleaseRandFreeAgent(team)
+      }
+    })
+  }
+
+  private cpuReleaseRandFreeAgent(team: Team) {
+    const eligibleFreeAgents: Hero[] = team.roster.filter(
+      (h: Hero) => h.getContract().duration === 0
+    )
+    if (eligibleFreeAgents.length > 0) {
+      const randomFreeAgent: Hero =
+        eligibleFreeAgents[
+          Math.floor(Math.random() * eligibleFreeAgents.length)
+        ]
+      this.freeAgents.push({
+        hero: randomFreeAgent,
+        previousTeamId: team.teamId,
+      })
+      team.releaseHero(randomFreeAgent.heroId)
+
+      // Resign all other free agents
+      eligibleFreeAgents.forEach((hero: Hero) => {
+        if (hero.heroId !== randomFreeAgent.heroId) {
+          const contract = hero.getContract()
+          contract.duration = 5
+          hero.setContract(contract)
         }
       })
-    })
+    }
   }
 
   public static getAskingAmount(hero: Hero) {
@@ -81,10 +113,10 @@ export class FrontOfficeManager {
       askingAmount = 10
     }
     if (ovr > 70 && ovr <= 80) {
-      askingAmount = 15
+      askingAmount = 20
     }
     if (ovr >= 80) {
-      askingAmount = 20
+      askingAmount = 30
     }
     return askingAmount
   }
@@ -159,13 +191,19 @@ export class FrontOfficeManager {
     }))
   }
 
-  public getProjectedSalaryCap(hero: Hero, newContract: Contract) {
+  public getProjectedSalaryCap(
+    hero: Hero,
+    newContract: Contract,
+    isFreeAgent?: boolean
+  ) {
     const currContract = hero.getContract()
     const diff = newContract.amount - currContract.amount
+    const newTotalSalary = isFreeAgent
+      ? this.getTotalSalary() + newContract.amount
+      : this.getTotalSalary() + diff
     return {
-      projectedSalary: this.getTotalSalary() + diff,
-      capSpace:
-        FrontOfficeManager.MAX_SALARY_CAP - (this.getTotalSalary() + diff),
+      projectedSalary: newTotalSalary,
+      capSpace: FrontOfficeManager.MAX_SALARY_CAP - newTotalSalary,
     }
   }
 
@@ -187,9 +225,29 @@ export class FrontOfficeManager {
     }
   }
 
+  public getTeam(teamId: string): Team {
+    return this.teams.find((t: Team) => t.teamId == teamId) as Team
+  }
+
   // Gets called once offseason is over and season restarts
   public onSeasonStart(): void {
-    // Return all unsigned free agents to their respective teams
+    this.resignAllCPUFreeAgents()
+    this.freeAgents = []
+  }
+
+  // Return all unsigned free agents to their respective teams
+  public resignAllCPUFreeAgents() {
+    this.freeAgents.forEach((freeAgent: FreeAgent) => {
+      if (freeAgent.previousTeamId !== this.playerTeam.teamId) {
+        const team: Team = this.getTeam(freeAgent.previousTeamId)
+        const contract = freeAgent.hero.getContract()
+
+        // Sign a max 5 year contract
+        contract.duration = 5
+        freeAgent.hero.setContract(contract)
+        team.addHero(freeAgent.hero)
+      }
+    })
   }
 
   public getPlayer() {

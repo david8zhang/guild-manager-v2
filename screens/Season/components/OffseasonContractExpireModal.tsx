@@ -40,7 +40,6 @@ export const OffseasonContractExpireModal: React.FC<Props> = ({
           text='Manage contracts'
           onPress={() => {
             onPress()
-            onClose()
           }}
         />
       </View>

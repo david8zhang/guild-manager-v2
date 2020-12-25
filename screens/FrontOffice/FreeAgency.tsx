@@ -1,5 +1,12 @@
 import * as React from 'react'
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native'
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native'
 import { Button, Navbar } from '../../components'
 import { HeroFactory } from '../../lib/factory/HeroFactory'
 import { FrontOfficeManager, FreeAgent } from '../../lib/FrontOfficeManager'
@@ -10,25 +17,29 @@ import { Portal } from 'react-native-paper'
 
 import * as guildActions from '../../redux/guildWidget'
 import * as frontOfficeActions from '../../redux/frontOfficeWidget'
+import * as leagueActions from '../../redux/leagueWidget'
 import { connect } from 'react-redux'
 
 interface Props {
   frontOfficeManager: FrontOfficeManager
   saveFrontOffice: Function
   saveGuild: Function
+  saveLeague: Function
   navigation: any
+  onBack: Function
 }
 
 const FreeAgency: React.FC<Props> = ({
   frontOfficeManager,
   saveFrontOffice,
   saveGuild,
+  saveLeague,
   navigation,
+  onBack,
 }) => {
   const [selectedHero, setSelectedHero] = React.useState<any>(null)
 
   const freeAgents = frontOfficeManager.getFreeAgents()
-
   const signFreeAgent = (newContract: any) => {
     frontOfficeManager.signFreeAgent(selectedHero, newContract)
     const serializedTeam = frontOfficeManager.getPlayer().serialize()
@@ -36,6 +47,9 @@ const FreeAgency: React.FC<Props> = ({
 
     const serializedFrontOffice = frontOfficeManager.serialize()
     saveFrontOffice(serializedFrontOffice)
+
+    const serializedLeagueObj = frontOfficeManager.getSerializedNonPlayerTeams()
+    saveLeague(serializedLeagueObj)
   }
 
   const renderRow = (hero: Hero) => {
@@ -125,10 +139,7 @@ const FreeAgency: React.FC<Props> = ({
               <Text style={styles.headerText}>Type</Text>
               <Text style={{ flex: 1.5 }} />
             </View>
-            <ScrollView
-              showsVerticalScrollIndicator
-              contentContainerStyle={{ paddingBottom: 20 }}
-            >
+            <ScrollView alwaysBounceVertical style={{ paddingBottom: 20 }}>
               {freeAgents.map((freeAgent: FreeAgent) => {
                 return renderRow(freeAgent.hero)
               })}
@@ -164,11 +175,23 @@ const FreeAgency: React.FC<Props> = ({
         style={{
           flexDirection: 'row',
           justifyContent: 'flex-end',
+          alignItems: 'center',
           paddingLeft: 10,
           paddingRight: 10,
           paddingTop: 10,
         }}
       >
+        {!selectedHero && (
+          <Pressable
+            onPress={() => {
+              onBack()
+            }}
+            style={{ flex: 1, alignItems: 'center', flexDirection: 'row' }}
+          >
+            <FontAwesome name='chevron-left' size={20} />
+            <Text style={{ fontSize: 20, marginLeft: 10 }}>Back</Text>
+          </Pressable>
+        )}
         <Text style={{ fontSize: 20, marginRight: 20 }}>
           Salary Cap:{' '}
           <Text style={{ color: salaryCapSpace >= 0 ? 'green' : 'red' }}>
@@ -182,9 +205,11 @@ const FreeAgency: React.FC<Props> = ({
   )
 }
 
-export default connect(null, { ...frontOfficeActions, ...guildActions })(
-  FreeAgency
-)
+export default connect(null, {
+  ...frontOfficeActions,
+  ...guildActions,
+  ...leagueActions,
+})(FreeAgency)
 
 const styles = StyleSheet.create({
   textRow: {

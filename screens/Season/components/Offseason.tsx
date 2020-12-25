@@ -30,10 +30,9 @@ export const Offseason: React.FC<Props> = ({
   const [hasContractsExpiring, setHasContractsExpiring] = React.useState(false)
 
   React.useEffect(() => {
-    console.log('Went here')
     const isExpiring = frontOfficeManager.hasContractsExpiring()
     setHasContractsExpiring(isExpiring)
-  }, [])
+  }, [frontOfficeManager.hasContractsExpiring()])
 
   const selectStatToTrain = (stat: string) => {
     if (statsToTrain.length < 2) {

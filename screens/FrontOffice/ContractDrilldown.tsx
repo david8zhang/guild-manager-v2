@@ -38,22 +38,19 @@ const ContractDrilldown: React.FC<Props> = ({
 
   const extendContract = (newContract: any) => {
     frontOfficeManager.extendContract(hero.heroId, newContract)
-
-    const serializedPlayerTeam = frontOfficeManager.getPlayer().serialize()
-    saveGuild(serializedPlayerTeam)
-    saveFO()
+    saveAllStates()
   }
 
-  const saveFO = () => {
+  const saveAllStates = () => {
+    const serializedPlayerTeam = frontOfficeManager.getPlayer().serialize()
+    saveGuild(serializedPlayerTeam)
     const frontOfficeObj = (frontOfficeManager as FrontOfficeManager).serialize()
     saveFrontOffice(frontOfficeObj)
   }
 
   const releaseHero = () => {
     frontOfficeManager.releaseHero(hero.heroId)
-    const serializedPlayerTeam = frontOfficeManager.getPlayer().serialize()
-    saveGuild(serializedPlayerTeam)
-    saveFO()
+    saveAllStates()
     onBack()
   }
 
@@ -65,6 +62,7 @@ const ContractDrilldown: React.FC<Props> = ({
     <View style={{ padding: 15 }}>
       <Portal>
         <ContractExtensionModal
+          isFreeAgent={isFreeAgent}
           frontOfficeManager={frontOfficeManager}
           isOpen={isExtendingContract}
           hero={hero}

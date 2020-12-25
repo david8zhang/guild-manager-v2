@@ -12,6 +12,7 @@ interface Props {
   hero: Hero
   onAccept: Function
   frontOfficeManager: FrontOfficeManager
+  isFreeAgent?: boolean
 }
 
 export const ContractExtensionModal: React.FC<Props> = ({
@@ -20,6 +21,7 @@ export const ContractExtensionModal: React.FC<Props> = ({
   hero,
   onAccept,
   frontOfficeManager,
+  isFreeAgent,
 }) => {
   const [duration, setDuration] = React.useState(2)
 
@@ -31,7 +33,7 @@ export const ContractExtensionModal: React.FC<Props> = ({
   const {
     projectedSalary,
     capSpace,
-  } = frontOfficeManager.getProjectedSalaryCap(hero, newContract)
+  } = frontOfficeManager.getProjectedSalaryCap(hero, newContract, isFreeAgent)
 
   return (
     <CustomModal
@@ -82,7 +84,7 @@ export const ContractExtensionModal: React.FC<Props> = ({
                 color: capSpace < 0 ? 'red' : 'green',
               }}
             >
-              {capSpace < 0 ? `${capSpace}` : `+${capSpace}`}G
+              {capSpace < 0 ? `${capSpace}` : `${capSpace}`}G
             </Text>
           </Text>
           <Text style={{ flex: 1, textAlign: 'center' }}>

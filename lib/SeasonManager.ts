@@ -21,14 +21,9 @@ export class SeasonManager {
   public playoffBracket: any
   public isOffseason: boolean
 
-  constructor(playerObj: any) {
+  constructor(playerObj: any, leagueObj: any) {
     this.playerTeam = Team.deserializeObj(playerObj)
-    this.teams = playerObj.league
-      ? playerObj.league.map((t: Team) => Team.deserializeObj(t))
-      : TeamGenerator.generateRandomTeams({
-          numTeams: TEAM_NAMES.length - 1,
-          playerTeam: this.playerTeam,
-        })
+    this.configureOtherTeams(leagueObj)
 
     // Set the player team's matchup schedule
     this.playerSeasonSchedule = playerObj.schedule
@@ -190,7 +185,6 @@ export class SeasonManager {
       serializedTeamRecords[key] = record.serialize()
     })
     return {
-      teams: this.teams.map((t) => t.serialize()),
       schedule: this.playerSeasonSchedule.serialize(),
       teamRecords: serializedTeamRecords,
       playoffBracket: this.playoffBracket
@@ -217,17 +211,27 @@ export class SeasonManager {
     return this.playoffBracket
   }
 
+  public configureOtherTeams(serializedLeagueObj: any) {
+    if (!serializedLeagueObj) {
+      this.teams = TeamGenerator.generateRandomTeams({
+        numTeams: TEAM_NAMES.length - 1,
+        playerTeam: this.playerTeam,
+      })
+    } else {
+      this.teams = serializedLeagueObj.map((team: any) =>
+        Team.deserializeObj(team)
+      )
+    }
+  }
+
   // Reconstruct the season manager state from a serialized object
   public deserialize(serializedSeasonObj: any) {
     const {
-      teams,
       schedule,
       teamRecords,
-      playerTeam,
       playoffBracket,
       isOffseason,
     } = serializedSeasonObj
-    this.teams = teams.map((t: any) => Team.deserializeObj(t))
     this.playerSeasonSchedule = Schedule.deserializeObj(schedule, this.teams)
     this.teamRecords = {}
     Object.keys(teamRecords).forEach((key: string) => {
@@ -246,6 +250,12 @@ export class SeasonManager {
       )
       ;(this.playoffBracket as PlayoffBracket).deserialize(playoffBracket)
     }
+  }
+
+  public getSerializedNonPlayerTeams(): any[] {
+    return this.teams
+      .filter((team: Team) => team.teamId !== this.playerTeam.teamId)
+      .map((team: Team) => team.serialize())
   }
 
   public saveHeroMatchStats(heroMatchStats: {

@@ -1,5 +1,12 @@
 import * as React from 'react'
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native'
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native'
 import { Button, Navbar } from '../../components'
 import { HeroFactory } from '../../lib/factory/HeroFactory'
 import { FrontOfficeManager } from '../../lib/FrontOfficeManager'
@@ -17,6 +24,7 @@ interface Props {
 export const Contracts: React.FC<Props> = ({
   frontOfficeManager,
   navigation,
+  onBack,
 }) => {
   const [selectedHero, setSelectedHero] = React.useState<any>(null)
   const playerHeroes: Hero[] = frontOfficeManager.getPlayerHeroes()
@@ -133,12 +141,24 @@ export const Contracts: React.FC<Props> = ({
       <View
         style={{
           flexDirection: 'row',
+          alignItems: 'center',
           justifyContent: 'flex-end',
           paddingLeft: 10,
           paddingRight: 10,
           paddingTop: 10,
         }}
       >
+        {!selectedHero && (
+          <Pressable
+            onPress={() => {
+              onBack()
+            }}
+            style={{ flex: 1, alignItems: 'center', flexDirection: 'row' }}
+          >
+            <FontAwesome name='chevron-left' size={20} />
+            <Text style={{ fontSize: 20, marginLeft: 10 }}>Back</Text>
+          </Pressable>
+        )}
         <Text style={{ fontSize: 20, marginRight: 20 }}>
           Salary Cap:{' '}
           <Text style={{ color: salaryCapSpace >= 0 ? 'green' : 'red' }}>

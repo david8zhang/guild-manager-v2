@@ -2,49 +2,56 @@ import * as React from 'react'
 
 // UI Components
 import { Text, View } from 'react-native'
+import { Portal } from 'react-native-paper'
 import { Button, Navbar } from '../../components'
 import { TeamRecord } from './components/TeamRecord'
 import { MatchupTeam } from './components/MatchupTeam'
 import { SeasonCalendar } from './components/SeasonCalendar'
 import { Match } from './Match/Match'
 import { RosterPreview } from './components/RosterPreview'
+import { Playoffs } from './components/Playoffs'
+import { SeasonOverModal } from './components/SeasonOverModal'
+import { Offseason } from './components/Offseason'
 
 // Game State
 import { Team } from '../../lib/model/Team'
 import { HeroStats } from '../../lib/model/HeroStats'
 import { Schedule } from '../../lib/model/Schedule'
 import { SeasonManager } from '../../lib/SeasonManager'
+import { FrontOfficeManager } from '../../lib/FrontOfficeManager'
+import { DEBUG_CONFIG } from '../../lib/constants/debugConfig'
 
 // Redux
 import * as guildActions from '../../redux/guildWidget'
 import * as seasonActions from '../../redux/seasonWidget'
+import * as frontOfficeActions from '../../redux/frontOfficeWidget'
+import * as leagueActions from '../../redux/leagueWidget'
 import { connect } from 'react-redux'
-import { SeasonOverModal } from './components/SeasonOverModal'
-import { Playoffs } from './components/Playoffs'
-import { DEBUG_CONFIG } from '../../lib/constants/debugConfig'
-import { Offseason } from './components/Offseason'
-import { ChampionshipResultsModal } from './components/ChampionshipResultsModal'
-import { FrontOfficeManager } from '../../lib/FrontOfficeManager'
-import { Portal } from 'react-native-paper'
 
 interface Props {
   savedSeason: any
   guild: any
+  league: any
+  frontOffice: any
   navigation: any
   saveSeason: Function
   saveGuild: Function
-  setOtherTeams: Function
   setSchedule: Function
+  saveFrontOffice: Function
+  saveLeague: Function
 }
 
 const Season: React.FC<Props> = ({
   navigation,
   guild,
+  league,
+  frontOffice,
   savedSeason,
-  setOtherTeams,
   setSchedule,
   saveSeason,
   saveGuild,
+  saveFrontOffice,
+  saveLeague,
 }) => {
   const [
     seasonManager,
@@ -63,25 +70,29 @@ const Season: React.FC<Props> = ({
   const [isOffseason, setIsOffseason] = React.useState<boolean>(false)
 
   React.useEffect(() => {
-    const seasonManager = new SeasonManager(guild)
-    const frontOfficeManager = new FrontOfficeManager(guild)
+    const seasonManager = new SeasonManager(guild, league)
+    const frontOfficeManager = new FrontOfficeManager(guild, null)
 
     // Point the front office manager team references to the season manager ones
     frontOfficeManager.setPlayerTeamReference(seasonManager.getPlayer())
     frontOfficeManager.setTeamReference(seasonManager.getAllTeams())
 
+    // Reconstruct the front office manager and seasonManagers from saved state
+    if (frontOffice) {
+      frontOfficeManager.deserializeObj(frontOffice)
+    }
     if (savedSeason) {
       seasonManager.deserialize(savedSeason)
-    } else if (!guild.league || !guild.schedule) {
+    } else if (!league || !guild.schedule) {
       const serializedState = seasonManager.serialize()
-      setOtherTeams(serializedState.teams)
+      saveLeague(seasonManager.getSerializedNonPlayerTeams())
       setSchedule(serializedState.schedule)
     }
     setSeasonManager(seasonManager)
     setFrontOfficeManager(frontOfficeManager)
     setShowPlayoffs(seasonManager.getPlayoffBracket() !== null)
     setIsOffseason(seasonManager.getIsOffseason())
-  }, [guild])
+  }, [guild, frontOffice, league])
 
   if (!seasonManager || !frontOfficeManager) {
     return <View />
@@ -110,7 +121,7 @@ const Season: React.FC<Props> = ({
         seasonManager.createPlayoffBracket()
         setShowPlayoffs(true)
       }
-      serializeSeasonManager()
+      serializeAllStates()
     }
   }
 
@@ -120,14 +131,14 @@ const Season: React.FC<Props> = ({
     setShowPlayoffs(false)
     setShowMatch(false)
     setIsOffseason(true)
-    serializeSeasonManager()
+    serializeAllStates()
   }
 
   const restartSeason = () => {
     seasonManager.restartSeason()
     frontOfficeManager.onSeasonStart()
     setIsOffseason(false)
-    serializeSeasonManager()
+    serializeAllStates()
   }
 
   const applyTeamStatIncreases = (statIncreases: any) => {
@@ -141,12 +152,19 @@ const Season: React.FC<Props> = ({
   }
 
   // Save the season manager state within the redux store or persistent storage
-  const serializeSeasonManager = () => {
+  const serializeAllStates = () => {
     const serializedSeason = seasonManager.serialize()
     saveSeason(serializedSeason)
 
     const serializedPlayerTeam = playerTeam.serialize()
     saveGuild(serializedPlayerTeam)
+
+    const serializedFrontOffice = frontOfficeManager.serialize()
+    saveFrontOffice(serializedFrontOffice)
+
+    // save other teams
+    const serializedTeams = seasonManager.getSerializedNonPlayerTeams()
+    saveLeague(serializedTeams)
   }
 
   if (showMatch) {
@@ -169,7 +187,7 @@ const Season: React.FC<Props> = ({
           saveHeroMatchStats(outcome.heroMatchStats)
           applyTeamStatIncreases(outcome.statIncreases)
           updateTeamRecords(outcome)
-          serializeSeasonManager()
+          serializeAllStates()
           setShowMatch(false)
         }}
       />
@@ -214,7 +232,7 @@ const Season: React.FC<Props> = ({
         }) => {
           saveHeroMatchStats(outcome.heroMatchStats)
           applyTeamStatIncreases(outcome.statIncreases)
-          serializeSeasonManager()
+          serializeAllStates()
         }}
         proceedToOffseason={() => {
           startOffseason()
@@ -285,7 +303,7 @@ const Season: React.FC<Props> = ({
                     loser: currentMatchup.teamInfo.teamId,
                     enemyId: currentMatchup.teamInfo.teamId,
                   })
-                  serializeSeasonManager()
+                  serializeAllStates()
                   setShowMatch(false)
                 } else {
                   setShowMatch(true)
@@ -329,8 +347,13 @@ const Season: React.FC<Props> = ({
 const mapStateToProps = (state: any) => ({
   guild: state.guild,
   savedSeason: state.season,
+  frontOffice: state.frontOffice,
+  league: state.league,
 })
 
-export default connect(mapStateToProps, { ...guildActions, ...seasonActions })(
-  Season
-)
+export default connect(mapStateToProps, {
+  ...guildActions,
+  ...seasonActions,
+  ...frontOfficeActions,
+  ...leagueActions,
+})(Season)

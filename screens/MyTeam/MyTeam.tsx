@@ -4,7 +4,6 @@ import { Button, Navbar } from '../../components'
 
 // Game state
 import { Team } from '../../lib/model/Team'
-import { SeasonManager } from '../../lib/SeasonManager'
 import { Hero } from '../../lib/model/Hero'
 
 // Redux
@@ -27,8 +26,6 @@ interface Props {
 const MyTeam: React.FC<Props> = ({
   navigation,
   savedPlayerGuild,
-  savedSeason,
-  saveSeason,
   saveGuild,
 }) => {
   const [team, setTeam] = React.useState<any>(null)
@@ -36,33 +33,17 @@ const MyTeam: React.FC<Props> = ({
   const [heroToDrilldown, setHeroToDrilldown] = React.useState<Hero | null>(
     null
   )
-  const [seasonManager, setSeasonManager] = React.useState<any>(null)
   const [heroToSwap, setHeroToSwap] = React.useState<Hero | null>(null)
   const [showDetailedRoster, setShowDetailedRoster] = React.useState(false)
 
   React.useEffect(() => {
-    let team: any
-    if (!savedSeason) {
-      team = Team.deserializeObj(savedPlayerGuild)
-    } else {
-      const seasonManager: SeasonManager = new SeasonManager(savedPlayerGuild)
-      seasonManager.deserialize(savedSeason)
-      team = seasonManager.getPlayer()
-      if (seasonManager) {
-        setSeasonManager(seasonManager)
-      }
-    }
+    const team: any = Team.deserializeObj(savedPlayerGuild)
     setTeam(team)
     setStarters(team.getStarters())
   }, [])
 
   const saveAdjustment = () => {
-    if (seasonManager) {
-      ;(seasonManager as SeasonManager).setPlayerTeam(team)
-      saveSeason((seasonManager as SeasonManager).serialize())
-    } else {
-      saveGuild((team as Team).serialize())
-    }
+    saveGuild((team as Team).serialize())
   }
 
   if (!team) {
