@@ -14,3 +14,7 @@ PLAY-TESTABLE STATE
 - Better animations for ranged attacks (Bow firing animation)
 - Respawn timer displayed
 - Support for different expressions
+
+## Known Bugs
+
+<!-- Update this with bugs found during playtesting -->

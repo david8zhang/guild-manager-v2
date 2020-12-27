@@ -32,6 +32,7 @@ export const MovesetModal: React.FC<Props> = ({
         onClose()
       }}
       customHeight={230}
+      customWidth={600}
     >
       <View>
         <Text style={{ fontSize: 25, fontWeight: 'bold', marginBottom: 10 }}>

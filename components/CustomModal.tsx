@@ -24,32 +24,39 @@ export const CustomModal: React.FC<Props> = ({
     return <View />
   }
 
-  const width = customWidth || Dimensions.get('window').width * 0.9
-  const height = customHeight || Dimensions.get('window').height * 0.9
+  const width = customWidth || 300
+  const height = customHeight || 200
 
   return (
     <View
       style={{
-        left: Dimensions.get('window').width / 2 - width / 2,
-        top: Dimensions.get('window').height / 2 - height / 2,
         position: 'absolute',
-        backgroundColor: 'white',
-        borderWidth: 1,
+        height: '100%',
+        width: '100%',
         zIndex: 100,
-        height,
-        width,
-        padding: 10,
-        ...style,
+        justifyContent: 'center',
+        alignItems: 'center',
       }}
     >
-      {!hideCloseButton && (
-        <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-          <Pressable onPress={() => onClose()}>
-            <Text>Close</Text>
-          </Pressable>
-        </View>
-      )}
-      {children}
+      <View
+        style={{
+          width,
+          height,
+          backgroundColor: 'white',
+          borderWidth: 1,
+          padding: 10,
+          ...style,
+        }}
+      >
+        {!hideCloseButton && (
+          <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+            <Pressable onPress={() => onClose()}>
+              <Text>Close</Text>
+            </Pressable>
+          </View>
+        )}
+        {children}
+      </View>
     </View>
   )
 }

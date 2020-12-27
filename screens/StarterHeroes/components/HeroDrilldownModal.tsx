@@ -47,6 +47,7 @@ export const HeroDrilldownModal: React.FC<Props> = ({
       onClose={() => onClose()}
       style={{ padding: 20 }}
       customHeight={285}
+      customWidth={700}
     >
       <View
         style={{
