@@ -10,6 +10,7 @@ import * as guildActions from '../../redux/guildWidget'
 import { TEAM_NAMES } from '../../lib/constants/fullTeamNames'
 import { TEAM_IMAGES } from '../../lib/constants/fullTeamImages'
 import { TEAM_COLOR } from '../../lib/constants/fullTeamColors'
+import { CommonActions } from '@react-navigation/native'
 
 interface Props {
   navigation: any

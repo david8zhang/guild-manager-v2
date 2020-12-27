@@ -4,7 +4,7 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
-- Draft rookies
+- Add rookie details during draft
 
 ## Future Features (ordered by priority)
 

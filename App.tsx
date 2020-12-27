@@ -34,7 +34,7 @@ export default function App() {
       <NavigationContainer>
         <Drawer.Navigator
           initialRouteName='Home'
-          screenOptions={{ gestureEnabled: false }}
+          screenOptions={{ gestureEnabled: false, unmountOnBlur: true }}
         >
           <Drawer.Screen name='Create' component={CreateGuild} />
           <Drawer.Screen name='Home' component={HomeScreen} />

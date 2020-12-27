@@ -35,7 +35,7 @@ const FrontOffice: React.FC<Props> = ({
       foManager.deserializeObj(frontOffice)
     }
     setFrontOfficeManager(foManager)
-  }, [frontOffice])
+  }, [frontOffice, guild, league])
 
   if (currPage === 'Contracts') {
     return (

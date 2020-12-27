@@ -18,6 +18,7 @@ export class FrontOfficeManager {
   public freeAgents: FreeAgent[] = []
   public draftClass: Hero[] = []
   public draftOutcomes: any[] = []
+  public hasDraftEnded: boolean = false
 
   public constructor(playerObj: any, leagueObj: any) {
     this.playerTeam = Team.deserializeObj(playerObj)
@@ -64,6 +65,7 @@ export class FrontOfficeManager {
   public finishDraft() {
     this.draftClass = []
     this.draftOutcomes = []
+    this.hasDraftEnded = true
   }
 
   public decrementContractDuration(): void {
@@ -145,8 +147,12 @@ export class FrontOfficeManager {
     // Factor in duration
     const durationMultiplier = 1.46429 - 0.0714286 * (duration + currDuration)
     askingAmount *= durationMultiplier
+    askingAmount = Math.floor(askingAmount)
 
-    return Math.min(Math.floor(askingAmount), 40)
+    // If hero is a rookie, the max they can ask for is 10
+    return hero.isRookie
+      ? Math.min(askingAmount, 10)
+      : Math.min(askingAmount, 40)
   }
 
   public getTotalSalary(): number {
@@ -191,6 +197,7 @@ export class FrontOfficeManager {
         previousTeamId: fa.previousTeamId,
       })),
       draftClass: this.draftClass.map((hero: Hero) => hero.serialize()),
+      hasDraftEnded: this.hasDraftEnded,
     }
   }
 
@@ -202,6 +209,7 @@ export class FrontOfficeManager {
     this.draftClass = frontOfficeObj.draftClass.map((hero: Hero) =>
       Hero.deserializeHeroObj(hero)
     )
+    this.hasDraftEnded = frontOfficeObj.hasDraftEnded
   }
 
   public getProjectedSalaryCap(
@@ -262,7 +270,6 @@ export class FrontOfficeManager {
     })
     const cutHeroes = cpuHeroesSortedByOVR.slice(6)
     cutHeroes.forEach((hero: Hero) => {
-      console.log(team.name, 'released', hero.name)
       team.releaseHero(hero.heroId)
       this.freeAgents.push({
         hero,
@@ -297,6 +304,7 @@ export class FrontOfficeManager {
   public onSeasonStart(): void {
     this.resignAllCPUFreeAgents()
     this.freeAgents = []
+    this.hasDraftEnded = false
   }
 
   // Return all unsigned free agents to their respective teams
@@ -333,6 +341,7 @@ export class FrontOfficeManager {
       contract.amount = 5
       contract.duration = 0
       rookie.setContract(contract)
+      rookie.setIsRookie(true)
     })
 
     this.draftClass = rookies

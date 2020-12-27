@@ -7,9 +7,9 @@ import {
   Text,
   View,
 } from 'react-native'
+import { CommonActions } from '@react-navigation/native'
 import { FontAwesome } from '@expo/vector-icons'
 import { Portal } from 'react-native-paper'
-import { Button } from './Button'
 
 interface Props {
   title: string
@@ -98,7 +98,7 @@ export const Navbar: React.FC<Props> = ({ title, style, navigation }) => {
                 style={{ padding: 10 }}
                 key={navOption.name}
                 onPress={() => {
-                  navigation.navigate(navOption.value)
+                  navigation.jumpTo(navOption.value)
                   closeMenu()
                 }}
               >

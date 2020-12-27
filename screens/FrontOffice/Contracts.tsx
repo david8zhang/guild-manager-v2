@@ -92,7 +92,7 @@ export const Contracts: React.FC<Props> = ({
   const renderContent = () => {
     if (!selectedHero) {
       return (
-        <View style={{ flexDirection: 'row', marginTop: 20 }}>
+        <View style={{ flexDirection: 'row', marginTop: 20, flex: 1 }}>
           <View style={{ flexDirection: 'column', flex: 1 }}>
             <View style={{ flexDirection: 'row' }}>
               <Text style={styles.nameColumn}></Text>

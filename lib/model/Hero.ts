@@ -47,6 +47,7 @@ export class Hero {
   public heroImageData: HeroImageData
   public attackRange: number
   public matchStats: SavedHeroStats
+  public isRookie: boolean
 
   constructor(config: any) {
     this.heroId = config.heroId
@@ -61,6 +62,7 @@ export class Hero {
     this.heroType = config.heroType
     this.attackRange = config.attackRange || 2
     this.contract = config.contract
+    this.isRookie = config.isRookie || false
     this.heroImageData =
       typeof config.heroImageData === 'string'
         ? JSON.parse(config.heroImageData)
@@ -94,8 +96,13 @@ export class Hero {
       attackRange: this.attackRange,
       heroImageData: JSON.stringify(this.heroImageData),
       matchStats: JSON.stringify(this.matchStats),
+      isRookie: this.isRookie,
       contract: this.contract,
     }
+  }
+
+  public setIsRookie(isRookie: boolean) {
+    this.isRookie = isRookie
   }
 
   public static deserializeHeroObj(heroObj: any): Hero {

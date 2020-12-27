@@ -31,17 +31,19 @@ export const Offseason: React.FC<Props> = ({
   const [notifIndex, setNotifIndex] = React.useState<number>(0)
 
   React.useEffect(() => {
-    const notifications = [
-      {
-        title: 'The Draft',
-        description:
-          'Time to draft some new talent! Pick a rookie to add to round out your squad',
-        onContinue: () => {
-          navigation.navigate('Draft')
-          setNotifIndex(notifIndex + 1)
-        },
-      },
-    ]
+    const notifications = frontOfficeManager.hasDraftEnded
+      ? []
+      : [
+          {
+            title: 'The Draft',
+            description:
+              'Time to draft some new talent! Pick a rookie to add to round out your squad',
+            onContinue: () => {
+              navigation.navigate('Draft')
+              setNotifIndex(notifIndex + 1)
+            },
+          },
+        ]
     const isExpiring = frontOfficeManager.hasContractsExpiring()
     if (isExpiring) {
       notifications.push({

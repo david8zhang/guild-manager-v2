@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { Pressable, Text, View } from 'react-native'
+import { Pressable, StatusBar, Text, View } from 'react-native'
 import { RandomHeroGenerator } from '../../lib/heroGenerator/RandomHeroGenerator'
 import * as guildActions from '../../redux/guildWidget'
 import { FontAwesome } from '@expo/vector-icons'
@@ -64,6 +64,7 @@ const StarterHeroes: React.FC<Props> = ({
   return (
     <Portal.Host>
       <View style={{ padding: 15 }}>
+        <StatusBar hidden />
         <HeroDrilldownModal
           isOpen={heroToDrilldown !== null}
           onClose={() => setHeroToDrilldown(null)}

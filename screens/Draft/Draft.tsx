@@ -13,9 +13,10 @@ import { Button, HeroImage, Navbar } from '../../components'
 import { connect } from 'react-redux'
 import * as guildActions from '../../redux/guildWidget'
 import * as leagueActions from '../../redux/leagueWidget'
+import * as frontOfficeActions from '../../redux/frontOfficeWidget'
+
 import { SeasonManager } from '../../lib/SeasonManager'
 import { FrontOfficeManager } from '../../lib/FrontOfficeManager'
-import { saveFrontOffice } from '../../redux/frontOfficeWidget'
 import { Hero } from '../../lib/model/Hero'
 import { HeroFactory } from '../../lib/factory/HeroFactory'
 
@@ -31,6 +32,7 @@ interface Props {
   frontOffice: any
   saveGuild: Function
   saveLeague: Function
+  saveFrontOffice: Function
 }
 
 const Draft: React.FC<Props> = ({
@@ -41,6 +43,7 @@ const Draft: React.FC<Props> = ({
   frontOffice,
   saveGuild,
   saveLeague,
+  saveFrontOffice,
 }) => {
   // Managers
   const [seasonManager, setSeasonManager] = React.useState<any>(null)
@@ -71,15 +74,11 @@ const Draft: React.FC<Props> = ({
       seasonManager.deserialize(season)
       const frontOfficeManager = new FrontOfficeManager(guild, league)
       frontOfficeManager.deserializeObj(frontOffice)
-
-      // Configure the player draft class and pick order
       setPickOrder(frontOfficeManager.getDraftOrder(seasonManager.teamRecords))
-      saveFrontOffice(frontOfficeManager.serialize())
-
       setSeasonManager(seasonManager)
       setFrontOfficeManager(frontOfficeManager)
     }
-  }, [])
+  }, [guild, league, frontOffice])
 
   if (!seasonManager || !frontOfficeManager) {
     return <View />
@@ -115,9 +114,13 @@ const Draft: React.FC<Props> = ({
   }
 
   const finishDraft = () => {
+    frontOfficeManager.finishDraft()
     saveGuild(frontOfficeManager.getPlayer().serialize())
     saveLeague(frontOfficeManager.getSerializedNonPlayerTeams())
     saveFrontOffice(frontOfficeManager.serialize())
+    setDraftOutcomes([])
+    setCurrDraftIndex(0)
+    setShowAvailableRookies(true)
     navigation.navigate('FrontOffice')
   }
 
@@ -354,9 +357,11 @@ const Draft: React.FC<Props> = ({
     )
   }
 
+  const isPlayerPick = pickOrder.playerDraftPick - 1 === currDraftIndex
+
   return (
     <Portal.Host>
-      <Navbar title='The Draft' />
+      <Navbar title={isPlayerPick ? 'Select a rookie to draft' : 'The Draft'} />
       <DraftOrderModal
         isOpen={showPickOrderModal}
         onClose={() => {}}
@@ -377,9 +382,11 @@ const mapStateToProps = (state: any) => ({
   frontOffice: state.frontOffice,
 })
 
-export default connect(mapStateToProps, { ...guildActions, ...leagueActions })(
-  Draft
-)
+export default connect(mapStateToProps, {
+  ...guildActions,
+  ...leagueActions,
+  ...frontOfficeActions,
+})(Draft)
 
 const styles = StyleSheet.create({
   textRow: {

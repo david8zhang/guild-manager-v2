@@ -40,7 +40,7 @@ const MyTeam: React.FC<Props> = ({
     const team: any = Team.deserializeObj(savedPlayerGuild)
     setTeam(team)
     setStarters(team.getStarters())
-  }, [])
+  }, [savedPlayerGuild])
 
   const saveAdjustment = () => {
     saveGuild((team as Team).serialize())
