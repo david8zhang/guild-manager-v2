@@ -110,14 +110,16 @@ export const Navbar: React.FC<Props> = ({ title, style, navigation }) => {
           })}
         </Animated.View>
       </Portal>
-      <Pressable
-        onPress={() => {
-          openMenu()
-        }}
-      >
-        <FontAwesome name='bars' size={20} color='gray' />
-      </Pressable>
-      <View style={{ flex: 1, marginLeft: 10 }}>
+      {navigation && (
+        <Pressable
+          onPress={() => {
+            openMenu()
+          }}
+        >
+          <FontAwesome name='bars' size={20} color='gray' />
+        </Pressable>
+      )}
+      <View style={{ flex: 1, marginLeft: navigation ? 10 : 0 }}>
         <Text style={{ fontSize: 18 }}>{title}</Text>
       </View>
     </View>

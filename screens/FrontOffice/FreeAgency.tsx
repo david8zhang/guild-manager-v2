@@ -125,7 +125,7 @@ const FreeAgency: React.FC<Props> = ({
         )
       }
       return (
-        <View style={{ flexDirection: 'row', marginTop: 20 }}>
+        <View style={{ flexDirection: 'row', marginTop: 20, flex: 1 }}>
           <View style={{ flexDirection: 'column', flex: 1 }}>
             <View style={{ flexDirection: 'row' }}>
               <Text style={styles.nameColumn}></Text>

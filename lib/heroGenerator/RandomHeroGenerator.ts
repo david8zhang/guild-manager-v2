@@ -70,4 +70,26 @@ export class RandomHeroGenerator {
     }
     return heroes
   }
+
+  generateAnyHeroType(
+    numHeroes: number,
+    minStat: number,
+    maxStat: number,
+    minPotential: number
+  ) {
+    let heroes: Hero[] = []
+    for (let i = 0; i < numHeroes; i++) {
+      const RandomHeroFactory = this.factories[
+        Math.floor(Math.random() * this.factories.length)
+      ]
+      const factory = new RandomHeroFactory({
+        minStat,
+        maxStat,
+        minPotential,
+        contract: this.reserveContract,
+      })
+      heroes = heroes.concat(factory.getHeroes(1))
+    }
+    return heroes
+  }
 }

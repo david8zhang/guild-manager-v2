@@ -8,7 +8,7 @@ import { OffseasonTrainingRoster } from './OffseasonTrainingRoster'
 import { OffseasonStatPicker } from './OffseasonStatPicker'
 import { TrainingCamp } from './TrainingCamp'
 import { FrontOfficeManager } from '../../../lib/FrontOfficeManager'
-import { OffseasonContractExpireModal } from './OffseasonContractExpireModal'
+import { OffseasonNotificationModal } from './OffseasonNotificationModal'
 
 interface Props {
   seasonManager: SeasonManager
@@ -27,11 +27,33 @@ export const Offseason: React.FC<Props> = ({
   const [heroesToTrain, setHeroesToTrain] = React.useState<any[]>([])
   const [campStarted, setCampStarted] = React.useState<boolean>(false)
   const [selectStage, setSelectStage] = React.useState<string>('hero')
-  const [hasContractsExpiring, setHasContractsExpiring] = React.useState(false)
+  const [notifications, setNotifications] = React.useState<any[]>([])
+  const [notifIndex, setNotifIndex] = React.useState<number>(0)
 
   React.useEffect(() => {
+    const notifications = [
+      {
+        title: 'The Draft',
+        description:
+          'Time to draft some new talent! Pick a rookie to add to round out your squad',
+        onContinue: () => {
+          navigation.navigate('Draft')
+          setNotifIndex(notifIndex + 1)
+        },
+      },
+    ]
     const isExpiring = frontOfficeManager.hasContractsExpiring()
-    setHasContractsExpiring(isExpiring)
+    if (isExpiring) {
+      notifications.push({
+        title: 'You have contracts expiring!',
+        description: 'Extend or release a contract before continuing',
+        onContinue: () => {
+          navigation.navigate('FrontOffice')
+          setNotifIndex(notifIndex + 1)
+        },
+      })
+    }
+    setNotifications(notifications)
   }, [frontOfficeManager.hasContractsExpiring()])
 
   const selectStatToTrain = (stat: string) => {
@@ -50,7 +72,7 @@ export const Offseason: React.FC<Props> = ({
   }
 
   const selectHeroToTrain = (hero: Hero) => {
-    if (hasContractsExpiring) {
+    if (notifIndex < notifications.length) {
       return
     }
     if (heroesToTrain.length < 3) {
@@ -60,7 +82,7 @@ export const Offseason: React.FC<Props> = ({
   }
 
   const deselectHeroToTrain = (hero: Hero) => {
-    if (hasContractsExpiring) {
+    if (notifIndex < notifications.length) {
       return
     }
     const newHeroesToTrain = heroesToTrain.filter(
@@ -124,15 +146,12 @@ export const Offseason: React.FC<Props> = ({
     <Portal.Host>
       <View style={{ flex: 1, backgroundColor: 'white' }}>
         <Navbar title='Offseason' navigation={navigation} />
-        <OffseasonContractExpireModal
-          isOpen={hasContractsExpiring}
-          onClose={() => {
-            setHasContractsExpiring(false)
-          }}
-          onPress={() => {
-            navigation.navigate('FrontOffice')
-          }}
-        />
+        {notifIndex < notifications.length && (
+          <OffseasonNotificationModal
+            notification={notifications[notifIndex]}
+            isOpen={notifIndex < notifications.length}
+          />
+        )}
         <View
           style={{
             margin: 15,

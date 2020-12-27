@@ -1,26 +1,28 @@
 import * as React from 'react'
-import { Portal } from 'react-native-paper'
 import { Text, View } from 'react-native'
-import { Button, CustomModal } from '../../../components'
+import { CustomModal, Button } from '../../../components'
 
 interface Props {
   isOpen: boolean
-  onClose: Function
-  onPress: Function
+  notification: {
+    title: string
+    description: string
+    onContinue: Function
+  }
 }
 
-export const OffseasonContractExpireModal: React.FC<Props> = ({
+export const OffseasonNotificationModal: React.FC<Props> = ({
   isOpen,
-  onClose,
-  onPress,
+  notification,
 }) => {
+  const { title, description, onContinue } = notification
   return (
     <CustomModal
-      isOpen={isOpen}
-      onClose={() => {}}
       hideCloseButton
       customWidth={350}
       customHeight={200}
+      isOpen={isOpen}
+      onClose={() => {}}
     >
       <View
         style={{
@@ -30,16 +32,14 @@ export const OffseasonContractExpireModal: React.FC<Props> = ({
         }}
       >
         <Text style={{ textAlign: 'center', fontSize: 20, marginBottom: 10 }}>
-          You have contracts expiring!
+          {title}
         </Text>
-        <Text style={{ textAlign: 'center', fontSize: 14 }}>
-          Extend or release them before continuing
-        </Text>
+        <Text style={{ textAlign: 'center', fontSize: 14 }}>{description}</Text>
         <Button
           style={{ marginTop: 20, width: 150 }}
-          text='Manage contracts'
+          text='Continue'
           onPress={() => {
-            onPress()
+            onContinue()
           }}
         />
       </View>

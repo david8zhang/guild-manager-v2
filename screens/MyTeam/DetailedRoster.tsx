@@ -21,7 +21,6 @@ interface Props {
 
 export const DetailedRoster: React.FC<Props> = ({
   heroes,
-  onBack,
   onHeroSelect,
   selectedHeroIds,
 }) => {
@@ -40,8 +39,8 @@ export const DetailedRoster: React.FC<Props> = ({
         <Text style={{ ...styles.nameColumn, fontSize: 13 }}>{hero.name}</Text>
         <Text style={styles.textRow}>{hero.attack}</Text>
         <Text style={styles.textRow}>{hero.defense}</Text>
-        <Text style={styles.textRow}>{hero.magic}</Text>
         <Text style={styles.textRow}>{hero.speed}</Text>
+        <Text style={styles.textRow}>{hero.magic}</Text>
         <Text style={styles.textRow}>{hero.health}</Text>
         <View
           style={{

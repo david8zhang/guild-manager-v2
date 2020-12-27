@@ -11,6 +11,7 @@ import {
   Season,
   MyTeam,
   FrontOffice,
+  Draft,
 } from './screens'
 import { Provider } from 'react-redux'
 import { store } from './redux/store'
@@ -41,6 +42,7 @@ export default function App() {
           <Drawer.Screen name='Season' component={Season} />
           <Drawer.Screen name='MyTeam' component={MyTeam} />
           <Drawer.Screen name='FrontOffice' component={FrontOffice} />
+          <Drawer.Screen name='Draft' component={Draft} />
         </Drawer.Navigator>
       </NavigationContainer>
     </Provider>

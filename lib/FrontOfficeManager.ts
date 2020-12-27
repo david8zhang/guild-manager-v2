@@ -1,5 +1,7 @@
 import { TEAM_NAMES } from './constants/fullTeamNames'
+import { RandomHeroGenerator } from './heroGenerator/RandomHeroGenerator'
 import { Hero, Contract } from './model/Hero'
+import { Record } from './model/Record'
 import { Team } from './model/Team'
 import { TeamGenerator } from './TeamGenerator'
 
@@ -14,6 +16,8 @@ export class FrontOfficeManager {
   public expiringHeroes: Hero[] = []
   public teams: Team[]
   public freeAgents: FreeAgent[] = []
+  public draftClass: Hero[] = []
+  public draftOutcomes: any[] = []
 
   public constructor(playerObj: any, leagueObj: any) {
     this.playerTeam = Team.deserializeObj(playerObj)
@@ -55,6 +59,11 @@ export class FrontOfficeManager {
 
   public getPlayerHeroes(): Hero[] {
     return this.playerTeam.roster
+  }
+
+  public finishDraft() {
+    this.draftClass = []
+    this.draftOutcomes = []
   }
 
   public decrementContractDuration(): void {
@@ -181,6 +190,7 @@ export class FrontOfficeManager {
         hero: fa.hero.serialize(),
         previousTeamId: fa.previousTeamId,
       })),
+      draftClass: this.draftClass.map((hero: Hero) => hero.serialize()),
     }
   }
 
@@ -189,6 +199,9 @@ export class FrontOfficeManager {
       hero: Hero.deserializeHeroObj(fa.hero),
       previousTeamId: fa.previousTeamId,
     }))
+    this.draftClass = frontOfficeObj.draftClass.map((hero: Hero) =>
+      Hero.deserializeHeroObj(hero)
+    )
   }
 
   public getProjectedSalaryCap(
@@ -207,6 +220,61 @@ export class FrontOfficeManager {
     }
   }
 
+  public playerPickRookie(rookie: Hero) {
+    this.playerTeam.addHero(rookie)
+    this.draftClass = this.draftClass.filter((hero: Hero) => {
+      return hero.heroId !== rookie.heroId
+    })
+    this.draftOutcomes.push({
+      pickedHero: rookie,
+      team: this.playerTeam,
+    })
+  }
+
+  public processNextCPUDraftPick(currDraftIndex: number, draftOrder: string[]) {
+    const teamToDraft = this.getTeam(draftOrder[currDraftIndex])
+    const sortedDraftClass = this.draftClass.sort((a: Hero, b: Hero) => {
+      return b.getOverall() - a.getOverall()
+    })
+
+    const heroToPick = sortedDraftClass[0]
+
+    // CPU Hero gives rookie a 5 year contract
+    const contract = heroToPick.contract
+    contract.duration = 5
+    heroToPick.setContract(contract)
+    teamToDraft.addHero(heroToPick)
+
+    this.draftOutcomes.push({
+      pickedHero: heroToPick,
+      team: teamToDraft,
+    })
+
+    this.draftClass = this.draftClass.filter(
+      (h: Hero) => h.heroId !== heroToPick.heroId
+    )
+  }
+
+  // If CPU has too many heroes, release the lowest ones to free agency (set the previousTeamId to null to prevent auto-resigning)
+  public rebalanceCPUTeam(team: Team) {
+    const cpuHeroesSortedByOVR = team.roster.sort((a: Hero, b: Hero) => {
+      return b.getOverall() - a.getOverall()
+    })
+    const cutHeroes = cpuHeroesSortedByOVR.slice(6)
+    cutHeroes.forEach((hero: Hero) => {
+      console.log(team.name, 'released', hero.name)
+      team.releaseHero(hero.heroId)
+      this.freeAgents.push({
+        hero,
+        previousTeamId: 'none',
+      })
+    })
+  }
+
+  public getDraftOutcomes(): any[] {
+    return this.draftOutcomes
+  }
+
   public hasContractsExpiring(): boolean {
     return (
       this.playerTeam.roster.find((hero: Hero) => {
@@ -218,11 +286,7 @@ export class FrontOfficeManager {
 
   public isHardCapped(hero: Hero, newContract: Contract) {
     const { projectedSalary } = this.getProjectedSalaryCap(hero, newContract)
-    if (projectedSalary > FrontOfficeManager.MAX_SALARY_CAP) {
-      return true
-    } else {
-      return false
-    }
+    return projectedSalary > FrontOfficeManager.MAX_SALARY_CAP
   }
 
   public getTeam(teamId: string): Team {
@@ -240,17 +304,53 @@ export class FrontOfficeManager {
     this.freeAgents.forEach((freeAgent: FreeAgent) => {
       if (freeAgent.previousTeamId !== this.playerTeam.teamId) {
         const team: Team = this.getTeam(freeAgent.previousTeamId)
-        const contract = freeAgent.hero.getContract()
+        if (team) {
+          const contract = freeAgent.hero.getContract()
 
-        // Sign a max 5 year contract
-        contract.duration = 5
-        freeAgent.hero.setContract(contract)
-        team.addHero(freeAgent.hero)
+          // Sign a max 5 year contract
+          contract.duration = 5
+          freeAgent.hero.setContract(contract)
+          team.addHero(freeAgent.hero)
+        }
       }
     })
   }
 
   public getPlayer() {
     return this.playerTeam
+  }
+
+  public getDraftClass() {
+    if (this.draftClass.length > 0) {
+      return this.draftClass
+    }
+    const heroGenerator = new RandomHeroGenerator()
+    const rookies = heroGenerator.generateAnyHeroType(20, 65, 80, 2)
+
+    // Rookie contracts are initially not guaranteed - team can manage them
+    rookies.forEach((rookie: Hero) => {
+      const contract = rookie.getContract()
+      contract.amount = 5
+      contract.duration = 0
+      rookie.setContract(contract)
+    })
+
+    this.draftClass = rookies
+    return this.draftClass
+  }
+
+  public getDraftOrder(teamRecords: { [teamId: string]: Record }): any {
+    const sortedTeamIds = Object.keys(teamRecords).sort(
+      (a: string, b: string) => {
+        return (
+          teamRecords[a].getWinLossRatio() - teamRecords[b].getWinLossRatio()
+        )
+      }
+    )
+    const playerDraftPick = sortedTeamIds.indexOf(this.playerTeam.teamId) + 1
+    return {
+      draftOrder: sortedTeamIds,
+      playerDraftPick,
+    }
   }
 }
