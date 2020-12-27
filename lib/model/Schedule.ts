@@ -1,5 +1,6 @@
 import { Team } from './Team'
 import { shuffle } from 'lodash'
+import { DEBUG_CONFIG } from '../constants/debugConfig'
 
 enum MatchResult {
   win = 'WIN',
@@ -49,7 +50,8 @@ export class Schedule {
   }[]
 
   private matchList: Matchup[]
-  private static NUM_MATCHUPS_IN_SCHEDULE: number = 2
+  private static NUM_MATCHUPS_IN_SCHEDULE: number =
+    DEBUG_CONFIG.numGamesInSeason || 21
   private currentMatchupIndex: number
 
   private isRegularSeason: boolean

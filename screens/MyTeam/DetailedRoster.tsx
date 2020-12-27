@@ -70,7 +70,7 @@ export const DetailedRoster: React.FC<Props> = ({
         <Text style={styles.textRow}>
           {matchStats.totalDeaths == 0
             ? matchStats.totalKills
-            : matchStats.totalKills / matchStats.totalDeaths}
+            : (matchStats.totalKills / matchStats.totalDeaths).toFixed(2)}
         </Text>
         <Text style={styles.textRow}>{matchStats.totalDeaths}</Text>
         <Text style={styles.textRow}>{matchStats.totalKills}</Text>

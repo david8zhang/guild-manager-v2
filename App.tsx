@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, BackHandler } from 'react-native'
+import { StyleSheet, BackHandler, StatusBar } from 'react-native'
 import * as ScreenOrientation from 'expo-screen-orientation'
 import 'react-native-gesture-handler'
 import { NavigationContainer } from '@react-navigation/native'
@@ -32,6 +32,7 @@ export default function App() {
   return (
     <Provider store={store}>
       <NavigationContainer>
+        <StatusBar hidden />
         <Drawer.Navigator
           initialRouteName='Home'
           screenOptions={{ gestureEnabled: false, unmountOnBlur: true }}
@@ -48,12 +49,3 @@ export default function App() {
     </Provider>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-})

@@ -10,6 +10,8 @@ import {
 import { CommonActions } from '@react-navigation/native'
 import { FontAwesome } from '@expo/vector-icons'
 import { Portal } from 'react-native-paper'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { DEBUG_CONFIG } from '../lib/constants/debugConfig'
 
 interface Props {
   title: string
@@ -108,6 +110,21 @@ export const Navbar: React.FC<Props> = ({ title, style, navigation }) => {
               </Pressable>
             )
           })}
+          {DEBUG_CONFIG.quitAndResetEnabled && (
+            <Pressable
+              style={{ padding: 10 }}
+              key='reset-state'
+              onPress={() => {
+                AsyncStorage.clear()
+                navigation.jumpTo('Create')
+                closeMenu()
+              }}
+            >
+              <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
+                Hard Reset
+              </Text>
+            </Pressable>
+          )}
         </Animated.View>
       </Portal>
       {navigation && (

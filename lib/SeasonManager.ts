@@ -9,11 +9,12 @@ import { HeroStats } from './model/HeroStats'
 import { PlayoffBracket } from './model/PlayoffBracket'
 import { MatchSimulator } from './simulation/MatchSimulator'
 import { StatGainManager } from './StatGainManager'
+import { DEBUG_CONFIG } from './constants/debugConfig'
 
 export class SeasonManager {
   private static NUM_PLAYOFF_TEAMS = 4
 
-  public numGamesInSeason: number = 2
+  public numGamesInSeason: number = DEBUG_CONFIG.numGamesInSeason || 21
   public teamRecords: any = {}
   public teams: Team[] = []
   public playerTeam: Team

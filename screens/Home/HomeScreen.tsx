@@ -1,22 +1,67 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { View, StyleSheet } from 'react-native'
+import { View, StyleSheet, Text, StatusBar } from 'react-native'
 import { Navbar } from '../../components/Navbar'
 import { ScrollView } from 'react-native-gesture-handler'
 import { MenuOption } from './components'
 import { Portal } from 'react-native-paper'
 
+// Saved state
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as guildActions from '../../redux/guildWidget'
+import * as leagueActions from '../../redux/leagueWidget'
+import * as seasonActions from '../../redux/seasonWidget'
+import * as frontOfficeActions from '../../redux/frontOfficeWidget'
+
 interface Props {
-  navigation: any
   guild: any
+  navigation: any
+  saveGuild: Function
+  saveLeague: Function
+  saveSeason: Function
+  saveFrontOffice: Function
 }
 
-const HomeScreen: React.FC<Props> = ({ navigation, guild }) => {
+const HomeScreen: React.FC<Props> = ({
+  guild,
+  navigation,
+  saveGuild,
+  saveLeague,
+  saveSeason,
+  saveFrontOffice,
+}) => {
+  const [isLoading, setIsLoading] = React.useState(true)
+
   React.useEffect(() => {
     if (!guild) {
-      navigation.navigate('Create')
+      AsyncStorage.getItem('@save')
+        .then((res) => {
+          if (res) {
+            const saveState = JSON.parse(res)
+            saveGuild(saveState.guild)
+            saveLeague(saveState.league)
+            saveSeason(saveState.season)
+            saveFrontOffice(saveState.frontOffice)
+            setIsLoading(false)
+          } else {
+            navigation.navigate('Create')
+          }
+        })
+        .catch((err) => {
+          navigation.navigate('Create')
+        })
+    } else {
+      setIsLoading(false)
     }
   }, [])
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text style={{ fontSize: 20, textAlign: 'center' }}>Loading...</Text>
+      </View>
+    )
+  }
 
   return (
     <Portal.Host>
@@ -62,9 +107,17 @@ const HomeScreen: React.FC<Props> = ({ navigation, guild }) => {
 
 const mapStateToProps = (state: any) => ({
   guild: state.guild,
+  season: state.season,
+  frontOffice: state.frontOffice,
+  league: state.league,
 })
 
-export default connect(mapStateToProps, null)(HomeScreen)
+export default connect(mapStateToProps, {
+  ...guildActions,
+  ...seasonActions,
+  ...leagueActions,
+  ...frontOfficeActions,
+})(HomeScreen)
 
 const styles = StyleSheet.create({
   root: {
