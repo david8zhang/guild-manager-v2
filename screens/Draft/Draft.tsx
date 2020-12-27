@@ -23,6 +23,7 @@ import { HeroFactory } from '../../lib/factory/HeroFactory'
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
 import { DraftOrderModal } from './DraftOrderModal'
 import { Team } from '../../lib/model/Team'
+import { HeroDrilldownModal } from '../StarterHeroes/components'
 
 interface Props {
   navigation: any
@@ -60,6 +61,10 @@ const Draft: React.FC<Props> = ({
   const [currDraftIndex, setCurrDraftIndex] = React.useState(0)
   const [showAvailableRookies, setShowAvailableRookies] = React.useState(true)
   const [draftOutcomes, setDraftOutcomes] = React.useState<any[]>([])
+
+  // Details
+  const [heroToDrilldown, setHeroToDrilldown] = React.useState<any>(null)
+  const [teamColorToDrilldown, setTeamColorToDrilldown] = React.useState('')
 
   const getSuffix = (number: number) => {
     if (number === 1) return 'st'
@@ -268,7 +273,8 @@ const Draft: React.FC<Props> = ({
                     </Text>
                     <Pressable
                       onPress={() => {
-                        console.log('hello')
+                        setHeroToDrilldown(draftOutcome.pickedHero)
+                        setTeamColorToDrilldown(draftOutcome.team.color)
                       }}
                     >
                       <MaterialIcons name='info' size={18} />
@@ -316,7 +322,10 @@ const Draft: React.FC<Props> = ({
               <Button
                 style={{ marginRight: 10 }}
                 text='More info'
-                onPress={() => {}}
+                onPress={() => {
+                  setHeroToDrilldown(draftOutcome.pickedHero)
+                  setTeamColorToDrilldown(draftOutcome.team.color)
+                }}
               />
               <Button
                 text='Next pick'
@@ -361,6 +370,12 @@ const Draft: React.FC<Props> = ({
 
   return (
     <Portal.Host>
+      <HeroDrilldownModal
+        isOpen={heroToDrilldown !== null}
+        onClose={() => setHeroToDrilldown(null)}
+        hero={heroToDrilldown}
+        teamColor={teamColorToDrilldown}
+      />
       <Navbar title={isPlayerPick ? 'Select a rookie to draft' : 'The Draft'} />
       <DraftOrderModal
         isOpen={showPickOrderModal}
