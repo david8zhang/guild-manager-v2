@@ -65,8 +65,12 @@ export const DetailedRoster: React.FC<Props> = ({
             source={HeroFactory.getIcon(hero.heroType)}
           ></Image>
         </View>
-        <Text style={styles.textRow}>{matchStats.averageKillsPerGame}</Text>
-        <Text style={styles.textRow}>{matchStats.averageDeathsPerGame}</Text>
+        <Text style={styles.textRow}>
+          {matchStats.averageKillsPerGame.toFixed(2)}
+        </Text>
+        <Text style={styles.textRow}>
+          {matchStats.averageDeathsPerGame.toFixed(2)}
+        </Text>
         <Text style={styles.textRow}>
           {matchStats.totalDeaths == 0
             ? matchStats.totalKills

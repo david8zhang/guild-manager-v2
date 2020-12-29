@@ -4,7 +4,9 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
-PLAY-TESTABLE STATE
+- Shorten season
+- Shorten matches to 10 turns instead of 15
+- Add power ups to map
 
 ## Future Features (ordered by priority)
 
