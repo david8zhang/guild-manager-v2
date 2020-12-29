@@ -14,7 +14,7 @@ import { DEBUG_CONFIG } from './constants/debugConfig'
 export class SeasonManager {
   private static NUM_PLAYOFF_TEAMS = 4
 
-  public numGamesInSeason: number = DEBUG_CONFIG.numGamesInSeason || 21
+  public numGamesInSeason: number = DEBUG_CONFIG.numGamesInSeason || 14
   public teamRecords: any = {}
   public teams: Team[] = []
   public playerTeam: Team

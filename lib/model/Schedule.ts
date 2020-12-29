@@ -51,7 +51,7 @@ export class Schedule {
 
   private matchList: Matchup[]
   private static NUM_MATCHUPS_IN_SCHEDULE: number =
-    DEBUG_CONFIG.numGamesInSeason || 21
+    DEBUG_CONFIG.numGamesInSeason || 14
   private currentMatchupIndex: number
 
   private isRegularSeason: boolean

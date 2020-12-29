@@ -21,7 +21,7 @@ export interface MatchManagerConfig {
 }
 
 export class MatchManager {
-  private static MATCH_DURATION = DEBUG_CONFIG.numTurnsInMatch || 15
+  private static MATCH_DURATION = DEBUG_CONFIG.numTurnsInMatch || 10
 
   private playerHeroes: HeroInMatch[] = []
   private enemyHeroes: HeroInMatch[] = []
