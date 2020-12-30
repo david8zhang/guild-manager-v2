@@ -116,6 +116,7 @@ const Draft: React.FC<Props> = ({
     frontOfficeManager.playerPickRookie(hero)
     setDraftOutcomes(frontOfficeManager.getDraftOutcomes())
     setCurrDraftIndex(currDraftIndex + 1)
+    doNextPick(currDraftIndex + 1)
   }
 
   const finishDraft = () => {

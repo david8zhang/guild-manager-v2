@@ -1,25 +1,35 @@
 import * as React from 'react'
-import {
-  Animated,
-  Dimensions,
-  Easing,
-  Pressable,
-  Text,
-  View,
-} from 'react-native'
-import { CommonActions } from '@react-navigation/native'
+import { Animated, Pressable, Text, View } from 'react-native'
 import { FontAwesome } from '@expo/vector-icons'
 import { Portal } from 'react-native-paper'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { DEBUG_CONFIG } from '../lib/constants/debugConfig'
 
+import { connect } from 'react-redux'
+import * as leagueActions from '../redux/leagueWidget'
+import * as seasonActions from '../redux/seasonWidget'
+import * as frontOfficeActions from '../redux/frontOfficeWidget'
+import * as guildActions from '../redux/guildWidget'
+
 interface Props {
   title: string
   style?: any
   navigation?: any
+  saveGuild: Function
+  saveSeason: Function
+  saveFrontOffice: Function
+  saveLeague: Function
 }
 
-export const Navbar: React.FC<Props> = ({ title, style, navigation }) => {
+const Navbar: React.FC<Props> = ({
+  title,
+  style,
+  navigation,
+  saveGuild,
+  saveSeason,
+  saveFrontOffice,
+  saveLeague,
+}) => {
   const [sideNavPos, setSideNavWidth] = React.useState(new Animated.Value(-200))
   const navStyle: any = {
     padding: 20,
@@ -43,6 +53,13 @@ export const Navbar: React.FC<Props> = ({ title, style, navigation }) => {
       duration: 500,
       useNativeDriver: true,
     }).start()
+  }
+
+  const resetAllStates = () => {
+    saveGuild(null)
+    saveSeason(null)
+    saveFrontOffice(null)
+    saveLeague(null)
   }
 
   const navOptions = [
@@ -115,9 +132,9 @@ export const Navbar: React.FC<Props> = ({ title, style, navigation }) => {
               style={{ padding: 10 }}
               key='reset-state'
               onPress={() => {
-                AsyncStorage.clear()
                 navigation.jumpTo('Create')
-                closeMenu()
+                resetAllStates()
+                AsyncStorage.clear()
               }}
             >
               <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
@@ -142,3 +159,17 @@ export const Navbar: React.FC<Props> = ({ title, style, navigation }) => {
     </View>
   )
 }
+
+export const mapStateToProps = (state: any) => ({
+  guild: state.guild,
+  league: state.league,
+  frontOffice: state.frontOffice,
+  season: state.season,
+})
+
+export default connect(mapStateToProps, {
+  ...guildActions,
+  ...leagueActions,
+  ...frontOfficeActions,
+  ...seasonActions,
+})(Navbar)

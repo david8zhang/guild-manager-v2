@@ -16,6 +16,7 @@ import { DEBUG_CONFIG } from '../../../lib/constants/debugConfig'
 import { ChampionshipResultsModal } from './ChampionshipResultsModal'
 import { Record } from '../../../lib/model/Record'
 import { Portal } from 'react-native-paper'
+import { MatchSimulator } from '../../../lib/simulation/MatchSimulator'
 
 interface Props {
   seasonManager: SeasonManager
@@ -49,6 +50,7 @@ export const Playoffs: React.FC<Props> = ({
   if (!playoffBracket) {
     return <View />
   }
+
   const updatePlayoffBracketScores = (winner: string) => {
     playoffBracket.updateScore(winner)
     if (playoffBracket.hasRoundFinished()) {
@@ -72,7 +74,7 @@ export const Playoffs: React.FC<Props> = ({
     setCounter(counter + 1)
   }
 
-  const checkIsWinner = () => {
+  const checkHasRoundWon = () => {
     const matchup = playoffBracket.getPlayerMatchup()
     if (matchup && matchup.winnerId) {
       if (matchup.winnerId === seasonManager.getPlayer().teamId) {
@@ -120,14 +122,31 @@ export const Playoffs: React.FC<Props> = ({
             [heroId: string]: HeroStats
           }
         }) => {
-          onMatchContinue(outcome)
           updatePlayoffBracketScores(outcome.winner)
           simulatePlayoffBracketGames()
-          checkIsWinner()
+          checkHasRoundWon()
           setShowMatch(false)
+          onMatchContinue(outcome)
         }}
       />
     )
+  }
+
+  const simulateMatchup = () => {
+    const matchup = playoffBracket.getPlayerMatchup() as PlayoffMatchup
+    const opponentId = matchup.teamIds.find(
+      (id) => id !== seasonManager.getPlayer().teamId
+    ) as string
+
+    const team1 = seasonManager.getPlayer()
+    const team2 = seasonManager.getTeam(opponentId) as Team
+
+    const outcome = MatchSimulator.simulateMatchup(team1, team2)
+    updatePlayoffBracketScores(outcome.winnerId)
+    simulatePlayoffBracketGames()
+    checkHasRoundWon()
+    setShowMatch(false)
+    onMatchContinue(outcome)
   }
 
   const renderBracket = () => {
@@ -198,13 +217,14 @@ export const Playoffs: React.FC<Props> = ({
         {renderBracket()}
         <View
           style={{
+            flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
             marginBottom: 20,
           }}
         >
           <Button
-            text={isWinner ? 'Simulate Match' : 'Play Match'}
+            text={isWinner ? 'Simulate' : 'Play'}
             onPress={() => {
               if (isWinner) {
                 simulatePlayoffBracketGames()
@@ -212,7 +232,7 @@ export const Playoffs: React.FC<Props> = ({
                 if (DEBUG_CONFIG.autoWinGames) {
                   updatePlayoffBracketScores(seasonManager.getPlayer().teamId)
                   simulatePlayoffBracketGames()
-                  checkIsWinner()
+                  checkHasRoundWon()
                   setCounter(counter + 1)
                 } else {
                   setShowMatch(true)
@@ -221,6 +241,15 @@ export const Playoffs: React.FC<Props> = ({
             }}
             style={{ width: 200 }}
           />
+          {!isWinner && (
+            <Button
+              style={{ marginLeft: 10, width: 200 }}
+              onPress={() => {
+                simulateMatchup()
+              }}
+              text='Simulate'
+            />
+          )}
         </View>
       </View>
     </Portal.Host>

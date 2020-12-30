@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Text, View, StyleSheet, Image, StatusBar } from 'react-native'
-import { BorderedPicker, Input, Button } from '../../components'
+import { BorderedPicker, Button } from '../../components'
 import { Picker } from '@react-native-community/picker'
 import 'react-native-get-random-values'
 import { v4 as uuidv4 } from 'uuid'
@@ -10,7 +10,6 @@ import * as guildActions from '../../redux/guildWidget'
 import { TEAM_NAMES } from '../../lib/constants/fullTeamNames'
 import { TEAM_IMAGES } from '../../lib/constants/fullTeamImages'
 import { TEAM_COLOR } from '../../lib/constants/fullTeamColors'
-import { CommonActions } from '@react-navigation/native'
 
 interface Props {
   navigation: any

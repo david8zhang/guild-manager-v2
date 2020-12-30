@@ -27,6 +27,7 @@ import * as seasonActions from '../../redux/seasonWidget'
 import * as frontOfficeActions from '../../redux/frontOfficeWidget'
 import * as leagueActions from '../../redux/leagueWidget'
 import { connect } from 'react-redux'
+import { MatchSimulator } from '../../lib/simulation/MatchSimulator'
 
 interface Props {
   savedSeason: any
@@ -167,6 +168,22 @@ const Season: React.FC<Props> = ({
     saveLeague(serializedTeams)
   }
 
+  const simulateMatchup = () => {
+    const team1 = seasonManager.getPlayer()
+    const team2 = seasonManager.getTeam(currentMatchup.teamInfo.teamId) as Team
+    const outcome = MatchSimulator.simulateMatchup(team1, team2)
+
+    const loserId =
+      outcome.winnerId === team1.teamId ? team2.teamId : team1.teamId
+    updateTeamRecords({
+      winner: outcome.winnerId,
+      loser: loserId,
+      enemyId: currentMatchup.teamInfo.teamId,
+    })
+    serializeAllStates()
+    setShowMatch(false)
+  }
+
   if (showMatch) {
     return (
       <Match
@@ -230,8 +247,9 @@ const Season: React.FC<Props> = ({
             [heroId: string]: HeroStats
           }
         }) => {
-          saveHeroMatchStats(outcome.heroMatchStats)
-          applyTeamStatIncreases(outcome.statIncreases)
+          if (outcome.heroMatchStats) saveHeroMatchStats(outcome.heroMatchStats)
+          if (outcome.statIncreases)
+            applyTeamStatIncreases(outcome.statIncreases)
           serializeAllStates()
         }}
         proceedToOffseason={() => {
@@ -294,23 +312,38 @@ const Season: React.FC<Props> = ({
                 />
               )}
             </View>
-            <Button
-              style={{ alignSelf: 'center', marginTop: 10 }}
-              onPress={() => {
-                if (DEBUG_CONFIG.autoWinGames) {
-                  updateTeamRecords({
-                    winner: playerTeam.teamId,
-                    loser: currentMatchup.teamInfo.teamId,
-                    enemyId: currentMatchup.teamInfo.teamId,
-                  })
-                  serializeAllStates()
-                  setShowMatch(false)
-                } else {
-                  setShowMatch(true)
-                }
+            <View
+              style={{
+                flexDirection: 'row',
+                marginTop: 20,
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
-              text={DEBUG_CONFIG.autoWinGames ? 'Auto Win' : 'Start Game'}
-            />
+            >
+              <Button
+                onPress={() => {
+                  if (DEBUG_CONFIG.autoWinGames) {
+                    updateTeamRecords({
+                      winner: playerTeam.teamId,
+                      loser: currentMatchup.teamInfo.teamId,
+                      enemyId: currentMatchup.teamInfo.teamId,
+                    })
+                    serializeAllStates()
+                    setShowMatch(false)
+                  } else {
+                    setShowMatch(true)
+                  }
+                }}
+                text={DEBUG_CONFIG.autoWinGames ? 'Auto Win' : 'Start Game'}
+              />
+              <Button
+                style={{ marginLeft: 10 }}
+                onPress={() => {
+                  simulateMatchup()
+                }}
+                text='Simulate'
+              />
+            </View>
           </View>
           <View style={{ flex: 1 }}>
             <View style={{ padding: 10 }}>

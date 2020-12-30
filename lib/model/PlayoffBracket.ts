@@ -106,6 +106,9 @@ export class PlayoffBracket {
         matchup.gameNumber++
       }
     }
+    this.roundResults[`round-${this.currentRound}`].matchups = [
+      ...this.matchupList,
+    ]
   }
 
   hasRoundFinished(): boolean {

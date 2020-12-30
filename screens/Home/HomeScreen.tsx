@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { View, StyleSheet, Text, StatusBar } from 'react-native'
-import { Navbar } from '../../components/Navbar'
+import { Navbar } from '../../components'
 import { ScrollView } from 'react-native-gesture-handler'
 import { MenuOption } from './components'
 import { Portal } from 'react-native-paper'
@@ -53,7 +53,7 @@ const HomeScreen: React.FC<Props> = ({
     } else {
       setIsLoading(false)
     }
-  }, [])
+  }, [guild])
 
   if (isLoading) {
     return (

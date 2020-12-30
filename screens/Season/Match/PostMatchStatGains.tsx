@@ -65,10 +65,10 @@ export const PostMatchStatGains: React.FC<Props> = ({
           {formatStatIncreaseText('defense', heroRef.defense, increasePayload)}
         </Text>
         <Text style={styles.textRow}>
-          {formatStatIncreaseText('magic', heroRef.magic, increasePayload)}
+          {formatStatIncreaseText('speed', heroRef.speed, increasePayload)}
         </Text>
         <Text style={styles.textRow}>
-          {formatStatIncreaseText('speed', heroRef.speed, increasePayload)}
+          {formatStatIncreaseText('magic', heroRef.magic, increasePayload)}
         </Text>
         <Text style={styles.textRow}>
           {formatStatIncreaseText('health', heroRef.health, increasePayload)}
