@@ -2,7 +2,6 @@ import { Arena } from '../model/Arena'
 import { Hero, HeroType } from '../model/Hero'
 import { HeroInMatch } from '../model/HeroInMatch'
 import { BehaviorSelector } from './BehaviorSelector'
-import { CPUBehavior } from './CPUBehavior'
 
 export class CPUHero {
   public behaviorSelector: BehaviorSelector

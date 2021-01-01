@@ -21,7 +21,7 @@ export interface MatchManagerConfig {
 }
 
 export class MatchManager {
-  private static MATCH_DURATION = DEBUG_CONFIG.numTurnsInMatch || 10
+  public static MATCH_DURATION = DEBUG_CONFIG.numTurnsInMatch || 10
 
   private playerHeroes: HeroInMatch[] = []
   private enemyHeroes: HeroInMatch[] = []
@@ -317,8 +317,8 @@ export class MatchManager {
     return (this.enemyAIManager as EnemyAIManager).moveNextEnemyHero()
   }
 
-  public doNextEnemyHeroAction(): any {
-    return (this.enemyAIManager as EnemyAIManager).doNextEnemyMove()
+  public doEnemyActionAfterMove(): any {
+    return (this.enemyAIManager as EnemyAIManager).doActionAfterMove()
   }
 
   public haveAllEnemyHeroesMoved(): boolean {

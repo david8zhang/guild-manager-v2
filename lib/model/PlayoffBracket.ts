@@ -173,7 +173,10 @@ export class PlayoffBracket {
         const team2Id = matchup.teamIds[1]
         const team1 = seasonManager.getTeam(team1Id) as Team
         const team2 = seasonManager.getTeam(team2Id) as Team
-        const matchOutcome = MatchSimulator.simulateMatchup(team1, team2)
+        const matchOutcome = MatchSimulator.simulateMatchupPercentages(
+          team1,
+          team2
+        )
         this.updateScore(matchOutcome.winnerId)
       }
     })

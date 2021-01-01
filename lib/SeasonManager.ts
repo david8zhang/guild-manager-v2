@@ -109,7 +109,10 @@ export class SeasonManager {
       const team2: Team | null = this.getTeam(matchup[1])
 
       if (team1 && team2) {
-        const matchOutcome = MatchSimulator.simulateMatchup(team1, team2)
+        const matchOutcome = MatchSimulator.simulateMatchupPercentages(
+          team1,
+          team2
+        )
         const team1Record = this.getTeamRecord(team1.teamId)
         const team2Record = this.getTeamRecord(team2.teamId)
         if (matchOutcome.winnerId === team1.teamId) {

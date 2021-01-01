@@ -61,7 +61,7 @@ export class EnemyAIManager {
     enemyHero.selectBehavior()
   }
 
-  public doNextEnemyMove(): any {
+  public doActionAfterMove(): any {
     this.haveAllHeroesMoved =
       this.currEnemyToMove === this.enemyHeroes.length - 1
     const enemyHeroToMove = this.getNextHero()

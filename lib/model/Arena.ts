@@ -25,6 +25,26 @@ export class Arena {
     return this.map
   }
 
+  public printArena(): void {
+    const mapMatrix: number[][] = []
+    for (let i = 0; i < Arena.NUM_ROWS; i++) {
+      mapMatrix.push(new Array(Arena.NUM_COLS))
+    }
+
+    for (let i = 0; i < Arena.NUM_ROWS; i++) {
+      let row = ''
+      for (let j = 0; j < Arena.NUM_COLS; j++) {
+        const key: string = this.getCoordinateKey(i, j)
+        if (this.map[key]) {
+          row += ' X '
+        } else {
+          row += ' - '
+        }
+      }
+      console.log(row)
+    }
+  }
+
   public getHeroAtLocation(row: number, col: number): HeroInMatch {
     const key = this.getCoordinateKey(row, col)
     return this.map[key] as HeroInMatch

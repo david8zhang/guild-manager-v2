@@ -314,7 +314,7 @@ export const Arena: React.FC<Props> = ({
     matchManager.moveNextEnemyHero()
     setUpdateCounter(nextRenderCount)
 
-    const action = matchManager.doNextEnemyHeroAction()
+    const action = matchManager.doEnemyActionAfterMove()
     setTimeout(() => {
       if (action) {
         if (action.actionType === ActionTypes.ATTACK) {
