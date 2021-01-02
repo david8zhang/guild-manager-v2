@@ -5,12 +5,18 @@ import { MatchManager } from '../MatchManager'
 import { Arena } from '../model/Arena'
 import { Hero } from '../model/Hero'
 import { HeroInMatch } from '../model/HeroInMatch'
+import { HeroStats } from '../model/HeroStats'
 import { Team } from '../model/Team'
 import { Move } from '../moves/Move'
+import { StatGainManager } from '../StatGainManager'
 
 // Match outcome can be extended to also include things like hero stats, etc.
 interface MatchOutcome {
+  heroMatchStats: any
   winnerId: string
+  statIncreases: {
+    [teamId: string]: any
+  }
 }
 
 export class MatchSimulator {
@@ -113,15 +119,76 @@ export class MatchSimulator {
       )
     }
 
-    if (score[team1.name] > score[team2.name]) {
-      return {
-        winnerId: team1.teamId,
-      }
-    } else {
-      return {
-        winnerId: team2.teamId,
-      }
+    // Get post match data
+    const matchStats = this.getHeroMatchStats(heroes1, heroes2)
+    const winnerId =
+      score[team1.name] > score[team2.name] ? team1.teamId : team2.teamId
+    const mvp = this.getMVP(winnerId === team1.teamId ? heroes1 : heroes2)
+    const team1StatGains = this.getStatGains(mvp.getHeroRef().heroId, heroes1)
+    const team2StatGains = this.getStatGains(mvp.getHeroRef().heroId, heroes2)
+    return {
+      heroMatchStats: matchStats,
+      winnerId,
+      statIncreases: {
+        [team1.teamId]: team1StatGains,
+        [team2.teamId]: team2StatGains,
+      },
     }
+  }
+
+  static getMVP(winnerHeroes: HeroInMatch[]): HeroInMatch {
+    let heroWithBestStats = winnerHeroes[0]
+
+    const getTotalStats = (hero: HeroInMatch): number => {
+      const heroStats: HeroStats = hero.getHeroStats()
+      return heroStats.numKills + heroStats.numPoints - heroStats.numDeaths
+    }
+
+    winnerHeroes.forEach((hero: HeroInMatch) => {
+      const thisTotalStats = getTotalStats(hero)
+      if (thisTotalStats > getTotalStats(heroWithBestStats)) {
+        heroWithBestStats = hero
+      }
+    })
+    return heroWithBestStats
+  }
+
+  static getStatGains(mvpId: string, heroes: HeroInMatch[]) {
+    const statGains: any = {}
+    heroes.forEach((hero: HeroInMatch) => {
+      const heroRef = hero.getHeroRef()
+      const potential = heroRef.potential
+      if (
+        StatGainManager.didStatIncrease(potential) ||
+        heroRef.heroId === mvpId
+      ) {
+        // If the hero is the MVP, they should guarantee a stat increase
+        const stat = StatGainManager.getStatsToIncrease(heroRef.heroType)
+        const amountToIncrease = StatGainManager.statIncreaseAmount(
+          potential,
+          stat
+        )
+        statGains[hero.getHeroRef().heroId] = {
+          statToIncrease: stat,
+          amountToIncrease,
+        }
+      } else {
+        statGains[hero.getHeroRef().heroId] = null
+      }
+    })
+    return statGains
+  }
+
+  static getHeroMatchStats(
+    thisHeroes: HeroInMatch[],
+    otherHeroes: HeroInMatch[]
+  ) {
+    const heroMatchStats: any = {}
+    const allHeroes = thisHeroes.concat(otherHeroes)
+    allHeroes.forEach((hero: HeroInMatch) => {
+      heroMatchStats[hero.getHeroRef().heroId] = hero.getHeroStats()
+    })
+    return heroMatchStats
   }
 
   static processTurn(
@@ -176,12 +243,14 @@ export class MatchSimulator {
     // Do post turn actions here
     thisTeamAI.resetEnemyMoves()
     currHeroes.forEach((hero: HeroInMatch) => {
-      if (!hero.isDead && hero.isUntargetable()) {
-        hero.countdownUntargetTimer()
-      } else if (hero.isDead) {
-        hero.countdownRespawnTimer()
+      if (hero) {
+        if (!hero.isDead && hero.isUntargetable()) {
+          hero.countdownUntargetTimer()
+        } else if (hero.isDead) {
+          hero.countdownRespawnTimer()
+        }
+        hero.tickBuffTimer()
       }
-      hero.tickBuffTimer()
     })
   }
 

@@ -4,13 +4,10 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
-- Simulate entire matches instead of just using probabilities
-  - Simulated player games can generate match stats for heroes, also stat gains based on performance
-  - Enemy heroes can also get match stats
+- Add power ups to map
+- add a warning screen when doing a hard reset
 
 ## Future Features (ordered by priority)
-
-- Add power ups to map
 
 - Show scores of previous matches
 - Trades with other teams

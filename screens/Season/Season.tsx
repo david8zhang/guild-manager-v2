@@ -143,7 +143,10 @@ const Season: React.FC<Props> = ({
   }
 
   const applyTeamStatIncreases = (statIncreases: any) => {
-    seasonManager.applyStatIncreases(statIncreases)
+    const playerTeamId = seasonManager.getPlayer().teamId
+    const enemyTeamId = currentMatchup.teamInfo.teamId
+    seasonManager.applyStatIncreases(playerTeamId, statIncreases[playerTeamId])
+    seasonManager.applyStatIncreases(enemyTeamId, statIncreases[enemyTeamId])
   }
 
   const saveHeroMatchStats = (heroMatchStats: {
@@ -180,6 +183,15 @@ const Season: React.FC<Props> = ({
       loser: loserId,
       enemyId: currentMatchup.teamInfo.teamId,
     })
+    saveHeroMatchStats(outcome.heroMatchStats)
+    seasonManager.applyStatIncreases(
+      team1.teamId,
+      outcome.statIncreases[team1.teamId]
+    )
+    seasonManager.applyStatIncreases(
+      team2.teamId,
+      outcome.statIncreases[team2.teamId]
+    )
     serializeAllStates()
     setShowMatch(false)
   }
@@ -196,7 +208,9 @@ const Season: React.FC<Props> = ({
           winner: string
           loser: string
           enemyId: string
-          statIncreases: any
+          statIncreases: {
+            [teamId: string]: any
+          }
           heroMatchStats: {
             [heroId: string]: HeroStats
           }
@@ -238,18 +252,7 @@ const Season: React.FC<Props> = ({
       <Playoffs
         navigation={navigation}
         seasonManager={seasonManager}
-        onMatchContinue={(outcome: {
-          winner: string
-          loser: string
-          enemyId: string
-          statIncreases: any
-          heroMatchStats: {
-            [heroId: string]: HeroStats
-          }
-        }) => {
-          if (outcome.heroMatchStats) saveHeroMatchStats(outcome.heroMatchStats)
-          if (outcome.statIncreases)
-            applyTeamStatIncreases(outcome.statIncreases)
+        onMatchContinue={() => {
           serializeAllStates()
         }}
         proceedToOffseason={() => {

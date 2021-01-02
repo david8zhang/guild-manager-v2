@@ -487,11 +487,12 @@ export class MatchManager {
   }
 
   public getStatIncreases(
+    heroes: HeroInMatch[],
     mvpId: string
   ): {
     [heroId: string]: any
   } {
-    return (this.statGainManager as StatGainManager).getStatGains(mvpId)
+    return (this.statGainManager as StatGainManager).getStatGains(mvpId, heroes)
   }
 
   public getHeroMatchStats() {

@@ -22,6 +22,7 @@ export class SupportCPUBehavior extends CPUBehavior {
       .filter((pos: number[]) => {
         const hero = this.arena.getHeroAtLocation(pos[0], pos[1])
         return (
+          hero &&
           !hero.isDead &&
           !this.isPlayerHero(hero) &&
           hero.getHeroRef().heroId !== this.hero.getHeroRef().heroId

@@ -18,7 +18,7 @@ export class AttackCPUBehavior extends CPUBehavior {
       .getPlayerHeroPositions()
       .filter((pos: number[]) => {
         const hero = this.arena.getHeroAtLocation(pos[0], pos[1])
-        return !hero.isDead && !hero.isUntargetable()
+        return hero && !hero.isDead && !hero.isUntargetable()
       })
     if (playerHeroPositions.length === 0) {
       return

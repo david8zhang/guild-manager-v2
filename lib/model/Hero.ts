@@ -149,19 +149,19 @@ export class Hero {
   public improveStats(stat: string, value: number) {
     switch (stat) {
       case 'attack':
-        this.attack += value
+        this.attack = Math.min(100, this.attack + value)
         break
       case 'defense':
-        this.defense += value
+        this.defense = Math.min(100, this.defense + value)
         break
       case 'speed':
-        this.speed += value
+        this.speed = Math.min(100, this.speed + value)
         break
       case 'health':
-        this.health += value
+        this.health = Math.min(800, this.health + value)
         break
       case 'magic':
-        this.magic += value
+        this.magic = Math.min(100, this.magic + value)
         break
       default:
         break

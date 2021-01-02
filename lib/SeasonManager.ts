@@ -51,9 +51,13 @@ export class SeasonManager {
     return this.teamRecords[teamId]
   }
 
-  public applyStatIncreases(statIncreases: { [heroId: string]: any }): void {
-    const playerRoster = this.playerTeam.roster
-    playerRoster.forEach((hero: Hero) => {
+  public applyStatIncreases(
+    teamId: string,
+    statIncreases: { [heroId: string]: any }
+  ): void {
+    const team: Team = this.getTeam(teamId) as Team
+    const roster = team.roster
+    roster.forEach((hero: Hero) => {
       const increasePayload = statIncreases[hero.heroId]
       if (increasePayload) {
         const { statToIncrease, amountToIncrease } = increasePayload
@@ -109,10 +113,7 @@ export class SeasonManager {
       const team2: Team | null = this.getTeam(matchup[1])
 
       if (team1 && team2) {
-        const matchOutcome = MatchSimulator.simulateMatchupPercentages(
-          team1,
-          team2
-        )
+        const matchOutcome = MatchSimulator.simulateMatchup(team1, team2)
         const team1Record = this.getTeamRecord(team1.teamId)
         const team2Record = this.getTeamRecord(team2.teamId)
         if (matchOutcome.winnerId === team1.teamId) {
@@ -122,6 +123,10 @@ export class SeasonManager {
           team2Record.addWin()
           team1Record.addLoss()
         }
+
+        const { statIncreases } = matchOutcome
+        this.applyStatIncreases(team1.teamId, statIncreases[team1.teamId])
+        this.applyStatIncreases(team2.teamId, statIncreases[team2.teamId])
       }
     })
   }

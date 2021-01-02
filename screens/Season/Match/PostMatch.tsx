@@ -36,8 +36,18 @@ export const PostMatch: React.FC<Props> = ({
   const mvp = matchManager.getMVP(winnerId)
 
   React.useEffect(() => {
-    const statIncreases = matchManager.getStatIncreases(mvp.getHeroRef().heroId)
-    setStatIncreases(statIncreases)
+    const playerStatIncreases = matchManager.getStatIncreases(
+      matchManager.getPlayerHeroesInMatch(),
+      mvp.getHeroRef().heroId
+    )
+    const enemyStatIncreases = matchManager.getStatIncreases(
+      matchManager.getEnemyHeroesInMatch(),
+      mvp.getHeroRef().heroId
+    )
+    setStatIncreases({
+      [playerTeamId]: playerStatIncreases,
+      [enemyTeamId]: enemyStatIncreases,
+    })
   }, [])
 
   if (showMatchStats) {

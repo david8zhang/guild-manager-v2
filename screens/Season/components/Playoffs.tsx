@@ -76,7 +76,9 @@ export const Playoffs: React.FC<Props> = ({
 
   const checkHasRoundWon = () => {
     const matchup = playoffBracket.getPlayerMatchup()
-    if (matchup && matchup.winnerId) {
+    if (!matchup) {
+      setPlayoffsOutcome('loss')
+    } else if (matchup.winnerId) {
       if (matchup.winnerId === seasonManager.getPlayer().teamId) {
         setIsWinner(true)
       } else {
@@ -102,6 +104,24 @@ export const Playoffs: React.FC<Props> = ({
     }
   }
 
+  const saveHeroMatchStats = (heroMatchStats: {
+    [heroId: string]: HeroStats
+  }) => {
+    seasonManager.saveHeroMatchStats(heroMatchStats)
+  }
+
+  const applyTeamStatIncreases = (
+    matchup: PlayoffMatchup,
+    statIncreases: any
+  ) => {
+    const playerTeamId = seasonManager.getPlayer().teamId
+    const enemyTeamId = matchup.teamIds.find(
+      (id) => id !== seasonManager.getPlayer().teamId
+    ) as string
+    seasonManager.applyStatIncreases(playerTeamId, statIncreases[playerTeamId])
+    seasonManager.applyStatIncreases(enemyTeamId, statIncreases[enemyTeamId])
+  }
+
   if (showMatch) {
     const matchup = playoffBracket.getPlayerMatchup() as PlayoffMatchup
     const opponentId = matchup.teamIds.find(
@@ -123,6 +143,8 @@ export const Playoffs: React.FC<Props> = ({
           }
         }) => {
           updatePlayoffBracketScores(outcome.winner)
+          applyTeamStatIncreases(matchup, outcome.statIncreases)
+          saveHeroMatchStats(outcome.heroMatchStats)
           simulatePlayoffBracketGames()
           checkHasRoundWon()
           setShowMatch(false)
@@ -143,6 +165,15 @@ export const Playoffs: React.FC<Props> = ({
 
     const outcome = MatchSimulator.simulateMatchup(team1, team2)
     updatePlayoffBracketScores(outcome.winnerId)
+    seasonManager.applyStatIncreases(
+      team1.teamId,
+      outcome.statIncreases[team1.teamId]
+    )
+    seasonManager.applyStatIncreases(
+      team2.teamId,
+      outcome.statIncreases[team2.teamId]
+    )
+    saveHeroMatchStats(outcome.heroMatchStats)
     simulatePlayoffBracketGames()
     checkHasRoundWon()
     setShowMatch(false)

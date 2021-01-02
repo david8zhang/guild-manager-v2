@@ -45,6 +45,24 @@ export class Arena {
     }
   }
 
+  public getRandomEmptyLocation(): number[] {
+    const mapMatrix: number[][] = []
+    for (let i = 0; i < Arena.NUM_ROWS; i++) {
+      mapMatrix.push(new Array(Arena.NUM_COLS))
+    }
+
+    let emptyLoc: number[] = []
+    for (let i = 0; i < Arena.NUM_ROWS; i++) {
+      for (let j = 0; j < Arena.NUM_COLS; j++) {
+        const key: string = this.getCoordinateKey(i, j)
+        if (!this.map[key]) {
+          emptyLoc = [i, j]
+        }
+      }
+    }
+    return emptyLoc
+  }
+
   public getHeroAtLocation(row: number, col: number): HeroInMatch {
     const key = this.getCoordinateKey(row, col)
     return this.map[key] as HeroInMatch

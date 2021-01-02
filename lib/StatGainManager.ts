@@ -11,14 +11,17 @@ export class StatGainManager {
     this.playerHeroTeam = config.playerHeroTeam
   }
 
-  public getStatGains(mvpId: string) {
+  public getStatGains(mvpId: string, heroes: HeroInMatch[]) {
     const statGains: any = {}
-    this.playerHeroTeam.forEach((hero: HeroInMatch) => {
+    heroes.forEach((hero: HeroInMatch) => {
       const heroRef = hero.getHeroRef()
       const potential = heroRef.potential
-      if (this.didStatIncrease(potential) || heroRef.heroId === mvpId) {
+      if (
+        StatGainManager.didStatIncrease(potential) ||
+        heroRef.heroId === mvpId
+      ) {
         // If the hero is the MVP, they should guarantee a stat increase
-        const stat = this.getStatsToIncrease(heroRef.heroType)
+        const stat = StatGainManager.getStatsToIncrease(heroRef.heroType)
         const amountToIncrease = StatGainManager.statIncreaseAmount(
           potential,
           stat
@@ -34,7 +37,7 @@ export class StatGainManager {
     return statGains
   }
 
-  public getStatsToIncrease(heroType: HeroType): string {
+  public static getStatsToIncrease(heroType: HeroType): string {
     let increasableStats = []
     switch (heroType) {
       case HeroType.RANGER: {
@@ -88,7 +91,7 @@ export class StatGainManager {
     return statIncreaseAmount
   }
 
-  public didStatIncrease(potential: number) {
+  public static didStatIncrease(potential: number) {
     const potentialToPercentArr = [0.05, 0.15, 0.25]
     const percent = potentialToPercentArr[potential - 1]
     return Math.floor(Math.random() * 100) + 1 >= percent * 100
