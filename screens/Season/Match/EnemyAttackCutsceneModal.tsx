@@ -4,6 +4,7 @@ import { Portal } from 'react-native-paper'
 import { Button, CustomModal } from '../../../components'
 import {
   RANGER_ANIMATIONS,
+  SUPPORT_ANIMATIONS,
   TANK_ANIMATIONS,
 } from '../../../lib/constants/animations'
 import { DEBUG_CONFIG } from '../../../lib/constants/debugConfig'
@@ -119,6 +120,10 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
       }
       case HeroType.TANK: {
         animationPool = TANK_ANIMATIONS
+        break
+      }
+      case HeroType.SUPPORT: {
+        animationPool = SUPPORT_ANIMATIONS
         break
       }
       default:

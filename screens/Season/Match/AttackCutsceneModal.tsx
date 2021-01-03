@@ -5,6 +5,7 @@ import { Button, CustomModal } from '../../../components'
 import {
   TANK_ANIMATIONS,
   RANGER_ANIMATIONS,
+  SUPPORT_ANIMATIONS,
 } from '../../../lib/constants/animations'
 import { DEBUG_CONFIG } from '../../../lib/constants/debugConfig'
 import { MatchManager } from '../../../lib/MatchManager'
@@ -147,6 +148,10 @@ export const AttackCutsceneModal: React.FC<Props> = ({
       }
       case HeroType.TANK: {
         animationPool = TANK_ANIMATIONS
+        break
+      }
+      case HeroType.SUPPORT: {
+        animationPool = SUPPORT_ANIMATIONS
         break
       }
       default:
