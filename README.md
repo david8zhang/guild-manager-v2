@@ -13,7 +13,6 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 - Trades with other teams
 - Hero age/retirement
 - Smarter AIs randomly set for different enemy teams
-- Better animations for ranged attacks (Bow firing animation)
 - Respawn timer displayed
 - Support for different expressions
 

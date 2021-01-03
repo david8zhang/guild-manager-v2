@@ -1,9 +1,14 @@
 import * as React from 'react'
-import { Animated, Easing, View } from 'react-native'
+import { Animated, Easing, Image, View } from 'react-native'
 import { Portal } from 'react-native-paper'
 import { Button, CustomModal } from '../../../components'
+import {
+  RANGER_ANIMATIONS,
+  TANK_ANIMATIONS,
+} from '../../../lib/constants/animations'
 import { DEBUG_CONFIG } from '../../../lib/constants/debugConfig'
 import { MatchManager } from '../../../lib/MatchManager'
+import { HeroType } from '../../../lib/model/Hero'
 import { AttackResult, HeroInMatch } from '../../../lib/model/HeroInMatch'
 import { AttackCutsceneHero } from './AttackCutsceneHero'
 import { DamageText } from './DamageText'
@@ -35,6 +40,9 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
 
   const [scorePayload, setScorePayload] = React.useState<any>(null)
   const [isFinishedAttacking, setIsFinishedAttacking] = React.useState(false)
+
+  const [attackAnimation, setAttackAnimation] = React.useState<any>(null)
+  const [defenderAnimation, setDefenderAnimation] = React.useState<any>(null)
 
   React.useEffect(() => {
     if (isOpen && attackAction) {
@@ -101,14 +109,36 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
     }
   }
 
+  const getRandomAnimation = (heroType: HeroType): any => {
+    let animationPool
+
+    switch (heroType) {
+      case HeroType.RANGER: {
+        animationPool = RANGER_ANIMATIONS
+        break
+      }
+      case HeroType.TANK: {
+        animationPool = TANK_ANIMATIONS
+        break
+      }
+      default:
+        animationPool = TANK_ANIMATIONS
+        break
+    }
+
+    const allAnimations = Object.keys(animationPool)
+    const randomAttackAnimation =
+      allAnimations[Math.floor(Math.random() * allAnimations.length)]
+    return animationPool[randomAttackAnimation]
+  }
+
   const startAttackerAnimation = () => {
-    Animated.timing(enemyHeroPos, {
-      toValue: -100,
-      duration: 1000,
-      easing: Easing.back(5),
-      useNativeDriver: true,
-    }).start(() => {
+    const animation = getRandomAnimation(user.getHeroRef().heroType)
+    const { duration } = animation
+    setAttackAnimation(animation)
+    setTimeout(() => {
       processAttackerHeroAttack()
+      setAttackAnimation(null)
       Animated.parallel([
         Animated.timing(enemyHeroPos, {
           toValue: 0,
@@ -142,17 +172,16 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
           setIsFinishedAttacking(true)
         }
       })
-    })
+    }, duration)
   }
 
   const startDefenderAnimation = () => {
-    Animated.timing(playerHeroPos, {
-      toValue: 100,
-      duration: 1000,
-      easing: Easing.back(5),
-      useNativeDriver: true,
-    }).start(() => {
+    const animation = getRandomAnimation(target.getHeroRef().heroType)
+    const { duration } = animation
+    setDefenderAnimation(animation)
+    setTimeout(() => {
       processDefenderHeroAttack()
+      setDefenderAnimation(null)
       Animated.parallel([
         Animated.timing(playerHeroPos, {
           toValue: 0,
@@ -182,7 +211,7 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
       ]).start(() => {
         setIsFinishedAttacking(true)
       })
-    })
+    }, duration)
   }
 
   const onAttackFinished = () => {
@@ -217,6 +246,43 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
           />
         )}
       </Portal>
+      {attackAnimation !== null && (
+        <View
+          style={{
+            position: 'absolute',
+            zIndex: 100,
+            right: 50,
+            top: 20,
+            transform: [
+              {
+                scaleX: -1,
+              },
+            ],
+          }}
+        >
+          <Image
+            style={{ width: 300, height: 300 }}
+            source={attackAnimation.source}
+            resizeMode='contain'
+          />
+        </View>
+      )}
+      {defenderAnimation !== null && (
+        <View
+          style={{
+            position: 'absolute',
+            zIndex: 100,
+            left: 50,
+            top: 20,
+          }}
+        >
+          <Image
+            style={{ width: 300, height: 300 }}
+            source={defenderAnimation.source}
+            resizeMode='contain'
+          />
+        </View>
+      )}
       <View
         style={{
           flexDirection: 'column',
