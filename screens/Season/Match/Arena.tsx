@@ -18,6 +18,7 @@ import { ActionTypes } from '../../../lib/enemyAI/CPUBehavior'
 import { Tile } from './Tile'
 import { TileHighlight } from './TileHighlight'
 import { ArenaTileMapUnderlay } from './ArenaTileMapUnderlay'
+import { PowerUpUnderlay } from './PowerupUnderlay'
 
 interface Props {
   matchManager: MatchManager
@@ -542,6 +543,15 @@ export const Arena: React.FC<Props> = ({
           tileMap={tileMap}
           rows={rows}
           cols={cols}
+        />
+
+        {/* Powerup underlay */}
+        <PowerUpUnderlay
+          rows={rows}
+          cols={cols}
+          arena={matchManager.getFullArena()}
+          allHeroPositions={matchManager.getAllHeroLocations()}
+          powerUps={matchManager.getPowerUps()}
         />
 
         {/* Render actual interactable grid cells */}

@@ -1,5 +1,6 @@
 import { ARENA_MAP } from '../constants/arenaTiles'
 import { HeroInMatch } from './HeroInMatch'
+import { shuffle } from 'lodash'
 
 export class Arena {
   public static NUM_COLS = 10
@@ -61,6 +62,20 @@ export class Arena {
       }
     }
     return emptyLoc
+  }
+
+  public getRandomEmptyLocations(numLocations: number): number[][] {
+    const emptyLocations = []
+    for (let i = 0; i < Arena.NUM_ROWS; i++) {
+      for (let j = 0; j < Arena.NUM_ROWS; j++) {
+        const key: string = this.getCoordinateKey(i, j)
+        if (!this.map[key]) {
+          emptyLocations.push([i, j])
+        }
+      }
+    }
+    const shuffledLocations = shuffle(emptyLocations)
+    return shuffledLocations.slice(0, numLocations)
   }
 
   public getHeroAtLocation(row: number, col: number): HeroInMatch {

@@ -9,9 +9,9 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Future Features (ordered by priority)
 
-- Show scores of previous matches
 - Trades with other teams
-- Hero age/retirement
+- Hero age, stat declines
+- Show scores of previous matches
 - Smarter AIs randomly set for different enemy teams
 - Respawn timer displayed
 - Support for different expressions

@@ -24,7 +24,7 @@ export const ArenaTileMapUnderlay: React.FC<Props> = ({
     for (let i = 0; i < totalNumCells; i++) {
       const row = Math.floor(i / cols)
       const col = i % cols
-      const coordinates = `${row},${cols}`
+      const coordinates = `${row},${col}`
       const tileImageIndex = tileMap[row][col]
       grid.push(
         <Tile

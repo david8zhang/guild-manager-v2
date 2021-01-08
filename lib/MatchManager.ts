@@ -7,6 +7,8 @@ import { HeroInMatch } from './model/HeroInMatch'
 import { MatchEvent } from './model/MatchEvent'
 import { Team } from './model/Team'
 import { StatGainManager } from './StatGainManager'
+import { PowerUp } from './powerup/Powerup'
+import { PowerUpFactory } from './powerup/PowerUpFactory'
 
 interface TeamInfo {
   name: string
@@ -22,6 +24,7 @@ export interface MatchManagerConfig {
 
 export class MatchManager {
   public static MATCH_DURATION = DEBUG_CONFIG.numTurnsInMatch || 10
+  public static NUM_POWERUPS = DEBUG_CONFIG.numPowerups || 3
 
   private playerHeroes: HeroInMatch[] = []
   private enemyHeroes: HeroInMatch[] = []
@@ -42,6 +45,11 @@ export class MatchManager {
   private enemyAIManager: any
   private statGainManager: any
   private isOvertime: boolean
+
+  private powerUpFactory: PowerUpFactory
+  private powerUps: {
+    [coord: string]: PowerUp
+  } = {}
 
   constructor(config: MatchManagerConfig) {
     this.eventLog = []
@@ -64,6 +72,8 @@ export class MatchManager {
     this.arena = new Arena(this.playerHeroes, this.enemyHeroes)
     this.enemyAIManager = null
     this.statGainManager = null
+    this.powerUps = {}
+    this.powerUpFactory = new PowerUpFactory()
   }
 
   // Do all initialization logic here
@@ -97,6 +107,43 @@ export class MatchManager {
     this.statGainManager = new StatGainManager({
       playerHeroTeam: this.playerHeroes,
     })
+
+    this.distributePowerUps()
+  }
+
+  public distributePowerUps(): void {
+    const emptyLocations = this.arena.getRandomEmptyLocations(
+      MatchManager.NUM_POWERUPS
+    )
+    emptyLocations.forEach((location) => {
+      const coordKey = `${location[0]},${location[1]}`
+      const powerUp = this.powerUpFactory.generateRandomPowerup()
+      this.powerUps[coordKey] = powerUp
+    })
+  }
+
+  public spawnNewPowerUp() {
+    const emptyLocations = this.arena
+      .getRandomEmptyLocations(1)
+      .filter((location) => {
+        const coordKey = `${location[0]},${location[1]}`
+        return !this.powerUps[coordKey]
+      })
+    const location = emptyLocations[0]
+    const newPowerUp = this.powerUpFactory.generateRandomPowerup()
+    const coordKey = `${location[0]},${location[1]}`
+    this.powerUps[coordKey] = newPowerUp
+  }
+
+  public getPowerUps() {
+    return this.powerUps
+  }
+
+  public getAllHeroLocations(): number[][] {
+    const allPositions = this.arena
+      .getPlayerHeroPositions()
+      .concat(this.arena.getEnemyHeroPositions())
+    return allPositions
   }
 
   public getHeroTeam(hero: HeroInMatch): Team {
@@ -119,6 +166,10 @@ export class MatchManager {
       cols: Arena.NUM_COLS,
       tileMap: this.arena.tileMap,
     }
+  }
+
+  public getFullArena(): Arena {
+    return this.arena
   }
 
   public canTargetRetaliate(
