@@ -547,11 +547,10 @@ export const Arena: React.FC<Props> = ({
 
         {/* Powerup underlay */}
         <PowerUpUnderlay
+          hasConfirmedMove={moveToUndo == null}
           rows={rows}
           cols={cols}
-          arena={matchManager.getFullArena()}
-          allHeroPositions={matchManager.getAllHeroLocations()}
-          powerUps={matchManager.getPowerUps()}
+          matchManager={matchManager}
         />
 
         {/* Render actual interactable grid cells */}

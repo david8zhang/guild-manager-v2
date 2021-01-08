@@ -1,46 +1,23 @@
 import * as React from 'react'
-import { Text, View } from 'react-native'
-import { Arena } from '../../../lib/model/Arena'
-import { PowerUp } from '../../../lib/powerup/Powerup'
+import { View } from 'react-native'
+import { MatchManager } from '../../../lib/MatchManager'
 import { Tile } from './Tile'
 
 interface Props {
   rows: number
   cols: number
-  arena: Arena
-  allHeroPositions: number[][]
-  powerUps: {
-    [key: string]: PowerUp
-  }
+  matchManager: MatchManager
+  hasConfirmedMove: boolean
 }
 
 export const PowerUpUnderlay: React.FC<Props> = ({
   rows,
   cols,
-  powerUps,
-  arena,
-  allHeroPositions,
+  matchManager,
+  hasConfirmedMove,
 }) => {
-  React.useEffect(() => {
-    if (arena) {
-      allHeroPositions.forEach((position: number[]) => {
-        const coordKey = `${position[0]},${position[1]}`
-        if (powerUps[coordKey]) {
-          console.log(arena.getHeroAtLocation)
-          const powerUpAtPosition = powerUps[coordKey]
-          const heroAtPosition = arena.getHeroAtLocation(
-            position[0],
-            position[1]
-          )
-          console.log(
-            heroAtPosition.getHeroRef().name,
-            'got',
-            powerUpAtPosition.name
-          )
-        }
-      })
-    }
-  }, [allHeroPositions])
+  const allHeroPositions = matchManager.getAllHeroLocations()
+  const powerUps = matchManager.getPowerUps()
 
   const renderGrid = () => {
     const totalNumCells = rows * cols
@@ -63,7 +40,17 @@ export const PowerUpUnderlay: React.FC<Props> = ({
           pointerEvents={powerUp ? 'none' : null}
           cols={cols}
         >
-          {powerUp ? <View>{powerUp.getPowerUpSprite()}</View> : <View />}
+          {powerUp ? (
+            <View>
+              {powerUp.getPowerUpSprite(
+                hasConfirmedMove,
+                allHeroPositions,
+                matchManager
+              )}
+            </View>
+          ) : (
+            <View />
+          )}
         </Tile>
       )
     }

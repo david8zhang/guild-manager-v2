@@ -117,7 +117,7 @@ export class MatchManager {
     )
     emptyLocations.forEach((location) => {
       const coordKey = `${location[0]},${location[1]}`
-      const powerUp = this.powerUpFactory.generateRandomPowerup()
+      const powerUp = this.powerUpFactory.generateRandomPowerup(location)
       this.powerUps[coordKey] = powerUp
     })
   }
@@ -130,7 +130,7 @@ export class MatchManager {
         return !this.powerUps[coordKey]
       })
     const location = emptyLocations[0]
-    const newPowerUp = this.powerUpFactory.generateRandomPowerup()
+    const newPowerUp = this.powerUpFactory.generateRandomPowerup(location)
     const coordKey = `${location[0]},${location[1]}`
     this.powerUps[coordKey] = newPowerUp
   }

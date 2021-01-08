@@ -14,7 +14,7 @@ export const RANGER_ANIMATIONS: any = {
 
 export const SUPPORT_ANIMATIONS: any = {
   magicBlast: {
-    duration: 1000,
+    duration: 1100,
     source: require('../../assets/animations/magic-blast-noloop.gif'),
   },
 }
