@@ -4,10 +4,17 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
-## Future Features (ordered by priority)
-
 - Hero "aura"
+
+  - builds up every turn (including turns when dead), increases signifcantly whenever hero earns a kill
+  - when activated, all hero's stats (except health) receive a 2x multiplier
+  - lasts for 2 turns
+
 - better hero designs
+
+  - design a sprite for heroes in the game
+
+## Future Features (ordered by priority)
 
 - Trades with other teams
 - Hero age, stat declines
