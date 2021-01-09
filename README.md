@@ -4,10 +4,10 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
-- Add power ups to map
-- add a warning screen when doing a hard reset
-
 ## Future Features (ordered by priority)
+
+- Hero "aura"
+- better hero designs
 
 - Trades with other teams
 - Hero age, stat declines

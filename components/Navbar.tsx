@@ -10,6 +10,7 @@ import * as leagueActions from '../redux/leagueWidget'
 import * as seasonActions from '../redux/seasonWidget'
 import * as frontOfficeActions from '../redux/frontOfficeWidget'
 import * as guildActions from '../redux/guildWidget'
+import { WarningModal } from './WarningModal'
 
 interface Props {
   title: string
@@ -31,6 +32,8 @@ const Navbar: React.FC<Props> = ({
   saveLeague,
 }) => {
   const [sideNavPos, setSideNavWidth] = React.useState(new Animated.Value(-200))
+  const [showResetWarning, setShowResetWarning] = React.useState(false)
+
   const navStyle: any = {
     padding: 20,
     flexDirection: 'row',
@@ -83,6 +86,18 @@ const Navbar: React.FC<Props> = ({
   return (
     <View style={navStyle}>
       <Portal>
+        <WarningModal
+          warningText='Are you sure you want to reset? You will lose all your progress!'
+          isOpen={showResetWarning}
+          onClose={() => setShowResetWarning(false)}
+          onConfirm={() => {
+            navigation.jumpTo('Create')
+            resetAllStates()
+            AsyncStorage.clear()
+          }}
+        />
+      </Portal>
+      <Portal>
         <Animated.View
           style={{
             position: 'absolute',
@@ -132,9 +147,7 @@ const Navbar: React.FC<Props> = ({
               style={{ padding: 10 }}
               key='reset-state'
               onPress={() => {
-                navigation.jumpTo('Create')
-                resetAllStates()
-                AsyncStorage.clear()
+                setShowResetWarning(true)
               }}
             >
               <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
