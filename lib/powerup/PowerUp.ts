@@ -7,10 +7,11 @@ export abstract class PowerUp {
   public onGetPowerUp: Function = () => {}
 
   abstract processEffect(hero: HeroInMatch): void
-  abstract getPowerUpSprite(
-    hasConfirmedMove: boolean,
-    allHeroPositions: number[][],
+  abstract getPowerUpSprite(config: {
+    onGetPowerUp: Function
+    hasConfirmedMove: boolean
+    allHeroPositions: number[][]
     matchManager: MatchManager
-  ): any
+  }): any
   abstract clone(position: number[]): PowerUp
 }

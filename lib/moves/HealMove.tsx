@@ -147,12 +147,7 @@ export class HealMove implements Move {
   processMove(user: HeroInMatch, target: HeroInMatch) {
     const userHeroRef: Hero = user.getHeroRef()
     const healAmount = Math.floor(userHeroRef.magic * 0.75)
-    const targetMaxHealth = target.getHeroRef().health
-    const targetTotalHealth = Math.min(
-      targetMaxHealth,
-      target.getCurrHealth() + healAmount
-    )
-    target.setCurrHealth(targetTotalHealth)
+    target.addHealth(healAmount)
   }
 
   getAnimation(

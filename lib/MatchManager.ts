@@ -48,7 +48,7 @@ export class MatchManager {
 
   private powerUpFactory: PowerUpFactory
   private powerUps: {
-    [coord: string]: PowerUp
+    [coord: string]: any
   } = {}
 
   constructor(config: MatchManagerConfig) {
@@ -122,6 +122,11 @@ export class MatchManager {
     })
   }
 
+  public removePowerUpAtLocation(location: number[]) {
+    const coordKey = `${location[0]},${location[1]}`
+    this.powerUps[coordKey] = null
+  }
+
   public spawnNewPowerUp() {
     const emptyLocations = this.arena
       .getRandomEmptyLocations(1)
@@ -130,9 +135,11 @@ export class MatchManager {
         return !this.powerUps[coordKey]
       })
     const location = emptyLocations[0]
-    const newPowerUp = this.powerUpFactory.generateRandomPowerup(location)
-    const coordKey = `${location[0]},${location[1]}`
-    this.powerUps[coordKey] = newPowerUp
+    if (location) {
+      const newPowerUp = this.powerUpFactory.generateRandomPowerup(location)
+      const coordKey = `${location[0]},${location[1]}`
+      this.powerUps[coordKey] = newPowerUp
+    }
   }
 
   public getPowerUps() {

@@ -55,6 +55,11 @@ export class HeroInMatch {
     this.currHealth = health
   }
 
+  public addHealth(health: number) {
+    this.currHealth += health
+    this.currHealth = Math.min(this.hero.health, this.currHealth)
+  }
+
   public getCurrHealth(): number {
     return this.currHealth
   }

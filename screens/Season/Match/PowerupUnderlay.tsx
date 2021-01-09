@@ -8,6 +8,7 @@ interface Props {
   cols: number
   matchManager: MatchManager
   hasConfirmedMove: boolean
+  refresh: Function
 }
 
 export const PowerUpUnderlay: React.FC<Props> = ({
@@ -15,6 +16,7 @@ export const PowerUpUnderlay: React.FC<Props> = ({
   cols,
   matchManager,
   hasConfirmedMove,
+  refresh,
 }) => {
   const allHeroPositions = matchManager.getAllHeroLocations()
   const powerUps = matchManager.getPowerUps()
@@ -42,11 +44,12 @@ export const PowerUpUnderlay: React.FC<Props> = ({
         >
           {powerUp ? (
             <View>
-              {powerUp.getPowerUpSprite(
+              {powerUp.getPowerUpSprite({
                 hasConfirmedMove,
                 allHeroPositions,
-                matchManager
-              )}
+                matchManager,
+                onGetPowerUp: refresh,
+              })}
             </View>
           ) : (
             <View />

@@ -547,6 +547,9 @@ export const Arena: React.FC<Props> = ({
 
         {/* Powerup underlay */}
         <PowerUpUnderlay
+          refresh={() => {
+            setUpdateCounter(updateCounter + 1)
+          }}
           hasConfirmedMove={moveToUndo == null}
           rows={rows}
           cols={cols}
