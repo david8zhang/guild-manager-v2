@@ -4,7 +4,10 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
-- Fix hero stat gains not showing up in post match stats
+- Announcers
+  - Announcers which say a line everytime a kill happens to add more flair to the presentation
+
+## Future Features (ordered by priority)
 
 - Hero "aura"
 
@@ -12,12 +15,7 @@ Fire Emblem crossed with NBA 2K MyGM mode.
   - when activated, all hero's stats (except health) receive a 2x multiplier
   - lasts for 2 turns
 
-- better hero designs
-
-  - design a sprite for heroes in the game
-
-## Future Features (ordered by priority)
-
+- design a sprite for heroes in-match v.s. heroes in roster
 - Trades with other teams
 - Hero age, stat declines
 - Show scores of previous matches
