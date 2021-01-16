@@ -56,6 +56,7 @@ export class SeasonManager {
     statIncreases: { [heroId: string]: any }
   ): void {
     const team: Team = this.getTeam(teamId) as Team
+
     const roster = team.roster
     roster.forEach((hero: Hero) => {
       const increasePayload = statIncreases[hero.heroId]

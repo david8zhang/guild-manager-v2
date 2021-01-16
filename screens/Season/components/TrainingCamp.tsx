@@ -23,7 +23,8 @@ export const TrainingCamp: React.FC<Props> = ({
   React.useEffect(() => {
     const result = seasonManager.trainStats(statsToTrain, heroesToTrain)
     const { trainingResult, statIncreases } = result
-    seasonManager.applyStatIncreases(statIncreases)
+    const playerTeamId = seasonManager.getPlayer().teamId
+    seasonManager.applyStatIncreases(playerTeamId, statIncreases)
     setTrainingResult(trainingResult)
   }, [])
 

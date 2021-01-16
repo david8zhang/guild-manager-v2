@@ -87,7 +87,7 @@ export class HeroInMatch {
       '60-69': 3,
       '70-79': 4,
       '80-89': 5,
-      '90-99': 6,
+      '90-100': 6,
     }
     let range: number = 0
     Object.keys(speedToRangeMap).forEach((key: string) => {

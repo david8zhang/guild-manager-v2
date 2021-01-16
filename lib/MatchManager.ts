@@ -167,6 +167,8 @@ export class MatchManager {
   public highlightMoveableSquares(rows: number, cols: number) {
     const hero: HeroInMatch = this.arena.getHeroAtLocation(rows, cols)
     const range = hero.getMoveRange()
+
+    console.log('Range: ', range)
     let squaresInRange: number[][] = this.arena.getSquaresInRange(
       range,
       rows,
