@@ -4,6 +4,8 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
+- Fix hero stat gains not showing up in post match stats
+
 - Hero "aura"
 
   - builds up every turn (including turns when dead), increases signifcantly whenever hero earns a kill

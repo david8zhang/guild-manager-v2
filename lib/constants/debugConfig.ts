@@ -5,7 +5,7 @@ export const DEBUG_CONFIG: any = {
   // playerCritRate: 0.2,
   // enemyOneShotRate: 1.0,
   // enemyCritRate: 0.2,
-  // numTurnsInMatch: 3,
+  numTurnsInMatch: 3,
   // autoWinGames: true,
   // numGamesInSeason: 2,
   quitAndResetEnabled: true,

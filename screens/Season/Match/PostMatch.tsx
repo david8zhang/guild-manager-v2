@@ -65,7 +65,7 @@ export const PostMatch: React.FC<Props> = ({
   if (showPostMatchGains) {
     return (
       <PostMatchStatGains
-        statIncreases={statIncreases}
+        statIncreases={statIncreases[matchManager.getPlayerTeamInfo().teamId]}
         matchManager={matchManager}
         onBack={() => {
           setShowMatchStats(true)
