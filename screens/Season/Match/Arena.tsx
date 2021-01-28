@@ -4,7 +4,7 @@ import { Portal } from 'react-native-paper'
 import { MatchManager } from '../../../lib/MatchManager'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
 import { Move } from '../../../lib/moves/Move'
-import { EnemyAttackCutsceneModal } from './EnemyAttackCutsceneModal'
+import EnemyAttackCutsceneModal from './EnemyAttackCutsceneModal'
 import { HeroInArena } from './HeroInArena'
 import { SkillSetOverlayMenu } from './SkillSetOverlayMenu'
 import { SkillTargetOverlay } from './SkillTargetOverlay'
@@ -18,7 +18,7 @@ import { ActionTypes } from '../../../lib/enemyAI/CPUBehavior'
 import { Tile } from './Tile'
 import { TileHighlight } from './TileHighlight'
 import { ArenaTileMapUnderlay } from './ArenaTileMapUnderlay'
-import { AnnouncerWindow } from './AnnouncerWindow'
+import AnnouncerWindow from './AnnouncerWindow'
 
 interface Props {
   matchManager: MatchManager

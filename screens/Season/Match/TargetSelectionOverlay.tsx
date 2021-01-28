@@ -4,7 +4,7 @@ import { Portal } from 'react-native-paper'
 import { Button } from '../../../components'
 import { MatchManager } from '../../../lib/MatchManager'
 import { HeroInMatch } from '../../../lib/model/HeroInMatch'
-import { AttackCutsceneModal } from './AttackCutsceneModal'
+import AttackCutsceneModal from './AttackCutsceneModal'
 import { AttackMatchupModal } from './AttackMatchupModal'
 import { Tile } from './Tile'
 

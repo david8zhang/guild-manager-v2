@@ -14,6 +14,12 @@ import { AttackResult, HeroInMatch } from '../../../lib/model/HeroInMatch'
 import { AttackCutsceneHero } from './AttackCutsceneHero'
 import { DamageText } from './DamageText'
 import { ScoreModal } from './ScoreModal'
+import { connect } from 'react-redux'
+import {
+  sendAttackEvent,
+  sendKillEvent,
+  EventTypes,
+} from '../../../redux/matchEventWidget'
 
 interface Props {
   isOpen: boolean
@@ -23,9 +29,11 @@ interface Props {
     target: HeroInMatch
   }
   matchManager: MatchManager
+  sendAttackEvent?: Function
+  sendKillEvent?: Function
 }
 
-export const EnemyAttackCutsceneModal: React.FC<Props> = ({
+const EnemyAttackCutsceneModal: React.FC<Props> = ({
   isOpen,
   onContinue,
   attackAction,
@@ -82,6 +90,13 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
         teamName: matchManager.getEnemyTeamInfo().name,
       })
       matchManager.respawnHero(target, 'player')
+    } else {
+      sendAttackEvent({
+        attacker: attacker.getHeroRef(),
+        target: target.getHeroRef(),
+        attackResult,
+        eventType: EventTypes.Damage,
+      })
     }
   }
 
@@ -106,6 +121,13 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
           teamName: matchManager.getPlayerTeamInfo().name,
         })
         matchManager.respawnHero(attacker, 'enemy')
+      } else {
+        sendAttackEvent({
+          attacker: target.getHeroRef(),
+          target: attacker.getHeroRef(),
+          attackResult,
+          eventType: EventTypes.Damage,
+        })
       }
     }
   }
@@ -360,3 +382,7 @@ export const EnemyAttackCutsceneModal: React.FC<Props> = ({
     </CustomModal>
   )
 }
+
+export default connect(null, { sendKillEvent, sendAttackEvent })(
+  EnemyAttackCutsceneModal
+)

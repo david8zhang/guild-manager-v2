@@ -14,6 +14,12 @@ import { HeroInMatch, AttackResult } from '../../../lib/model/HeroInMatch'
 import { AttackCutsceneHero } from './AttackCutsceneHero'
 import { DamageText } from './DamageText'
 import { ScoreModal } from './ScoreModal'
+import { connect } from 'react-redux'
+import {
+  sendAttackEvent,
+  sendKillEvent,
+  EventTypes,
+} from '../../../redux/matchEventWidget'
 
 interface Props {
   isOpen: boolean
@@ -21,14 +27,18 @@ interface Props {
   targetHero: HeroInMatch
   playerHero: HeroInMatch
   matchManager: MatchManager
+  sendAttackEvent: Function
+  sendKillEvent: Function
 }
 
-export const AttackCutsceneModal: React.FC<Props> = ({
+const AttackCutsceneModal: React.FC<Props> = ({
   isOpen,
   onClose,
   targetHero,
   playerHero,
   matchManager,
+  sendAttackEvent,
+  sendKillEvent,
 }) => {
   if (!isOpen) {
     return <View />
@@ -55,6 +65,12 @@ export const AttackCutsceneModal: React.FC<Props> = ({
     )
     setDefenderDamage(attackResult.damageDealt)
     if (targetHero.isDead) {
+      sendKillEvent({
+        attacker: playerHero.getHeroRef(),
+        target: targetHero.getHeroRef(),
+        attackResult,
+        eventType: EventTypes.Kill,
+      })
       matchManager.playerScoreKill(
         playerHero.getHeroRef().heroId,
         targetHero.getHeroRef().heroId
@@ -67,6 +83,13 @@ export const AttackCutsceneModal: React.FC<Props> = ({
         teamName: matchManager.getPlayerTeamInfo().name,
       })
       matchManager.respawnHero(targetHero, 'enemy')
+    } else {
+      sendAttackEvent({
+        attacker: playerHero.getHeroRef(),
+        target: targetHero.getHeroRef(),
+        attackResult,
+        eventType: EventTypes.Damage,
+      })
     }
   }
 
@@ -79,6 +102,12 @@ export const AttackCutsceneModal: React.FC<Props> = ({
       )
       setAttackerDamage(Math.floor(attackResult.damageDealt))
       if (playerHero.isDead) {
+        sendKillEvent({
+          attacker: targetHero.getHeroRef(),
+          target: playerHero.getHeroRef(),
+          attackResult,
+          eventType: EventTypes.Kill,
+        })
         matchManager.enemyScoreKill(
           targetHero.getHeroRef().heroId,
           playerHero.getHeroRef().heroId
@@ -91,6 +120,13 @@ export const AttackCutsceneModal: React.FC<Props> = ({
           teamName: matchManager.getEnemyTeamInfo().name,
         })
         matchManager.respawnHero(playerHero, 'player')
+      } else {
+        sendAttackEvent({
+          attacker: targetHero.getHeroRef(),
+          target: playerHero.getHeroRef(),
+          attackResult,
+          eventType: EventTypes.Damage,
+        })
       }
     }
   }
@@ -339,3 +375,11 @@ export const AttackCutsceneModal: React.FC<Props> = ({
     </CustomModal>
   )
 }
+
+const mapStateToProps = (state: any) => ({
+  matchEvents: state.matchEvents,
+})
+
+export default connect(mapStateToProps, { sendAttackEvent, sendKillEvent })(
+  AttackCutsceneModal
+)
