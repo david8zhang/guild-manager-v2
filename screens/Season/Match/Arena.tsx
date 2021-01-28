@@ -18,7 +18,6 @@ import { ActionTypes } from '../../../lib/enemyAI/CPUBehavior'
 import { Tile } from './Tile'
 import { TileHighlight } from './TileHighlight'
 import { ArenaTileMapUnderlay } from './ArenaTileMapUnderlay'
-import { AnnouncerWindow } from './AnnouncerWindow'
 
 interface Props {
   matchManager: MatchManager
@@ -516,9 +515,6 @@ export const Arena: React.FC<Props> = ({
 
   return (
     <View style={{ width: '100%' }}>
-      <Portal>
-        <AnnouncerWindow />
-      </Portal>
       <View
         style={{
           marginLeft: 15,
