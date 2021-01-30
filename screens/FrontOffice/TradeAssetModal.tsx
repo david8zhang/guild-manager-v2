@@ -11,6 +11,7 @@ interface Props {
   isOpen: boolean
   onClose: Function
   addAssets: Function
+  currAssets: Hero[]
   team: Team
 }
 
@@ -19,7 +20,13 @@ export const TradeAssetModal: React.FC<Props> = ({
   onClose,
   team,
   addAssets,
+  currAssets,
 }) => {
+  const [addedAssets, setAddedAssets] = React.useState<string[]>([])
+  React.useEffect(() => {
+    setAddedAssets(currAssets.map((h: Hero) => h.heroId))
+  }, [currAssets])
+
   if (!team) {
     return <View />
   }
@@ -48,8 +55,12 @@ export const TradeAssetModal: React.FC<Props> = ({
         </Text>
         <ScrollView style={{ height: 200 }}>
           {roster.map((h: Hero) => {
+            const isAdded = addedAssets.includes(h.heroId)
             return (
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View
+                key={h.heroId}
+                style={{ flexDirection: 'row', alignItems: 'center' }}
+              >
                 <StarterHero
                   style={{ flex: 1 }}
                   innerStyle={{ width: 240 }}
@@ -65,7 +76,26 @@ export const TradeAssetModal: React.FC<Props> = ({
                   potential={h.potential}
                   button={<View />}
                 />
-                <Button text='Add' onPress={() => {}} />
+                {isAdded ? (
+                  <Pressable
+                    onPress={() => {
+                      const newAddedAssets = addedAssets.filter(
+                        (id: string) => id !== h.heroId
+                      )
+                      setAddedAssets(newAddedAssets)
+                    }}
+                  >
+                    <FontAwesome name='trash-o' size={25} />
+                  </Pressable>
+                ) : (
+                  <Button
+                    text='Add'
+                    onPress={() => {
+                      const newAddedAssets: any[] = addedAssets.concat(h.heroId)
+                      setAddedAssets(newAddedAssets)
+                    }}
+                  />
+                )}
               </View>
             )
           })}
@@ -73,7 +103,14 @@ export const TradeAssetModal: React.FC<Props> = ({
         <Button
           style={{ alignSelf: 'center' }}
           onPress={() => {
-            addAssets()
+            const heroes: any[] = []
+            roster.forEach((h: Hero) => {
+              if (addedAssets.includes(h.heroId)) {
+                heroes.push(h)
+              }
+            })
+            onClose()
+            addAssets(heroes)
           }}
           text='Add assets'
         />

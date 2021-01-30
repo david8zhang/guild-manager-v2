@@ -6,7 +6,7 @@ import { Team } from '../../lib/model/Team'
 import { HeroDrilldownModal, StarterHero } from '../StarterHeroes/components'
 import { FontAwesome } from '@expo/vector-icons'
 import { Portal } from 'react-native-paper'
-import { TradeOffer } from './TradeOffer'
+import TradeOffer from './TradeOffer'
 import { FrontOfficeManager } from '../../lib/FrontOfficeManager'
 
 interface Props {
@@ -25,7 +25,15 @@ export const TeamRosterDrilldown: React.FC<Props> = ({
   const starters = team.getStarters()
 
   if (showTradeOffer) {
-    return <TradeOffer team={team} frontOfficeManager={frontOfficeManager} />
+    return (
+      <TradeOffer
+        team={team}
+        frontOfficeManager={frontOfficeManager}
+        onBack={() => {
+          setShowTradeOffer(false)
+        }}
+      />
+    )
   }
 
   return (

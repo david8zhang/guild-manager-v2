@@ -366,4 +366,85 @@ export class FrontOfficeManager {
       playerDraftPick,
     }
   }
+
+  // Get the trade value of the hero based on their overall, potential, and contract size
+  // Trade values are rated between 1-15. Overall accounts for 12 stars, potential for 3
+  public getHeroTradeValue(hero: Hero) {
+    const overall = hero.getOverall()
+    const potential = hero.potential
+
+    const a = 0.00625
+    const b = -0.7125
+    const c = 21.28
+
+    const overallStarValue = Math.round(
+      a * Math.pow(overall, 2) + b * overall + c
+    )
+
+    return overallStarValue + potential
+  }
+
+  public getSalaryAfterTrade(
+    playerAssets: Hero[],
+    otherTeamAssets: Hero[]
+  ): number {
+    const playerAssetIds = playerAssets.map((h: Hero) => h.heroId)
+    const playerTotalSalary = this.playerTeam.roster
+      .filter((h: Hero) => {
+        return !playerAssetIds.includes(h.heroId)
+      })
+      .concat(otherTeamAssets)
+      .reduce((acc, curr) => {
+        return acc + curr.getContract().amount
+      }, 0)
+
+    return playerTotalSalary
+  }
+
+  // Check if the trade is equitable for the CPU
+  public proposeTrade(
+    playerAssets: Hero[],
+    otherTeamAssets: Hero[],
+    otherTeam: Team
+  ): boolean {
+    const totalHeroTradeValue = playerAssets.reduce((acc, curr) => {
+      return acc + this.getHeroTradeValue(curr)
+    }, 0)
+
+    // Calculate the total asset value that the other team is giving up
+    let otherTeamAssetValue = otherTeamAssets.reduce((acc, curr) => {
+      return acc + this.getHeroTradeValue(curr)
+    }, 0)
+
+    const otherTeamStarters = otherTeam.getStarters()
+    const bestHero = otherTeamStarters.reduce((acc, curr) => {
+      if (acc.getOverall() > curr.getOverall()) {
+        acc = curr
+      }
+      return acc
+    }, otherTeamStarters[0])
+    const isBestHeroTraded =
+      otherTeamStarters.find((h: Hero) => h.heroId === bestHero.heroId) !==
+      undefined
+    if (isBestHeroTraded) {
+      otherTeamAssetValue += 3
+    }
+
+    return totalHeroTradeValue >= otherTeamAssetValue
+  }
+
+  public executeTrade(
+    playerAssets: Hero[],
+    otherTeamAssets: Hero[],
+    otherTeam: Team
+  ): void {
+    playerAssets.forEach((h: Hero) => {
+      this.playerTeam.releaseHero(h.heroId)
+      otherTeam.addHero(h)
+    })
+    otherTeamAssets.forEach((h: Hero) => {
+      this.playerTeam.addHero(h)
+      otherTeam.releaseHero(h.heroId)
+    })
+  }
 }
