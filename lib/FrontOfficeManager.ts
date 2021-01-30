@@ -58,6 +58,10 @@ export class FrontOfficeManager {
     this.teams = teams
   }
 
+  public getTeams(): Team[] {
+    return this.teams
+  }
+
   public getPlayerHeroes(): Hero[] {
     return this.playerTeam.roster
   }

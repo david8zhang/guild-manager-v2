@@ -18,6 +18,7 @@ interface Props {
   isPicked?: boolean
   button?: any
   style?: any
+  innerStyle?: any
 }
 
 export const StarterHero: React.FC<Props> = ({
@@ -32,6 +33,7 @@ export const StarterHero: React.FC<Props> = ({
   hero,
   teamColor,
   style,
+  innerStyle,
 }) => {
   const overall = Math.round((attack + defense + speed) / 3)
   return (
@@ -49,6 +51,7 @@ export const StarterHero: React.FC<Props> = ({
           backgroundColor: 'white',
           height: 115,
           borderRadius: 5,
+          ...innerStyle,
         }}
       >
         <View style={{ flex: 1 }}>

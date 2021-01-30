@@ -50,7 +50,15 @@ const FrontOffice: React.FC<Props> = ({
   }
 
   if (currPage === 'Trades') {
-    return <Trades />
+    return (
+      <Trades
+        navigation={navigation}
+        frontOfficeManager={frontOfficeManager}
+        onBack={() => {
+          setCurrPage('')
+        }}
+      />
+    )
   }
 
   if (currPage === 'Free Agents') {

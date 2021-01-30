@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { FontAwesome } from '@expo/vector-icons'
-import { BackHandler, Pressable, Text, View } from 'react-native'
+import { Pressable, Text, View } from 'react-native'
 import { Hero } from '../../../lib/model/Hero'
 import { Team } from '../../../lib/model/Team'
 import { HeroDrilldownModal, StarterHero } from '../../StarterHeroes/components'
