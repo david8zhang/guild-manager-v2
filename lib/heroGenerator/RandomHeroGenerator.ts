@@ -53,6 +53,8 @@ export class RandomHeroGenerator {
   generateReserveHeroes(numHeroes: number) {
     const minStat = 59
     const maxStat = 70
+    const minAge = 20
+    const maxAge = 23
     const minPotential = 2
 
     let heroes: Hero[] = []
@@ -63,6 +65,8 @@ export class RandomHeroGenerator {
       const factory = new RandomHeroFactory({
         minStat,
         maxStat,
+        minAge,
+        maxAge,
         minPotential,
         contract: this.reserveContract,
       })
@@ -71,12 +75,15 @@ export class RandomHeroGenerator {
     return heroes
   }
 
-  generateAnyHeroType(
-    numHeroes: number,
-    minStat: number,
-    maxStat: number,
+  generateAnyHeroType(config: {
+    numHeroes: number
+    minStat: number
+    maxStat: number
+    minAge: number
+    maxAge: number
     minPotential: number
-  ) {
+  }) {
+    const { minStat, maxStat, minAge, maxAge, numHeroes, minPotential } = config
     let heroes: Hero[] = []
     for (let i = 0; i < numHeroes; i++) {
       const RandomHeroFactory = this.factories[
@@ -85,6 +92,8 @@ export class RandomHeroGenerator {
       const factory = new RandomHeroFactory({
         minStat,
         maxStat,
+        minAge,
+        maxAge,
         minPotential,
         contract: this.reserveContract,
       })

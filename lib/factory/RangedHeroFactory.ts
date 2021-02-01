@@ -14,6 +14,7 @@ export class RangedHeroFactory extends HeroFactory {
           attackRange: 4,
           heroType: HeroType.RANGER,
           heroId: super.generateRandomHeroId(),
+          age: super.generateRandomAge(),
           gender,
           name,
           attack: super.generateNumberWithinRange(

@@ -1,31 +1,36 @@
-import { HeroType } from './model/Hero'
+import { Hero, HeroType } from './model/Hero'
 import { HeroInMatch } from './model/HeroInMatch'
 
-export interface StatGainManagerConfig {
-  playerHeroTeam: HeroInMatch[]
-}
-
 export class StatGainManager {
-  private playerHeroTeam: HeroInMatch[]
-  constructor(config: StatGainManagerConfig) {
-    this.playerHeroTeam = config.playerHeroTeam
-  }
+  public static PRIME_AGE_THRESHOLD = 30
+  constructor() {}
 
   public getStatGains(mvpId: string, heroes: HeroInMatch[]) {
     const statGains: any = {}
     heroes.forEach((hero: HeroInMatch) => {
       const heroRef = hero.getHeroRef()
       const potential = heroRef.potential
+      const age = heroRef.age
       if (
-        StatGainManager.didStatIncrease(potential) ||
+        StatGainManager.didStatIncrease(potential, age) ||
         heroRef.heroId === mvpId
       ) {
         // If the hero is the MVP, they should guarantee a stat increase
         const stat = StatGainManager.getStatsToIncrease(heroRef.heroType)
-        const amountToIncrease = StatGainManager.statIncreaseAmount(
+        let amountToIncrease = StatGainManager.statIncreaseAmount(
           potential,
           stat
         )
+
+        // Don't increase a stat above 99
+        if (
+          hero.getHeroRef().getStat(stat) + amountToIncrease >
+          Hero.getMaxStatAmount(stat)
+        ) {
+          amountToIncrease =
+            Hero.getMaxStatAmount(stat) - hero.getHeroRef().getStat(stat)
+        }
+
         statGains[hero.getHeroRef().heroId] = {
           statToIncrease: stat,
           amountToIncrease,
@@ -91,7 +96,11 @@ export class StatGainManager {
     return statIncreaseAmount
   }
 
-  public static didStatIncrease(potential: number) {
+  public static didStatIncrease(potential: number, age: number): boolean {
+    // If the hero is past their prime age, they no longer will gain stats
+    if (age >= StatGainManager.PRIME_AGE_THRESHOLD) {
+      return false
+    }
     const potentialToPercentArr = [0.05, 0.15, 0.25]
     const percent = potentialToPercentArr[potential - 1]
     return Math.floor(Math.random() * 100) + 1 >= percent * 100

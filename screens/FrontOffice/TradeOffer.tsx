@@ -4,7 +4,7 @@ import { Button } from '../../components'
 import { FrontOfficeManager } from '../../lib/FrontOfficeManager'
 import { Hero } from '../../lib/model/Hero'
 import { Team } from '../../lib/model/Team'
-import { StarterHero } from '../StarterHeroes/components'
+import { HeroDrilldownModal, StarterHero } from '../StarterHeroes/components'
 import { TradeAssetModal } from './TradeAssetModal'
 import { FontAwesome } from '@expo/vector-icons'
 import { connect } from 'react-redux'
@@ -12,6 +12,7 @@ import { connect } from 'react-redux'
 import * as guildActions from '../../redux/guildWidget'
 import * as frontOfficeActions from '../../redux/frontOfficeWidget'
 import * as leagueActions from '../../redux/leagueWidget'
+import { Portal } from 'react-native-paper'
 
 interface Props {
   team: Team
@@ -36,6 +37,7 @@ const TradeOffer: React.FC<Props> = ({
   const [teamToPickAssetsFrom, setTeamToPickAssetsFrom] = React.useState<any>(
     null
   )
+  const [heroToDrilldown, setHeroToDrilldown] = React.useState<any>(null)
 
   const saveAllStates = () => {
     const serializedPlayerTeam = frontOfficeManager.getPlayer().serialize()
@@ -50,6 +52,14 @@ const TradeOffer: React.FC<Props> = ({
   const renderTeamAssetList = (teamToRender: Team, assets: Hero[]) => {
     return (
       <View style={{ flex: 1, padding: 10 }}>
+        <Portal>
+          <HeroDrilldownModal
+            hero={heroToDrilldown}
+            isOpen={heroToDrilldown !== null}
+            onClose={() => setHeroToDrilldown(null)}
+            teamColor={teamToRender.color}
+          />
+        </Portal>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Text style={{ fontSize: 20, flex: 1 }}>{teamToRender.name}</Text>
           <Button
@@ -83,7 +93,9 @@ const TradeOffer: React.FC<Props> = ({
                   defense={h.defense}
                   health={h.health}
                   speed={h.speed}
-                  onShowDetails={() => {}}
+                  onShowDetails={() => {
+                    setHeroToDrilldown(h)
+                  }}
                   potential={h.potential}
                   button={<View />}
                 />

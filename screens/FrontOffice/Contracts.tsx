@@ -48,6 +48,7 @@ export const Contracts: React.FC<Props> = ({
         <Text style={styles.textRow}>{hero.speed}</Text>
         <Text style={styles.textRow}>{hero.magic}</Text>
         <Text style={styles.textRow}>{hero.health}</Text>
+        <Text style={styles.textRow}>{hero.age}</Text>
         <View
           style={{
             flex: 1,
@@ -102,6 +103,7 @@ export const Contracts: React.FC<Props> = ({
               <Text style={styles.headerText}>SPD</Text>
               <Text style={styles.headerText}>MGK</Text>
               <Text style={styles.headerText}>HP</Text>
+              <Text style={styles.headerText}>Age</Text>
               <Text style={styles.headerText}>Pot.</Text>
               <Text style={styles.headerText}>Type</Text>
               <Text style={styles.headerText}>Contract</Text>
@@ -180,7 +182,7 @@ const styles = StyleSheet.create({
   headerText: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: 'bold',
   },
   nameColumn: {

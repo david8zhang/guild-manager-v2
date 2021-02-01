@@ -49,6 +49,7 @@ export class SuperstarFactory extends HeroFactory {
           attackRange: this.heroAttackRange[heroType],
           heroType,
           heroId: super.generateRandomHeroId(),
+          age: super.generateRandomAge(),
           gender,
           name,
           attack: this.generateStat(heroType, 'attack'),

@@ -37,11 +37,13 @@ export const DetailedRoster: React.FC<Props> = ({
         style={{ flexDirection: 'row', height: 35, alignItems: 'center' }}
       >
         <Text style={{ ...styles.nameColumn, fontSize: 13 }}>{hero.name}</Text>
+        <Text style={styles.textRow}>{hero.getOverall()}</Text>
         <Text style={styles.textRow}>{hero.attack}</Text>
         <Text style={styles.textRow}>{hero.defense}</Text>
         <Text style={styles.textRow}>{hero.speed}</Text>
         <Text style={styles.textRow}>{hero.magic}</Text>
         <Text style={styles.textRow}>{hero.health}</Text>
+        <Text style={styles.textRow}>{hero.age}</Text>
         <View
           style={{
             flex: 1,
@@ -76,8 +78,6 @@ export const DetailedRoster: React.FC<Props> = ({
             ? matchStats.totalKills
             : (matchStats.totalKills / matchStats.totalDeaths).toFixed(2)}
         </Text>
-        <Text style={styles.textRow}>{matchStats.totalDeaths}</Text>
-        <Text style={styles.textRow}>{matchStats.totalKills}</Text>
         <Text style={styles.textRow}>{matchStats.totalMatchesPlayed}</Text>
         {onHeroSelect && (
           <View style={{ flex: 1 }}>
@@ -103,18 +103,18 @@ export const DetailedRoster: React.FC<Props> = ({
         <View style={{ flexDirection: 'row', alignItems: 'center' }}></View>
         <View style={{ flexDirection: 'row' }}>
           <Text style={styles.nameColumn}></Text>
+          <Text style={styles.textRow}>OVR</Text>
           <Text style={styles.textRow}>ATK</Text>
           <Text style={styles.textRow}>DEF</Text>
           <Text style={styles.textRow}>SPD</Text>
           <Text style={styles.textRow}>MGK</Text>
           <Text style={styles.textRow}>HP</Text>
+          <Text style={styles.textRow}>Age</Text>
           <Text style={styles.textRow}>Pot.</Text>
           <Text style={styles.textRow}>Type</Text>
           <Text style={styles.textRow}>KPG</Text>
           <Text style={styles.textRow}>DPG</Text>
           <Text style={styles.textRow}>K/D</Text>
-          <Text style={styles.textRow}>TD</Text>
-          <Text style={styles.textRow}>TK</Text>
           <Text style={styles.textRow}>TM</Text>
           {onHeroSelect && <Text style={{ flex: 1 }} />}
         </View>

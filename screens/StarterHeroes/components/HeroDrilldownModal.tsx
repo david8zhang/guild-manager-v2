@@ -35,6 +35,7 @@ export const HeroDrilldownModal: React.FC<Props> = ({
     contract,
     magic,
     moveSet,
+    age,
   } = hero
   const ovr = Math.round((attack + defense + speed) / 3)
   const stars = []
@@ -80,12 +81,26 @@ export const HeroDrilldownModal: React.FC<Props> = ({
               <Text style={{ fontSize: 30 }}>{name}</Text>
               <View
                 style={{
-                  marginTop: 10,
                   flexDirection: 'row',
                   alignItems: 'center',
+                  marginTop: 10,
+                  marginBottom: 15,
                 }}
               >
-                {stars}
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}
+                >
+                  {stars}
+                </View>
+                <Text style={{ marginLeft: 5, fontSize: 20 }}>
+                  |{' '}
+                  <Text style={{ fontStyle: 'italic' }}>
+                    {hero.age || 25} yrs. old
+                  </Text>
+                </Text>
               </View>
             </View>
             <View

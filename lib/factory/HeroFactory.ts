@@ -24,6 +24,8 @@ interface HeroFactoryConfig {
   minPotential?: number
   minHealth?: number
   maxHealth?: number
+  minAge?: number
+  maxAge?: number
   contract: {
     duration: number
     amount: number
@@ -38,6 +40,9 @@ export class HeroFactory {
   public minHealth: number
   public maxHealth: number
   public minPotential: number
+  public minAge: number
+  public maxAge: number
+
   public contract: {
     duration: number
     amount: number
@@ -50,6 +55,8 @@ export class HeroFactory {
     this.maxStat = config.maxStat || 99
     this.minPotential = config.minPotential || 1
     this.contract = config.contract
+    this.minAge = config.minAge || 25
+    this.maxAge = config.maxAge || 28
   }
 
   static getIcon(heroType: string): any {
@@ -71,6 +78,10 @@ export class HeroFactory {
 
   generateRandomGender(): string {
     return this.generateNumberWithinRange(0, 1) === 1 ? 'male' : 'female'
+  }
+
+  generateRandomAge(): number {
+    return Math.floor(Math.random() * (this.maxAge - this.minAge) + this.minAge)
   }
 
   generateRandomHeroId(): string {

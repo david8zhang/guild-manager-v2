@@ -95,9 +95,7 @@ export class MatchManager {
       enemyHeroes: this.enemyHeroes,
       arena: this.arena,
     })
-    this.statGainManager = new StatGainManager({
-      playerHeroTeam: this.playerHeroes,
-    })
+    this.statGainManager = new StatGainManager()
   }
 
   public getAllHeroLocations(): number[][] {

@@ -1,5 +1,4 @@
 import { ActionTypes } from '../enemyAI/CPUBehavior'
-import { CPUHero } from '../enemyAI/CPUHero'
 import { EnemyAIManager } from '../EnemyAIManager'
 import { MatchManager } from '../MatchManager'
 import { Arena } from '../model/Arena'
@@ -158,16 +157,26 @@ export class MatchSimulator {
     heroes.forEach((hero: HeroInMatch) => {
       const heroRef = hero.getHeroRef()
       const potential = heroRef.potential
+      const age = heroRef.age
       if (
-        StatGainManager.didStatIncrease(potential) ||
+        StatGainManager.didStatIncrease(potential, age) ||
         heroRef.heroId === mvpId
       ) {
         // If the hero is the MVP, they should guarantee a stat increase
         const stat = StatGainManager.getStatsToIncrease(heroRef.heroType)
-        const amountToIncrease = StatGainManager.statIncreaseAmount(
+        let amountToIncrease = StatGainManager.statIncreaseAmount(
           potential,
           stat
         )
+
+        if (
+          hero.getHeroRef().getStat(stat) + amountToIncrease >
+          Hero.getMaxStatAmount(stat)
+        ) {
+          amountToIncrease =
+            Hero.getMaxStatAmount(stat) - hero.getHeroRef().getStat(stat)
+        }
+
         statGains[hero.getHeroRef().heroId] = {
           statToIncrease: stat,
           amountToIncrease,
@@ -271,7 +280,7 @@ export class MatchSimulator {
         return coord
       }
     }
-    return [0, 0]
+    return arena.getRandomEmptyLocation()
   }
 
   static simulateMatchupPercentages(team1: Team, team2: Team) {

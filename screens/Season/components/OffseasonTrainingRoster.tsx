@@ -34,6 +34,7 @@ export const OffseasonTrainingRoster: React.FC<Props> = ({
         <Text style={styles.textRow}>{hero.magic}</Text>
         <Text style={styles.textRow}>{hero.speed}</Text>
         <Text style={styles.textRow}>{hero.health}</Text>
+        <Text style={styles.textRow}>{hero.age}</Text>
         <View
           style={{
             flex: 1,
@@ -91,6 +92,7 @@ export const OffseasonTrainingRoster: React.FC<Props> = ({
           <Text style={styles.textRow}>SPD</Text>
           <Text style={styles.textRow}>MGK</Text>
           <Text style={styles.textRow}>HP</Text>
+          <Text style={styles.textRow}>Age</Text>
           <Text style={styles.textRow}>Pot.</Text>
           <Text style={styles.textRow}>Type</Text>
           {onHeroSelect && <Text style={{ flex: 1.75 }} />}

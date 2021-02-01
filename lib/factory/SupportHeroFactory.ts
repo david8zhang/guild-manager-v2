@@ -13,6 +13,7 @@ export class SupportHeroFactory extends HeroFactory {
         new Hero({
           heroType: HeroType.SUPPORT,
           heroId: super.generateRandomHeroId(),
+          age: super.generateRandomAge(),
           gender,
           name,
           attack: super.generateNumberWithinRange(

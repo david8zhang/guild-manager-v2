@@ -110,6 +110,7 @@ const ContractDrilldown: React.FC<Props> = ({
         <Text style={styles.headerText}>SPD</Text>
         <Text style={styles.headerText}>MGK</Text>
         <Text style={styles.headerText}>HP</Text>
+        <Text style={styles.headerText}>Age</Text>
         <Text style={styles.headerText}>Pot.</Text>
         <Text style={styles.headerText}>Type</Text>
         <Text style={styles.headerText}>Contract</Text>
@@ -122,6 +123,7 @@ const ContractDrilldown: React.FC<Props> = ({
         <Text style={styles.textRow}>{hero.speed}</Text>
         <Text style={styles.textRow}>{hero.magic}</Text>
         <Text style={styles.textRow}>{hero.health}</Text>
+        <Text style={styles.textRow}>{hero.age}</Text>
         <View
           style={{
             flex: 1,
@@ -190,6 +192,6 @@ const styles = StyleSheet.create({
   textRow: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 18,
+    fontSize: 17,
   },
 })

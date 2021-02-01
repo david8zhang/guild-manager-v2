@@ -33,6 +33,8 @@ export interface SavedHeroStats {
 }
 
 export class Hero {
+  public static DECAY_PERCENTAGE = 0.05
+
   public heroId: string
   public name: string
   public potential: number
@@ -48,6 +50,7 @@ export class Hero {
   public attackRange: number
   public matchStats: SavedHeroStats
   public isRookie: boolean
+  public age: number
 
   constructor(config: any) {
     this.heroId = config.heroId
@@ -79,6 +82,7 @@ export class Hero {
             averageDeathsPerGame: 0,
             totalMatchesPlayed: 0,
           }
+    this.age = config.age
   }
 
   public serialize(): any {
@@ -98,7 +102,18 @@ export class Hero {
       matchStats: JSON.stringify(this.matchStats),
       isRookie: this.isRookie,
       contract: this.contract,
+      age: this.age,
     }
+  }
+
+  public decayStats(): void {
+    const stats = ['attack', 'defense', 'health', 'speed', 'magic']
+    stats.forEach((stat: string) => {
+      const decayAmount =
+        this.getStat(stat) -
+        Math.round(this.getStat(stat) * Hero.DECAY_PERCENTAGE)
+      this.setStat(stat, decayAmount)
+    })
   }
 
   public setIsRookie(isRookie: boolean) {
@@ -128,6 +143,35 @@ export class Hero {
       default:
         return 0
     }
+  }
+
+  public setStat(stat: string, value: number) {
+    switch (stat) {
+      case 'attack':
+        this.attack = value
+        break
+      case 'defense':
+        this.defense = value
+        break
+      case 'speed':
+        this.speed = value
+        break
+      case 'health':
+        this.health = value
+        break
+      case 'magic':
+        this.magic = value
+        break
+      default:
+        break
+    }
+  }
+
+  public static getMaxStatAmount(stat: string) {
+    if (stat === 'health') {
+      return 400
+    }
+    return 99
   }
 
   public savePostMatchStats(heroStats: HeroStats): void {

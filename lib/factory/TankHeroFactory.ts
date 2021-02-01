@@ -13,6 +13,7 @@ export class TankHeroFactory extends HeroFactory {
         new Hero({
           heroType: HeroType.TANK,
           heroId: super.generateRandomHeroId(),
+          age: super.generateRandomAge(),
           gender,
           name,
           attack: super.generateNumberWithinRange(

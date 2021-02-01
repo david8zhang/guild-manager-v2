@@ -3,6 +3,7 @@ import { RandomHeroGenerator } from './heroGenerator/RandomHeroGenerator'
 import { Hero, Contract } from './model/Hero'
 import { Record } from './model/Record'
 import { Team } from './model/Team'
+import { StatGainManager } from './StatGainManager'
 import { TeamGenerator } from './TeamGenerator'
 
 export interface FreeAgent {
@@ -28,6 +29,25 @@ export class FrontOfficeManager {
       if (hero.getContract().duration == 0) {
         this.expiringHeroes.push(hero)
       }
+    })
+  }
+
+  public incrementHeroAges() {
+    this.teams.forEach((team: Team) => {
+      team.roster.forEach((h: Hero) => {
+        h.age += 1
+      })
+    })
+  }
+
+  // If a hero has gone past their prime age range, they will experience a -5% stat decrease in all stats
+  public processHeroStatDecay() {
+    this.teams.forEach((team: Team) => {
+      team.roster.forEach((h: Hero) => {
+        if (h.age >= StatGainManager.PRIME_AGE_THRESHOLD) {
+          h.decayStats()
+        }
+      })
     })
   }
 
@@ -67,6 +87,8 @@ export class FrontOfficeManager {
   }
 
   public finishDraft() {
+    // Rebalance CPU starters
+    this.rebalanceCPUTeams()
     this.draftClass = []
     this.draftOutcomes = []
     this.hasDraftEnded = true
@@ -74,6 +96,10 @@ export class FrontOfficeManager {
 
   public decrementContractDuration(): void {
     this.playerTeam.roster.forEach((h: Hero) => {
+      // Rookies are no longer rookies after their first season
+      if (h.isRookie) {
+        h.setIsRookie(false)
+      }
       const contract = h.getContract()
       contract.duration--
       if (contract.duration == 0) {
@@ -268,10 +294,22 @@ export class FrontOfficeManager {
   }
 
   // If CPU has too many heroes, release the lowest ones to free agency (set the previousTeamId to null to prevent auto-resigning)
+  public rebalanceCPUTeams() {
+    this.teams.forEach((team: Team) => {
+      if (team.teamId !== this.playerTeam.teamId) {
+        this.rebalanceCPUTeam(team)
+      }
+    })
+  }
+
   public rebalanceCPUTeam(team: Team) {
     const cpuHeroesSortedByOVR = team.roster.sort((a: Hero, b: Hero) => {
       return b.getOverall() - a.getOverall()
     })
+    const finalCPURoster = cpuHeroesSortedByOVR.slice(0, 6)
+    team.starterIds = finalCPURoster
+      .slice(0, 3)
+      .map((hero: Hero) => hero.heroId)
     const cutHeroes = cpuHeroesSortedByOVR.slice(6)
     cutHeroes.forEach((hero: Hero) => {
       team.releaseHero(hero.heroId)
@@ -337,7 +375,14 @@ export class FrontOfficeManager {
       return this.draftClass
     }
     const heroGenerator = new RandomHeroGenerator()
-    const rookies = heroGenerator.generateAnyHeroType(20, 65, 80, 2)
+    const rookies = heroGenerator.generateAnyHeroType({
+      numHeroes: 20,
+      minStat: 65,
+      maxStat: 80,
+      minAge: 20,
+      maxAge: 23,
+      minPotential: 2,
+    })
 
     // Rookie contracts are initially not guaranteed - team can manage them
     rookies.forEach((rookie: Hero) => {
@@ -418,13 +463,13 @@ export class FrontOfficeManager {
 
     const otherTeamStarters = otherTeam.getStarters()
     const bestHero = otherTeamStarters.reduce((acc, curr) => {
-      if (acc.getOverall() > curr.getOverall()) {
+      if (acc.getOverall() < curr.getOverall()) {
         acc = curr
       }
       return acc
     }, otherTeamStarters[0])
     const isBestHeroTraded =
-      otherTeamStarters.find((h: Hero) => h.heroId === bestHero.heroId) !==
+      otherTeamAssets.find((h: Hero) => h.heroId === bestHero.heroId) !==
       undefined
     if (isBestHeroTraded) {
       otherTeamAssetValue += 3
@@ -446,5 +491,6 @@ export class FrontOfficeManager {
       this.playerTeam.addHero(h)
       otherTeam.releaseHero(h.heroId)
     })
+    this.rebalanceCPUTeam(otherTeam)
   }
 }

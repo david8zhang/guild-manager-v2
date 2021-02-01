@@ -128,7 +128,9 @@ const Season: React.FC<Props> = ({
 
   const startOffseason = () => {
     seasonManager.startOffseason()
+    frontOfficeManager.incrementHeroAges()
     frontOfficeManager.decrementContractDuration()
+    frontOfficeManager.processHeroStatDecay()
     setShowPlayoffs(false)
     setShowMatch(false)
     setIsOffseason(true)
