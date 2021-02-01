@@ -130,6 +130,9 @@ export class FrontOfficeManager {
         eligibleFreeAgents[
           Math.floor(Math.random() * eligibleFreeAgents.length)
         ]
+      if (randomFreeAgent.isRookie) {
+        randomFreeAgent.setIsRookie(false)
+      }
       this.freeAgents.push({
         hero: randomFreeAgent,
         previousTeamId: team.teamId,
@@ -313,6 +316,9 @@ export class FrontOfficeManager {
     const cutHeroes = cpuHeroesSortedByOVR.slice(6)
     cutHeroes.forEach((hero: Hero) => {
       team.releaseHero(hero.heroId)
+      if (hero.isRookie) {
+        hero.setIsRookie(false)
+      }
       this.freeAgents.push({
         hero,
         previousTeamId: 'none',

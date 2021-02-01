@@ -11,12 +11,14 @@ interface Props {
   playerTeam: Team
   enemyTeam: Team
   onConfirm: Function
+  onBack: Function
 }
 
 export const LineupConfirm: React.FC<Props> = ({
   playerTeam,
   onConfirm,
   enemyTeam,
+  onBack,
 }) => {
   const [heroToDrilldown, setHeroToDrilldown] = React.useState<any>(null)
   const [teamColorToDrilldown, setTeamColorToDrilldown] = React.useState('')
@@ -141,12 +143,20 @@ export const LineupConfirm: React.FC<Props> = ({
         <View
           style={{
             width: '100%',
+            flexDirection: 'row',
             alignItems: 'flex-end',
             justifyContent: 'flex-end',
             marginBottom: 10,
             flex: 0.5,
           }}
         >
+          <Button
+            style={{ width: 200, padding: 5, marginRight: 10 }}
+            onPress={() => {
+              onBack()
+            }}
+            text='Back'
+          />
           <Button
             style={{ width: 200, padding: 5 }}
             onPress={() => {

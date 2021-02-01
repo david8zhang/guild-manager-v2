@@ -223,6 +223,9 @@ const Season: React.FC<Props> = ({
           serializeAllStates()
           setShowMatch(false)
         }}
+        onBack={() => {
+          setShowMatch(false)
+        }}
       />
     )
   }

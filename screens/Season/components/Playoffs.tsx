@@ -150,6 +150,9 @@ export const Playoffs: React.FC<Props> = ({
           setShowMatch(false)
           onMatchContinue(outcome)
         }}
+        onBack={() => {
+          setShowMatch(false)
+        }}
       />
     )
   }

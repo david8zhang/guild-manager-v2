@@ -14,6 +14,7 @@ interface Props {
   enemyTeam: Team
   onContinue: Function
   isHome: boolean
+  onBack: Function
 }
 
 export const Match: React.FC<Props> = ({
@@ -21,6 +22,7 @@ export const Match: React.FC<Props> = ({
   enemyTeam,
   onContinue,
   isHome,
+  onBack,
 }) => {
   const [matchManager, setMatchManager] = React.useState<MatchManager | null>(
     null
@@ -53,6 +55,9 @@ export const Match: React.FC<Props> = ({
           setScore(matchManager.getScore())
           setTurnsRemaining(matchManager.getTurnsRemaining())
           setLineupConfirmed(true)
+        }}
+        onBack={() => {
+          onBack()
         }}
       />
     )

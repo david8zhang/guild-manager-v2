@@ -19,8 +19,6 @@ interface Props {
 }
 
 export const OverlayMenu: React.FC<Props> = ({
-  cols,
-  menuToShowCoords,
   onAttack,
   onWait,
   onCancel,
