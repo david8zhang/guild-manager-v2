@@ -33,8 +33,6 @@ export interface SavedHeroStats {
 }
 
 export class Hero {
-  public static DECAY_PERCENTAGE = 0.05
-
   public heroId: string
   public name: string
   public potential: number
@@ -51,6 +49,7 @@ export class Hero {
   public matchStats: SavedHeroStats
   public isRookie: boolean
   public age: number
+  public numRings: number
 
   constructor(config: any) {
     this.heroId = config.heroId
@@ -83,6 +82,7 @@ export class Hero {
             totalMatchesPlayed: 0,
           }
     this.age = config.age
+    this.numRings = config.numRings || 0
   }
 
   public serialize(): any {
@@ -103,17 +103,30 @@ export class Hero {
       isRookie: this.isRookie,
       contract: this.contract,
       age: this.age,
+      numRings: this.numRings,
     }
   }
 
-  public decayStats(): void {
+  public decayStats(age: number): void {
     const stats = ['attack', 'defense', 'health', 'speed', 'magic']
     stats.forEach((stat: string) => {
       const decayAmount =
         this.getStat(stat) -
-        Math.round(this.getStat(stat) * Hero.DECAY_PERCENTAGE)
+        Math.round(this.getStat(stat) * this.getDecayPercentage(age))
       this.setStat(stat, decayAmount)
     })
+  }
+
+  public getDecayPercentage(age: number) {
+    if (age >= 40) {
+      return 0.25
+    } else if (age >= 35) {
+      return 0.1
+    } else if (age >= 30) {
+      return 0.05
+    } else {
+      return 0
+    }
   }
 
   public setIsRookie(isRookie: boolean) {

@@ -82,6 +82,10 @@ const Navbar: React.FC<Props> = ({
       name: 'Season',
       value: 'Season',
     },
+    {
+      name: 'Trophy Case',
+      value: 'TrophyCase',
+    },
   ]
   return (
     <View style={navStyle}>

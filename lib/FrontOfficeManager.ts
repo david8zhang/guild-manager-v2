@@ -13,6 +13,8 @@ export interface FreeAgent {
 
 export class FrontOfficeManager {
   public static MAX_SALARY_CAP = 100
+
+  public championships: number[] = []
   public playerTeam: Team
   public expiringHeroes: Hero[] = []
   public teams: Team[]
@@ -45,7 +47,7 @@ export class FrontOfficeManager {
     this.teams.forEach((team: Team) => {
       team.roster.forEach((h: Hero) => {
         if (h.age >= StatGainManager.PRIME_AGE_THRESHOLD) {
-          h.decayStats()
+          h.decayStats(h.age)
         }
       })
     })
@@ -229,6 +231,7 @@ export class FrontOfficeManager {
         hero: fa.hero.serialize(),
         previousTeamId: fa.previousTeamId,
       })),
+      championships: this.championships,
       draftClass: this.draftClass.map((hero: Hero) => hero.serialize()),
       hasDraftEnded: this.hasDraftEnded,
     }
@@ -242,6 +245,7 @@ export class FrontOfficeManager {
     this.draftClass = frontOfficeObj.draftClass.map((hero: Hero) =>
       Hero.deserializeHeroObj(hero)
     )
+    this.championships = frontOfficeObj.championships
     this.hasDraftEnded = frontOfficeObj.hasDraftEnded
   }
 
@@ -401,6 +405,10 @@ export class FrontOfficeManager {
 
     this.draftClass = rookies
     return this.draftClass
+  }
+
+  public addChampionship(seasonNumber: number) {
+    this.championships.push(seasonNumber)
   }
 
   public getDraftOrder(teamRecords: { [teamId: string]: Record }): any {

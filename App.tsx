@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, BackHandler, StatusBar } from 'react-native'
+import { BackHandler, StatusBar } from 'react-native'
 import * as ScreenOrientation from 'expo-screen-orientation'
 import 'react-native-gesture-handler'
 import { NavigationContainer } from '@react-navigation/native'
@@ -12,6 +12,7 @@ import {
   MyTeam,
   FrontOffice,
   Draft,
+  TrophyCase,
 } from './screens'
 import { Provider } from 'react-redux'
 import { store } from './redux/store'
@@ -44,6 +45,7 @@ export default function App() {
           <Drawer.Screen name='MyTeam' component={MyTeam} />
           <Drawer.Screen name='FrontOffice' component={FrontOffice} />
           <Drawer.Screen name='Draft' component={Draft} />
+          <Drawer.Screen name='TrophyCase' component={TrophyCase} />
         </Drawer.Navigator>
       </NavigationContainer>
     </Provider>

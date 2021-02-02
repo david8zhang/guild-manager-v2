@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { CustomModal } from '../../../components/CustomModal'
-import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons'
+import { FontAwesome, Entypo } from '@expo/vector-icons'
 import { TextLink } from '../../../components/TextLink'
 import { MovesetModal } from './MovesetModal'
 import { Portal } from 'react-native-paper'
@@ -95,12 +95,29 @@ export const HeroDrilldownModal: React.FC<Props> = ({
                 >
                   {stars}
                 </View>
-                <Text style={{ marginLeft: 5, fontSize: 20 }}>
-                  |{' '}
-                  <Text style={{ fontStyle: 'italic' }}>
-                    {hero.age || 25} yrs. old
-                  </Text>
+                <Entypo
+                  size={16}
+                  name='dot-single'
+                  style={{ marginLeft: 10, marginRight: 10 }}
+                />
+                <Text style={{ fontStyle: 'italic', fontSize: 20 }}>
+                  {hero.age || 25} yrs. old
                 </Text>
+                {hero.numRings > 0 && (
+                  <Entypo
+                    size={16}
+                    name='dot-single'
+                    style={{ marginLeft: 10, marginRight: 10 }}
+                  />
+                )}
+                {hero.numRings > 0 && (
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <FontAwesome name='trophy' color='#d4af37' size={20} />
+                    <Text style={{ marginLeft: 5, fontSize: 20 }}>
+                      {hero.numRings}
+                    </Text>
+                  </View>
+                )}
               </View>
             </View>
             <View

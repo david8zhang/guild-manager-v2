@@ -97,7 +97,9 @@ const HomeScreen: React.FC<Props> = ({
           <MenuOption
             optionName='Trophy Case'
             iconName='trophy'
-            onPress={() => {}}
+            onPress={() => {
+              navigation.navigate('TrophyCase')
+            }}
           />
         </ScrollView>
       </View>

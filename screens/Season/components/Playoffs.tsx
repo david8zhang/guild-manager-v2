@@ -17,9 +17,11 @@ import { ChampionshipResultsModal } from './ChampionshipResultsModal'
 import { Record } from '../../../lib/model/Record'
 import { Portal } from 'react-native-paper'
 import { MatchSimulator } from '../../../lib/simulation/MatchSimulator'
+import { FrontOfficeManager } from '../../../lib/FrontOfficeManager'
 
 interface Props {
   seasonManager: SeasonManager
+  frontOfficeManager: FrontOfficeManager
   onMatchContinue: Function
   proceedToOffseason: Function
   navigation: any
@@ -27,6 +29,7 @@ interface Props {
 
 export const Playoffs: React.FC<Props> = ({
   seasonManager,
+  frontOfficeManager,
   onMatchContinue,
   proceedToOffseason,
   navigation,
@@ -183,6 +186,14 @@ export const Playoffs: React.FC<Props> = ({
     onMatchContinue(outcome)
   }
 
+  const processChampionshipResult = (didWin: boolean) => {
+    if (didWin) {
+      frontOfficeManager.addChampionship(seasonManager.seasonNumber)
+      seasonManager.addRingsToPlayerHeroes()
+    }
+    proceedToOffseason()
+  }
+
   const renderBracket = () => {
     const numTotalRounds = playoffBracket.getNumTotalRounds()
     const rightSide: any[] = []
@@ -246,7 +257,9 @@ export const Playoffs: React.FC<Props> = ({
           isOpen={playoffsOutcome !== ''}
           didWin={playoffsOutcome === 'win'}
           seasonManager={seasonManager}
-          onContinue={() => proceedToOffseason()}
+          onContinue={() => {
+            processChampionshipResult(playoffsOutcome === 'win')
+          }}
         />
         {renderBracket()}
         <View

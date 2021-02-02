@@ -256,6 +256,7 @@ const Season: React.FC<Props> = ({
     return (
       <Playoffs
         navigation={navigation}
+        frontOfficeManager={frontOfficeManager}
         seasonManager={seasonManager}
         onMatchContinue={() => {
           serializeAllStates()

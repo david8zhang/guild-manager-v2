@@ -14,6 +14,7 @@ import { DEBUG_CONFIG } from './constants/debugConfig'
 export class SeasonManager {
   private static NUM_PLAYOFF_TEAMS = 4
 
+  public seasonNumber: number = 1
   public numGamesInSeason: number = DEBUG_CONFIG.numGamesInSeason || 14
   public teamRecords: any = {}
   public teams: Team[] = []
@@ -195,6 +196,7 @@ export class SeasonManager {
       serializedTeamRecords[key] = record.serialize()
     })
     return {
+      seasonNumber: this.seasonNumber,
       schedule: this.playerSeasonSchedule.serialize(),
       teamRecords: serializedTeamRecords,
       playoffBracket: this.playoffBracket
@@ -241,7 +243,9 @@ export class SeasonManager {
       teamRecords,
       playoffBracket,
       isOffseason,
+      seasonNumber,
     } = serializedSeasonObj
+    this.seasonNumber = parseInt(seasonNumber)
     this.playerSeasonSchedule = Schedule.deserializeObj(schedule, this.teams)
     this.teamRecords = {}
     Object.keys(teamRecords).forEach((key: string) => {
@@ -289,6 +293,7 @@ export class SeasonManager {
 
   // Officially end the season, all contract logic should also go through here
   public startOffseason() {
+    this.seasonNumber += 1
     this.playoffBracket = null
     this.isOffseason = true
   }
@@ -304,6 +309,13 @@ export class SeasonManager {
         return acc + curr.getStat(stat.toLowerCase())
       }, 0) / heroes.length
     return Math.round(statAvg)
+  }
+
+  // Whenever the player heroes win a championship, increment their championship counter
+  public addRingsToPlayerHeroes(): void {
+    this.playerTeam.getStarters().forEach((h: Hero) => {
+      h.numRings += 1
+    })
   }
 
   // Train a set of specific stats
