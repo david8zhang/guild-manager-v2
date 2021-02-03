@@ -115,15 +115,19 @@ export class HeroInMatch {
   public getNumAttacks(): number {
     const speed = this.getHeroRef().speed
 
-    // If the speed is greater than 80, there is a 50% chance of attacking twice
-    if (speed >= 80) {
+    // If the speed is greater than 95, there is a 50% chance of attacking twice
+    if (speed >= 95) {
       return Math.floor(Math.random() * 100) <= 50 ? 2 : 1
     }
-
-    // If the speed is greater than 90, there is a 75% chance of attacking twice
-    if (speed >= 90) {
-      return Math.floor(Math.random() * 100) <= 75 ? 2 : 1
+    // If the speed is greater than 85, there is a 25% chance of attacking twice
+    if (speed >= 85) {
+      return Math.floor(Math.random() * 100) <= 25 ? 2 : 1
     }
+    // If the speed is greater than 75, there is a 15% chance of attacking twice
+    if (speed >= 75) {
+      return Math.floor(Math.random() * 100) <= 15 ? 2 : 1
+    }
+
     return 1
   }
 
