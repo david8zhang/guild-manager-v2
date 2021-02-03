@@ -138,7 +138,9 @@ export class Hero {
   }
 
   public getOverall(): number {
-    return Math.round((this.attack + this.defense + this.speed) / 3)
+    return Math.round(
+      (this.attack + this.defense + this.speed + this.magic) / 4
+    )
   }
 
   public getStat(stat: string): number {

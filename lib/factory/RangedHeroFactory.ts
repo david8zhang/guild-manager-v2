@@ -17,18 +17,12 @@ export class RangedHeroFactory extends HeroFactory {
           age: super.generateRandomAge(),
           gender,
           name,
-          attack: super.generateNumberWithinRange(
-            this.minStat + 5,
-            this.maxStat + 5
-          ),
+          attack: super.generateNumberWithinRange(this.minStat, this.maxStat),
           defense: super.generateNumberWithinRange(
             this.minStat - 10,
             this.maxStat - 10
           ),
-          magic: super.generateNumberWithinRange(
-            this.minStat - 10,
-            this.maxStat - 10
-          ),
+          magic: super.generateNumberWithinRange(this.minStat, this.maxStat),
           speed: super.generateNumberWithinRange(
             this.minStat + 5,
             this.maxStat + 5

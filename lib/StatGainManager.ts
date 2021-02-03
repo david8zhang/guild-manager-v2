@@ -46,7 +46,7 @@ export class StatGainManager {
     let increasableStats = []
     switch (heroType) {
       case HeroType.RANGER: {
-        increasableStats = ['attack', 'speed']
+        increasableStats = ['speed']
         break
       }
       case HeroType.SUPPORT: {
@@ -54,7 +54,7 @@ export class StatGainManager {
         break
       }
       case HeroType.TANK: {
-        increasableStats = ['health', 'defense']
+        increasableStats = ['defense']
         break
       }
     }

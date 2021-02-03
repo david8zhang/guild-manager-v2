@@ -1,5 +1,5 @@
 import { HeroStats } from './HeroStats'
-import { Hero } from './Hero'
+import { Hero, HeroType } from './Hero'
 
 export interface AttackResult {
   damageDealt: number
@@ -17,6 +17,21 @@ export interface Buff {
 const RESPAWN_TIME = 3
 const UNTARGET_TIME = 1
 const BUFF_DURATION = 2
+
+const COUNTERS = {
+  [HeroType.SUPPORT]: {
+    type: HeroType.TANK,
+    multiplier: 2,
+  },
+  [HeroType.RANGER]: {
+    type: HeroType.SUPPORT,
+    multiplier: 2,
+  },
+  [HeroType.TANK]: {
+    type: HeroType.RANGER,
+    multiplier: 2,
+  },
+}
 
 export class HeroInMatch {
   private hero: Hero
@@ -82,31 +97,52 @@ export class HeroInMatch {
   }
 
   public getMoveRange(): number {
-    const speedToRangeMap: any = {
-      '50-59': 2,
-      '60-69': 3,
-      '70-79': 4,
-      '80-89': 5,
-      '90-100': 6,
-    }
-    let range: number = 0
-    Object.keys(speedToRangeMap).forEach((key: string) => {
-      const ranges = key.split('-')
-      const bottom = parseInt(ranges[0], 10)
-      const top = parseInt(ranges[1], 10)
-      if (this.hero.speed >= bottom && this.hero.speed <= top) {
-        range = speedToRangeMap[key]
+    switch (this.hero.heroType) {
+      case HeroType.RANGER: {
+        return 5
       }
-    })
-    return range
+      case HeroType.SUPPORT: {
+        return 4
+      }
+      case HeroType.TANK: {
+        return 3
+      }
+      default:
+        return 4
+    }
+  }
+
+  public getNumAttacks(): number {
+    const speed = this.getHeroRef().speed
+
+    // If the speed is greater than 80, there is a 50% chance of attacking twice
+    if (speed >= 80) {
+      return Math.floor(Math.random() * 100) <= 50 ? 2 : 1
+    }
+
+    // If the speed is greater than 90, there is a 75% chance of attacking twice
+    if (speed >= 90) {
+      return Math.floor(Math.random() * 100) <= 75 ? 2 : 1
+    }
+    return 1
   }
 
   public calculateDamage(targetHero: HeroInMatch) {
     if (!targetHero) {
       return 0
     }
-    const targetDefense = targetHero.getStatsWithBuffs().defense
-    const diff = this.getStatsWithBuffs().attack - targetDefense
+    const targetStats = targetHero.getStatsWithBuffs()
+    const userStats = this.getStatsWithBuffs()
+
+    const targetDefense =
+      this.getHeroRef().heroType === HeroType.SUPPORT
+        ? targetStats.magic
+        : targetStats.defense
+    const damageStat =
+      this.getHeroRef().heroType === HeroType.SUPPORT
+        ? userStats.magic
+        : userStats.attack
+    const diff = damageStat - targetDefense
     return (37 * Math.max(diff, 0)) / 8 + 15
   }
 
@@ -168,6 +204,11 @@ export class HeroInMatch {
       if (didCrit) {
         damage *= 3
       }
+    }
+
+    const thisHeroType = this.getHeroRef().heroType
+    if (COUNTERS[thisHeroType].type === target.getHeroRef().heroType) {
+      damage *= COUNTERS[thisHeroType].multiplier
     }
 
     damage = Math.floor(damage)

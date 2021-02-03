@@ -17,16 +17,16 @@ export class SupportHeroFactory extends HeroFactory {
           gender,
           name,
           attack: super.generateNumberWithinRange(
-            this.minStat - 10,
-            this.maxStat - 10
+            this.minStat - 5,
+            this.maxStat - 5
           ),
           defense: super.generateNumberWithinRange(
             this.minStat - 10,
             this.maxStat - 10
           ),
           magic: super.generateNumberWithinRange(
-            this.minStat + 5,
-            this.maxStat + 5
+            this.minStat + 10,
+            this.maxStat + 10
           ),
           speed: super.generateNumberWithinRange(this.minStat, this.maxStat),
           health: super.generateNumberWithinRange(

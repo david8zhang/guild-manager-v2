@@ -219,20 +219,31 @@ export class MatchSimulator {
           const user = actionResult.user as HeroInMatch
 
           // User attacks
-          user.attack(target)
-          if (target.isDead) {
-            user.addKillToRecord()
-            target.addDeathToRecord()
-            respawnHero(target, 2)
-            score[thisTeamName] += 2
-          } else {
-            // Target retaliates if possible
-            target.attack(user)
-            if (user.isDead) {
-              target.addKillToRecord()
-              user.addDeathToRecord()
-              respawnHero(user, 1)
-              score[otherTeamName] += 2
+          let isTargetDead = false
+          const numAttacks = user.getNumAttacks()
+          for (let i = 0; i < numAttacks; i++) {
+            user.attack(target)
+            if (target.isDead) {
+              isTargetDead = true
+              user.addKillToRecord()
+              target.addDeathToRecord()
+              respawnHero(target, 2)
+              score[thisTeamName] += 2
+              break
+            }
+          }
+
+          // Target retaliates
+          if (!isTargetDead) {
+            const numTargetAttacks = target.getNumAttacks()
+            for (let i = 0; i < numTargetAttacks; i++) {
+              target.attack(user)
+              if (user.isDead) {
+                target.addKillToRecord()
+                user.addDeathToRecord()
+                respawnHero(user, 1)
+                score[otherTeamName] += 2
+              }
             }
           }
         }

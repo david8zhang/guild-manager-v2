@@ -23,9 +23,6 @@ interface Props {
 
 export const StarterHero: React.FC<Props> = ({
   onShowDetails,
-  attack,
-  defense,
-  speed,
   onPick,
   isPicked,
   name,
@@ -35,7 +32,7 @@ export const StarterHero: React.FC<Props> = ({
   style,
   innerStyle,
 }) => {
-  const overall = Math.round((attack + defense + speed) / 3)
+  const overall = hero.getOverall()
   return (
     <View
       style={{

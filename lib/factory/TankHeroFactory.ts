@@ -16,16 +16,13 @@ export class TankHeroFactory extends HeroFactory {
           age: super.generateRandomAge(),
           gender,
           name,
-          attack: super.generateNumberWithinRange(
-            this.minStat - 10,
-            this.maxStat - 10
-          ),
+          attack: super.generateNumberWithinRange(this.minStat, this.maxStat),
           defense: super.generateNumberWithinRange(
             this.minStat + 5,
             this.maxStat + 5
           ),
           magic: super.generateNumberWithinRange(
-            this.minStat,
+            this.minStat - 10,
             this.maxStat - 10
           ),
           speed: super.generateNumberWithinRange(this.minStat, this.maxStat),

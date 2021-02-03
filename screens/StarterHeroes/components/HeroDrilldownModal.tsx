@@ -37,7 +37,7 @@ export const HeroDrilldownModal: React.FC<Props> = ({
     moveSet,
     age,
   } = hero
-  const ovr = Math.round((attack + defense + speed) / 3)
+  const ovr = hero.getOverall()
   const stars = []
   for (let i = 0; i < potential; i++) {
     stars.push(<FontAwesome key={`star-${i}`} name='star' size={20} />)
