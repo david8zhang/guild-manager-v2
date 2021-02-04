@@ -8,19 +8,10 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
   - Change "support" name to "mage"
   - Make it so spells can be used by any hero type, but spells can only be used a limited number of times per match
-  - Training a stat that does not align with hero's type grows more slowly
-    - Tanks:
-      - Low Growth: Speed, Magic
-      - Medium Growth: Attack, Health
-      - High Growth: Defense
-    - Rangers:
-      - Low Growth: Defense, Magic
-      - Medium Growth: Attack, Health
-      - High Growth: Speed
-    - Support:
-      - Low Growth: Attack, Speed
-      - Medium Growth: Defense, Health
-      - High Growth: Magic
+  - Allow any stat to grow during matches, but:
+    - rangers have higher chance to increase speed
+    - tanks have higher chance to increase defense
+    - mages have higher chance to increase attack
 
 - Add random injury chance, which will require a swap
 - Show scores of previous matches

@@ -43,21 +43,7 @@ export class StatGainManager {
   }
 
   public static getStatsToIncrease(heroType: HeroType): string {
-    let increasableStats = []
-    switch (heroType) {
-      case HeroType.RANGER: {
-        increasableStats = ['speed']
-        break
-      }
-      case HeroType.SUPPORT: {
-        increasableStats = ['magic']
-        break
-      }
-      case HeroType.TANK: {
-        increasableStats = ['defense']
-        break
-      }
-    }
+    const increasableStats = ['attack', 'health', 'magic', 'defense', 'speed']
     return increasableStats[Math.floor(Math.random() * increasableStats.length)]
   }
 
