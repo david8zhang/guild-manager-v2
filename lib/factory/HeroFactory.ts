@@ -72,16 +72,12 @@ export class HeroFactory {
     }
   }
 
-  getHeroes(numHeroes: number): Hero[] {
-    return []
-  }
-
   generateRandomGender(): string {
     return this.generateNumberWithinRange(0, 1) === 1 ? 'male' : 'female'
   }
 
   generateRandomAge(): number {
-    return Math.floor(Math.random() * (this.maxAge - this.minAge) + this.minAge)
+    return this.generateNumberWithinRange(this.minAge, this.maxAge)
   }
 
   generateRandomHeroId(): string {
