@@ -4,8 +4,16 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
+- Add a player hall of fame
+- Allow CPU teams to win championship
+- Show a championship count for each team
+- News headlines:
+  - Trades
+  - Championships
+
 ## Future Features (ordered by priority)
 
+- CPU Trading
 - Add random injury chance, which will require a swap
 - Percentage chance for "Breakout" events in training and matches, where the hero suddenly increases multiple stats by a dramatic amount
 - Enemy teams are subject to contract growth per season
