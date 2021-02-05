@@ -22,6 +22,7 @@ export class SeasonManager {
   public playerSeasonSchedule: Schedule
   public playoffBracket: any
   public isOffseason: boolean
+  public matchResults: any[]
 
   constructor(playerObj: any, leagueObj: any) {
     this.playerTeam = Team.deserializeObj(playerObj)
@@ -38,6 +39,7 @@ export class SeasonManager {
     })
     this.playoffBracket = null
     this.isOffseason = false
+    this.matchResults = []
   }
 
   public setPlayerTeam(playerTeam: Team) {
@@ -50,6 +52,26 @@ export class SeasonManager {
 
   public getTeamRecord(teamId: string) {
     return this.teamRecords[teamId]
+  }
+
+  public getMatchResults() {
+    return this.matchResults
+  }
+
+  public getMatchResultAtIndex(index: number) {
+    if (index >= this.matchResults.length) {
+      return null
+    }
+    return this.matchResults[index]
+  }
+
+  public addMatchResult(matchResult: {
+    playerScore: number
+    enemyScore: number
+    enemyTeamId: string
+    isHome: boolean
+  }): void {
+    this.matchResults.push(matchResult)
   }
 
   public applyStatIncreases(
@@ -203,6 +225,7 @@ export class SeasonManager {
         ? this.playoffBracket.serialize()
         : null,
       isOffseason: this.isOffseason,
+      matchResults: this.matchResults,
     }
   }
 
@@ -244,10 +267,12 @@ export class SeasonManager {
       playoffBracket,
       isOffseason,
       seasonNumber,
+      matchResults,
     } = serializedSeasonObj
     this.seasonNumber = parseInt(seasonNumber)
     this.playerSeasonSchedule = Schedule.deserializeObj(schedule, this.teams)
     this.teamRecords = {}
+    this.matchResults = matchResults
     Object.keys(teamRecords).forEach((key: string) => {
       this.teamRecords[key] = Record.deserializeObj(teamRecords[key])
     })
@@ -296,6 +321,7 @@ export class SeasonManager {
     this.seasonNumber += 1
     this.playoffBracket = null
     this.isOffseason = true
+    this.matchResults = []
   }
 
   public getIsOffseason() {

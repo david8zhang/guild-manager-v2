@@ -4,7 +4,6 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
-- Show scores of previous matches
 - Enemy teams are subject to contract growth per season
 - Percentage chance for "Breakout" events in training and matches, where the hero suddenly increases multiple stats by a dramatic amount
 

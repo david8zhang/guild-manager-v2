@@ -76,6 +76,10 @@ export const Match: React.FC<Props> = ({
           heroMatchStats: {
             [heroId: string]: HeroStats
           }
+          score: {
+            playerScore: number
+            enemyScore: number
+          }
         }) => {
           onContinue(outcome)
         }}

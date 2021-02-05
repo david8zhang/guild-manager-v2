@@ -12,6 +12,7 @@ import { RosterPreview } from './components/RosterPreview'
 import { Playoffs } from './components/Playoffs'
 import { SeasonOverModal } from './components/SeasonOverModal'
 import { Offseason } from './components/Offseason'
+import { MatchScore } from './components/MatchScore'
 
 // Game State
 import { Team } from '../../lib/model/Team'
@@ -70,6 +71,9 @@ const Season: React.FC<Props> = ({
   const [showSeasonOver, setShowSeasonOver] = React.useState<boolean>(false)
   const [isOffseason, setIsOffseason] = React.useState<boolean>(false)
 
+  // For viewing previous match scores
+  const [matchToView, setMatchToView] = React.useState<number>(0)
+
   React.useEffect(() => {
     const seasonManager = new SeasonManager(guild, league)
     const frontOfficeManager = new FrontOfficeManager(guild, null)
@@ -93,6 +97,10 @@ const Season: React.FC<Props> = ({
     setFrontOfficeManager(frontOfficeManager)
     setShowPlayoffs(seasonManager.getPlayoffBracket() !== null)
     setIsOffseason(seasonManager.getIsOffseason())
+
+    // Set the current match to view
+    const schedule: Schedule = seasonManager.getPlayerSchedule()
+    setMatchToView(schedule.getCurrentMatchupIndex())
   }, [guild, frontOffice, league])
 
   if (!seasonManager || !frontOfficeManager) {
@@ -178,6 +186,9 @@ const Season: React.FC<Props> = ({
     const team2 = seasonManager.getTeam(currentMatchup.teamInfo.teamId) as Team
     const outcome = MatchSimulator.simulateMatchup(team1, team2)
 
+    const playerScore = outcome.score[team1.name]
+    const enemyScore = outcome.score[team2.name]
+
     const loserId =
       outcome.winnerId === team1.teamId ? team2.teamId : team1.teamId
     updateTeamRecords({
@@ -194,6 +205,12 @@ const Season: React.FC<Props> = ({
       team2.teamId,
       outcome.statIncreases[team2.teamId]
     )
+    seasonManager.addMatchResult({
+      playerScore,
+      enemyScore,
+      enemyTeamId: team2.teamId,
+      isHome: currentMatchup.isHome,
+    })
     serializeAllStates()
     setShowMatch(false)
   }
@@ -216,9 +233,20 @@ const Season: React.FC<Props> = ({
           heroMatchStats: {
             [heroId: string]: HeroStats
           }
+          score: {
+            playerScore: number
+            enemyScore: number
+          }
         }) => {
+          const { score } = outcome
           saveHeroMatchStats(outcome.heroMatchStats)
           applyTeamStatIncreases(outcome.statIncreases)
+          seasonManager.addMatchResult({
+            playerScore: score.playerScore,
+            enemyScore: score.enemyScore,
+            enemyTeamId: outcome.enemyId,
+            isHome: currentMatchup.isHome,
+          })
           updateTeamRecords(outcome)
           serializeAllStates()
           setShowMatch(false)
@@ -268,6 +296,67 @@ const Season: React.FC<Props> = ({
     )
   }
 
+  const renderMatchupView = () => {
+    if (matchToView === schedule.getCurrentMatchupIndex()) {
+      return (
+        <View
+          style={{
+            flex: 5,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {currentMatchup.isHome ? (
+            <MatchupTeam
+              team={playerTeam}
+              record={seasonManager.getTeamRecord(playerTeam.teamId)}
+            />
+          ) : (
+            <MatchupTeam
+              team={currentMatchup.teamInfo}
+              record={seasonManager.getTeamRecord(
+                currentMatchup.teamInfo.teamId
+              )}
+            />
+          )}
+          <Text style={{ fontSize: 20, textAlign: 'center' }}>@</Text>
+          {currentMatchup.isHome ? (
+            <MatchupTeam
+              team={currentMatchup.teamInfo}
+              record={seasonManager.getTeamRecord(
+                currentMatchup.teamInfo.teamId
+              )}
+            />
+          ) : (
+            <MatchupTeam
+              team={playerTeam}
+              record={seasonManager.getTeamRecord(playerTeam.teamId)}
+            />
+          )}
+        </View>
+      )
+    } else {
+      const matchResult = seasonManager.getMatchResultAtIndex(matchToView)
+      if (matchResult) {
+        const team = seasonManager.getTeam(matchResult.enemyTeamId) as Team
+        const playerTeam = seasonManager.getPlayer()
+        const { isHome, playerScore, enemyScore } = matchResult
+        return (
+          <MatchScore
+            team={team}
+            isHome={isHome}
+            playerTeam={playerTeam}
+            playerScore={playerScore}
+            enemyScore={enemyScore}
+          />
+        )
+      } else {
+        return <View />
+      }
+    }
+  }
+
   return (
     <Portal.Host>
       <View style={{ flex: 1, backgroundColor: 'white' }}>
@@ -282,45 +371,16 @@ const Season: React.FC<Props> = ({
         <View style={{ flexDirection: 'row' }}>
           <View style={{ flex: 1.4, flexDirection: 'column' }}>
             <SeasonCalendar
+              matchIndexToBold={matchToView}
               currentMatchIndex={schedule.getCurrentMatchIndex()}
               matchList={schedule.getMatchupList()}
-            />
-            <View
-              style={{
-                flex: 5,
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
+              onMatchPress={(index: number) => {
+                if (index <= schedule.getCurrentMatchIndex()) {
+                  setMatchToView(index)
+                }
               }}
-            >
-              {currentMatchup.isHome ? (
-                <MatchupTeam
-                  team={playerTeam}
-                  record={seasonManager.getTeamRecord(playerTeam.teamId)}
-                />
-              ) : (
-                <MatchupTeam
-                  team={currentMatchup.teamInfo}
-                  record={seasonManager.getTeamRecord(
-                    currentMatchup.teamInfo.teamId
-                  )}
-                />
-              )}
-              <Text style={{ fontSize: 20, textAlign: 'center' }}>@</Text>
-              {currentMatchup.isHome ? (
-                <MatchupTeam
-                  team={currentMatchup.teamInfo}
-                  record={seasonManager.getTeamRecord(
-                    currentMatchup.teamInfo.teamId
-                  )}
-                />
-              ) : (
-                <MatchupTeam
-                  team={playerTeam}
-                  record={seasonManager.getTeamRecord(playerTeam.teamId)}
-                />
-              )}
-            </View>
+            />
+            {renderMatchupView()}
             <View
               style={{
                 flexDirection: 'row',

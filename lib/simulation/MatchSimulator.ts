@@ -16,6 +16,9 @@ interface MatchOutcome {
   statIncreases: {
     [teamId: string]: any
   }
+  score: {
+    [teamName: string]: number
+  }
 }
 
 export class MatchSimulator {
@@ -132,6 +135,10 @@ export class MatchSimulator {
         [team1.teamId]: team1StatGains,
         [team2.teamId]: team2StatGains,
       },
+      score: {
+        [team1.name]: score[team1.name],
+        [team2.name]: score[team2.name]
+      }
     }
   }
 

@@ -1,16 +1,20 @@
 import * as React from 'react'
-import { Dimensions, Text, View } from 'react-native'
+import { Pressable, Text, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Team } from '../../../lib/model/Team'
 
 interface Props {
   currentMatchIndex: number
   matchList: any[]
+  onMatchPress: Function
+  matchIndexToBold: number
 }
 
 export const SeasonCalendar: React.FC<Props> = ({
   currentMatchIndex,
   matchList,
+  onMatchPress,
+  matchIndexToBold,
 }) => {
   const [ref, setRef] = React.useState<any>(null)
 
@@ -32,15 +36,21 @@ export const SeasonCalendar: React.FC<Props> = ({
     >
       {matchList.map((m, index: number) => {
         return (
-          <View key={`match-${index}`} style={{ margin: 10 }}>
+          <Pressable
+            key={`match-${index}`}
+            style={{ margin: 10 }}
+            onPress={() => {
+              onMatchPress(index)
+            }}
+          >
             <Text
               style={{
-                fontWeight: currentMatchIndex === index ? 'bold' : 'normal',
+                fontWeight: matchIndexToBold === index ? 'bold' : 'normal',
               }}
             >
               {Team.getNameAbbrevForName(m.teamInfo.name)}
             </Text>
-          </View>
+          </Pressable>
         )
       })}
     </ScrollView>

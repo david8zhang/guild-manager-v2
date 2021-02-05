@@ -102,7 +102,7 @@ export class Hero {
       matchStats: JSON.stringify(this.matchStats),
       isRookie: this.isRookie,
       contract: this.contract,
-      age: this.age,
+      age: this.age || 25,
       numRings: this.numRings,
     }
   }

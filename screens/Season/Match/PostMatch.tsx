@@ -110,6 +110,10 @@ export const PostMatch: React.FC<Props> = ({
                 enemyId: enemyTeamId,
                 statIncreases,
                 heroMatchStats,
+                score: {
+                  playerScore,
+                  enemyScore,
+                },
               })
             }}
           />
