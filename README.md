@@ -4,12 +4,12 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
-- Enemy teams are subject to contract growth per season
-- Percentage chance for "Breakout" events in training and matches, where the hero suddenly increases multiple stats by a dramatic amount
-
 ## Future Features (ordered by priority)
 
 - Add random injury chance, which will require a swap
+- Percentage chance for "Breakout" events in training and matches, where the hero suddenly increases multiple stats by a dramatic amount
+- Enemy teams are subject to contract growth per season
+- Enemy initiate trades
 - Hero "aura"
 
   - builds up every turn (including turns when dead), increases signifcantly whenever hero earns a kill
