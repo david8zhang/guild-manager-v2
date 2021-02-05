@@ -13,6 +13,11 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Future Features (ordered by priority)
 
+- Make the entire game simulation based
+
+  - Create a "sim cast" play by play announcement
+  - Remove fire emblem gameplay :(
+
 - CPU Trading
 - Add random injury chance, which will require a swap
 - Percentage chance for "Breakout" events in training and matches, where the hero suddenly increases multiple stats by a dramatic amount
