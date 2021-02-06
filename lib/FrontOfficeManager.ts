@@ -1,6 +1,6 @@
 import { TEAM_NAMES } from './constants/fullTeamNames'
 import { RandomHeroGenerator } from './heroGenerator/RandomHeroGenerator'
-import { Hero, Contract } from './model/Hero'
+import { Hero, Contract, HeroType } from './model/Hero'
 import { Record } from './model/Record'
 import { Team } from './model/Team'
 import { StatGainManager } from './StatGainManager'
@@ -11,10 +11,25 @@ export interface FreeAgent {
   previousTeamId: string
 }
 
+export interface HallOfFamer {
+  heroId: string
+  name: string
+  type: HeroType
+  image: any
+  team: {
+    id: string
+    name: string
+  }
+  overall: number
+  rings: number
+  playoffs: number
+}
+
 export class FrontOfficeManager {
   public static MAX_SALARY_CAP = 100
 
   public championships: number[] = []
+  public hallOfFamers: HallOfFamer[] = []
   public playerTeam: Team
   public expiringHeroes: Hero[] = []
   public teams: Team[]
@@ -64,6 +79,47 @@ export class FrontOfficeManager {
         Team.deserializeObj(team)
       )
     }
+  }
+
+  public addHallOfFamers() {
+    this.teams.forEach((team: Team) => {
+      team.roster.forEach((h: Hero) => {
+        if (this.checkHallOfFameCriteria(h) && !this.isAlreadyHallOfFamer(h)) {
+          this.hallOfFamers.push({
+            heroId: h.heroId,
+            name: h.name,
+            type: h.heroType,
+            image: h.heroImageData,
+            team: {
+              name: team.name,
+              id: team.teamId,
+            },
+            overall: h.highestOVR,
+            rings: h.numRings,
+            playoffs: h.numPlayoffs,
+          })
+        }
+      })
+    })
+  }
+
+  public getHallOfFamers(): HallOfFamer[] {
+    return this.hallOfFamers
+  }
+
+  public isAlreadyHallOfFamer(h: Hero) {
+    return (
+      this.hallOfFamers.find((hof: any) => hof.heroId === h.heroId) !==
+      undefined
+    )
+  }
+
+  public checkHallOfFameCriteria(h: Hero): boolean {
+    const ovrPoints: number = h.highestOVR >= 95 ? 6 : 0
+    const championshipPoints: number = h.numRings > 1 ? 3 : 0
+    const playoffPoints: number = h.numPlayoffs > 5 ? 3 : 0
+    const total = ovrPoints + championshipPoints + playoffPoints
+    return total >= 9
   }
 
   public getSerializedNonPlayerTeams(): any[] {
@@ -234,6 +290,7 @@ export class FrontOfficeManager {
       championships: this.championships,
       draftClass: this.draftClass.map((hero: Hero) => hero.serialize()),
       hasDraftEnded: this.hasDraftEnded,
+      hallOfFamers: this.hallOfFamers,
     }
   }
 
@@ -247,6 +304,7 @@ export class FrontOfficeManager {
     )
     this.championships = frontOfficeObj.championships
     this.hasDraftEnded = frontOfficeObj.hasDraftEnded
+    this.hallOfFamers = frontOfficeObj.hallOfFamers
   }
 
   public getProjectedSalaryCap(
@@ -349,7 +407,8 @@ export class FrontOfficeManager {
   }
 
   public getTeam(teamId: string): Team {
-    return this.teams.find((t: Team) => t.teamId == teamId) as Team
+    const allTeams = this.teams.concat(this.playerTeam)
+    return allTeams.find((t: Team) => t.teamId == teamId) as Team
   }
 
   // Gets called once offseason is over and season restarts

@@ -123,15 +123,22 @@ const Season: React.FC<Props> = ({
     schedule.advanceToNextMatch()
     if (!schedule.getIsRegularSeason()) {
       // If the regular season is over, check if the player made the playoffs. If so, show the playoffs UI. If not, show a model that just restarts with a new season
-      const madePlayoffs = seasonManager.didPlayerMakePlayoffs()
-      if (!madePlayoffs) {
-        setShowSeasonOver(true)
-      } else {
-        seasonManager.createPlayoffBracket()
-        setShowPlayoffs(true)
-      }
-      serializeAllStates()
+      handlePostSeason()
     }
+  }
+
+  const handlePostSeason = () => {
+    const madePlayoffs = seasonManager.didPlayerMakePlayoffs()
+    if (!madePlayoffs) {
+      setShowSeasonOver(true)
+    } else {
+      seasonManager.createPlayoffBracket()
+      setShowPlayoffs(true)
+    }
+    // induct certain players into the hall of fame
+    seasonManager.incrementPlayoffCounts()
+    frontOfficeManager.addHallOfFamers()
+    serializeAllStates()
   }
 
   const startOffseason = () => {

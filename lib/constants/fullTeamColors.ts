@@ -1,6 +1,6 @@
 export const TEAM_COLOR: any = {
   'Ironborn Dragons': 'black',
-  'Cavebell Vikings': '#bdc3c7',
+  'Cavebell Vikings': '#606060',
   'Deadmere Flames': '#f39c12',
   'Roguemire Cardinal': '#e74c3c',
   'Thornford Rangers': '#16a085',

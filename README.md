@@ -4,12 +4,12 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
-- Add a player hall of fame
 - Allow CPU teams to win championship
 - Show a championship count for each team
 - News headlines:
   - Trades
   - Championships
+  - Hall of fame inductions
 
 ## Future Features (ordered by priority)
 

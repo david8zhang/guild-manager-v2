@@ -50,6 +50,8 @@ export class Hero {
   public isRookie: boolean
   public age: number
   public numRings: number
+  public numPlayoffs: number
+  public highestOVR: number
 
   constructor(config: any) {
     this.heroId = config.heroId
@@ -83,6 +85,8 @@ export class Hero {
           }
     this.age = config.age
     this.numRings = config.numRings || 0
+    this.numPlayoffs = config.numPlayoffs || 0
+    this.highestOVR = config.highestOVR || this.getOverall()
   }
 
   public serialize(): any {
@@ -104,6 +108,8 @@ export class Hero {
       contract: this.contract,
       age: this.age || 25,
       numRings: this.numRings,
+      numPlayoffs: this.numPlayoffs,
+      highestOVR: this.highestOVR,
     }
   }
 

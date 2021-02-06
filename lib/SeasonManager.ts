@@ -242,6 +242,21 @@ export class SeasonManager {
     return this.playoffBracket
   }
 
+  public incrementPlayoffCounts(): void {
+    const playoffTeams = this.getAllTeams().slice(
+      0,
+      SeasonManager.NUM_PLAYOFF_TEAMS
+    )
+    playoffTeams.forEach((t: Team) => {
+      t.roster.forEach((h: Hero) => {
+        h.numPlayoffs++
+        if (h.getOverall() > h.highestOVR) {
+          h.highestOVR = h.getOverall()
+        }
+      })
+    })
+  }
+
   public getPlayoffBracket(): PlayoffBracket {
     return this.playoffBracket
   }

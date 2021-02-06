@@ -15,7 +15,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { HeroFactory } from '../lib/factory/HeroFactory'
 
 interface Props {
-  hero: Hero
+  hero: any
   width: number
   height: number
   teamColor: string

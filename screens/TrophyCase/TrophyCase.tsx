@@ -1,77 +1,86 @@
 import * as React from 'react'
-import { ScrollView, Text, View } from 'react-native'
+import { View } from 'react-native'
 import { Navbar } from '../../components'
 import { connect } from 'react-redux'
-import { FontAwesome } from '@expo/vector-icons'
-import { FrontOfficeManager } from '../../lib/FrontOfficeManager'
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
 import { Portal } from 'react-native-paper'
+import { MenuOption } from '../Home/components'
+import { FrontOfficeManager } from '../../lib/FrontOfficeManager'
+import { TeamTrophies } from './TeamTrophies'
+import { HallOfFame } from './HallOfFame'
 
 interface Props {
   navigation: any
+  frontOffice: any
   guild: any
   league: any
-  frontOffice: any
 }
 
 const TrophyCase: React.FC<Props> = ({
   navigation,
+  frontOffice,
   guild,
   league,
-  frontOffice,
 }) => {
-  const [
-    frontOfficeManager,
-    setFrontOfficeManager,
-  ] = React.useState<FrontOfficeManager | null>(null)
+  const [frontOfficeManager, setFrontOfficeManager] = React.useState<any>(null)
+  const [currPage, setCurrPage] = React.useState<string>('')
   React.useEffect(() => {
-    const foManager = new FrontOfficeManager(guild, league)
+    const foManager: FrontOfficeManager = new FrontOfficeManager(guild, league)
     if (frontOffice) {
       foManager.deserializeObj(frontOffice)
     }
     setFrontOfficeManager(foManager)
-  }, [guild, league, frontOffice])
+  }, [frontOffice, guild, league])
 
-  if (!frontOfficeManager) {
-    return <View />
+  if (currPage === 'Team Trophies') {
+    return (
+      <TeamTrophies
+        navigation={navigation}
+        frontOfficeManager={frontOfficeManager}
+        onBack={() => {
+          setCurrPage('')
+        }}
+      />
+    )
   }
 
-  const championships = frontOfficeManager.championships
+  if (currPage === 'Hall of Fame') {
+    return (
+      <HallOfFame
+        navigation={navigation}
+        frontOfficeManager={frontOfficeManager}
+        onBack={() => {
+          setCurrPage('')
+        }}
+      />
+    )
+  }
+
   return (
     <Portal.Host>
       <Navbar title='Trophy Case' navigation={navigation} />
-      <View style={{ padding: 10 }}>
-        <Text style={{ fontSize: 18 }}>
-          Total Championships: {championships.length}
-        </Text>
-        <ScrollView horizontal style={{ marginTop: 10 }}>
-          {championships.map((seasonNumber: number) => {
-            return (
-              <View
-                key={`championship-${seasonNumber}`}
-                style={{
-                  flexDirection: 'column',
-                  padding: 20,
-                  height: 200,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderWidth: 1,
-                  borderColor: 'black',
-                  margin: 5,
-                }}
-              >
-                <FontAwesome
-                  name='trophy'
-                  color='#d4af37'
-                  size={60}
-                  style={{ marginBottom: 10 }}
-                />
-                <Text style={{ textAlign: 'center', fontSize: 25 }}>
-                  Season {seasonNumber}
-                </Text>
-              </View>
-            )
-          })}
-        </ScrollView>
+      <View
+        style={{
+          flexDirection: 'row',
+          paddingTop: 10,
+          paddingLeft: 10,
+          paddingRight: 10,
+        }}
+      >
+        <MenuOption
+          optionName='Team Trophies'
+          icon={<FontAwesome name='trophy' size={80} />}
+          onPress={() => {
+            setCurrPage('Team Trophies')
+          }}
+        />
+        <MenuOption
+          optionName='Hall of Fame'
+          icon={<FontAwesome name='star' size={80} />}
+          onPress={() => {
+            setCurrPage('Hall of Fame')
+          }}
+        />
       </View>
     </Portal.Host>
   )
