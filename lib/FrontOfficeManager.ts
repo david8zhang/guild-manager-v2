@@ -84,22 +84,40 @@ export class FrontOfficeManager {
   public addHallOfFamers() {
     this.teams.forEach((team: Team) => {
       team.roster.forEach((h: Hero) => {
-        if (this.checkHallOfFameCriteria(h) && !this.isAlreadyHallOfFamer(h)) {
-          this.hallOfFamers.push({
-            heroId: h.heroId,
-            name: h.name,
-            type: h.heroType,
-            image: h.heroImageData,
-            team: {
-              name: team.name,
-              id: team.teamId,
-            },
-            overall: h.highestOVR,
-            rings: h.numRings,
-            playoffs: h.numPlayoffs,
-          })
+        if (this.checkHallOfFameCriteria(h)) {
+          if (!this.isAlreadyHallOfFamer(h)) {
+            this.hallOfFamers.push({
+              heroId: h.heroId,
+              name: h.name,
+              type: h.heroType,
+              image: h.heroImageData,
+              team: {
+                name: team.name,
+                id: team.teamId,
+              },
+              overall: h.highestOVR,
+              rings: h.numRings,
+              playoffs: h.numPlayoffs,
+            })
+          } else {
+            this.updateHallOfFamer(h)
+          }
         }
       })
+    })
+  }
+
+  public updateHallOfFamer(h: Hero) {
+    this.hallOfFamers = this.hallOfFamers.map((hof: HallOfFamer) => {
+      if (hof.heroId === h.heroId) {
+        return {
+          ...hof,
+          overall: Math.max(h.highestOVR, hof.overall),
+          playoffs: Math.max(h.numPlayoffs, hof.playoffs),
+          rings: Math.max(h.numRings, hof.rings),
+        }
+      }
+      return hof
     })
   }
 

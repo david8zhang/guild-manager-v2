@@ -94,8 +94,9 @@ export class PlayoffBracket {
     })
 
     if (matchup) {
-      matchup.score[winnerId]++
-
+      if (matchup.score[winnerId] + 1 <= PlayoffBracket.WIN_THRESHOLD) {
+        matchup.score[winnerId]++
+      }
       // If the winner has won the required number of games to progress to the next round, add them to qualifiers
       if (matchup.score[winnerId] === PlayoffBracket.WIN_THRESHOLD) {
         matchup.winnerId = winnerId
