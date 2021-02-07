@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { View } from 'react-native'
+import { Alert, View } from 'react-native'
 import { Button, Navbar } from '../../../components'
 import { Match } from '../Match/Match'
 import { PlayoffRound } from './PlayoffRound'
@@ -41,6 +41,7 @@ export const Playoffs: React.FC<Props> = ({
   const [showMatch, setShowMatch] = React.useState<boolean>(false)
   const [isWinner, setIsWinner] = React.useState<boolean>(false)
   const [playoffsOutcome, setPlayoffsOutcome] = React.useState<string>('')
+  const [CPUChampionId, setCPUChampionId] = React.useState<string>('')
 
   // Auto win simulation
   const [counter, setCounter] = React.useState(0)
@@ -80,14 +81,21 @@ export const Playoffs: React.FC<Props> = ({
   const checkHasRoundWon = () => {
     const matchup = playoffBracket.getPlayerMatchup()
     if (!matchup) {
-      setPlayoffsOutcome('loss')
+      processPlayerLoss()
     } else if (matchup.winnerId) {
       if (matchup.winnerId === seasonManager.getPlayer().teamId) {
         setIsWinner(true)
       } else {
-        setPlayoffsOutcome('loss')
+        processPlayerLoss()
       }
     }
+  }
+
+  const processPlayerLoss = () => {
+    const winnerId = playoffBracket.getEventualWinner(seasonManager)
+    frontOfficeManager.processCPUChampionship(winnerId)
+    setCPUChampionId(winnerId as string)
+    setPlayoffsOutcome('loss')
   }
 
   const getIsHome = (matchup: PlayoffMatchup) => {
@@ -258,7 +266,25 @@ export const Playoffs: React.FC<Props> = ({
           didWin={playoffsOutcome === 'win'}
           seasonManager={seasonManager}
           onContinue={() => {
-            processChampionshipResult(playoffsOutcome === 'win')
+            if (playoffsOutcome !== 'win') {
+              const cpuChampionTeam = seasonManager.getTeam(CPUChampionId)
+              if (cpuChampionTeam) {
+                Alert.alert(
+                  `${cpuChampionTeam.name} have won the championships!`,
+                  '',
+                  [
+                    {
+                      text: 'OK',
+                      onPress: () => {
+                        processChampionshipResult(playoffsOutcome === 'win')
+                      },
+                    },
+                  ]
+                )
+              }
+            } else {
+              processChampionshipResult(playoffsOutcome === 'win')
+            }
           }}
         />
         {renderBracket()}

@@ -121,6 +121,15 @@ export class FrontOfficeManager {
     })
   }
 
+  public processCPUChampionship(championId: string | undefined) {
+    if (championId) {
+      const championTeam = this.getTeam(championId) as Team
+      championTeam.roster.forEach((h: Hero) => {
+        h.numRings++
+      })
+    }
+  }
+
   public getHallOfFamers(): HallOfFamer[] {
     return this.hallOfFamers
   }

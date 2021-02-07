@@ -183,6 +183,18 @@ export class PlayoffBracket {
     })
   }
 
+  public getEventualWinner(seasonManager: SeasonManager) {
+    const diff = this.numTotalRounds - this.currentRound
+    for (let i = 0; i <= diff; i++) {
+      while (!this.hasRoundFinished()) {
+        this.simulateGames(seasonManager)
+      }
+      this.goToNextRound()
+    }
+    const finalsMatchup = this.matchupList[0]
+    return finalsMatchup.winnerId
+  }
+
   public serialize(): any {
     return {
       matchupList: this.matchupList,
