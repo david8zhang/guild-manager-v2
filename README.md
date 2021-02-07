@@ -4,19 +4,20 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 
 ## Features to implement for next time:
 
-- Allow CPU teams to win championship
-- Show a championship count for each team
 - News headlines:
+
   - Trades
   - Championships
   - Hall of fame inductions
-
-## Future Features (ordered by priority)
 
 - Make the entire game simulation based
 
   - Create a "sim cast" play by play announcement
   - Remove fire emblem gameplay :(
+
+## Future Features (ordered by priority)
+
+- Show a championship count for each team
 
 - CPU Trading
 - Add random injury chance, which will require a swap
