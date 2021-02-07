@@ -170,6 +170,9 @@ export const Playoffs: React.FC<Props> = ({
 
   const simulateMatchup = () => {
     const matchup = playoffBracket.getPlayerMatchup() as PlayoffMatchup
+    if (!matchup) {
+      return
+    }
     const opponentId = matchup.teamIds.find(
       (id) => id !== seasonManager.getPlayer().teamId
     ) as string

@@ -83,7 +83,7 @@ export class PlayoffBracket {
   getPlayerMatchup(): PlayoffMatchup | null {
     const matchup =
       this.matchupList.find((matchup) => {
-        return matchup.teamIds.includes(this.playerTeamId)
+        return matchup && matchup.teamIds.includes(this.playerTeamId)
       }) || null
     return matchup
   }

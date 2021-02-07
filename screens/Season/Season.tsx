@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 // UI Components
-import { Text, View } from 'react-native'
+import { Alert, Text, View } from 'react-native'
 import { Portal } from 'react-native-paper'
 import { Button, Navbar } from '../../components'
 import { TeamRecord } from './components/TeamRecord'
@@ -135,10 +135,26 @@ const Season: React.FC<Props> = ({
       seasonManager.createPlayoffBracket()
       setShowPlayoffs(true)
     }
-    // induct certain players into the hall of fame
     seasonManager.incrementPlayoffCounts()
-    frontOfficeManager.addHallOfFamers()
     serializeAllStates()
+  }
+
+  // Handle CPU winning championship when player misses the playoffs
+  const handleCPUPostSeason = (callback: Function) => {
+    const playoffBracket = seasonManager.createPlayoffBracket()
+    const winnerId = playoffBracket.getEventualWinner(seasonManager)
+    if (winnerId) {
+      const championTeam = seasonManager.getTeam(winnerId) as Team
+      Alert.alert(`${championTeam.name} has won the championship!`, '', [
+        {
+          text: 'Ok',
+          onPress: () => {
+            frontOfficeManager.processCPUChampionship(championTeam.teamId)
+            callback()
+          },
+        },
+      ])
+    }
   }
 
   const startOffseason = () => {
@@ -146,6 +162,7 @@ const Season: React.FC<Props> = ({
     frontOfficeManager.incrementHeroAges()
     frontOfficeManager.decrementContractDuration()
     frontOfficeManager.processHeroStatDecay()
+    frontOfficeManager.addHallOfFamers()
     setShowPlayoffs(false)
     setShowMatch(false)
     setIsOffseason(true)
@@ -369,8 +386,10 @@ const Season: React.FC<Props> = ({
       <View style={{ flex: 1, backgroundColor: 'white' }}>
         <SeasonOverModal
           onContinue={() => {
-            setShowSeasonOver(false)
-            startOffseason()
+            handleCPUPostSeason(() => {
+              setShowSeasonOver(false)
+              startOffseason()
+            })
           }}
           isOpen={showSeasonOver}
         />
