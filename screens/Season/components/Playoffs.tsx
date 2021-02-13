@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Alert, View } from 'react-native'
 import { Button, Navbar } from '../../../components'
-import { Match } from '../Match/Match'
 import { PlayoffRound } from './PlayoffRound'
 
 // Game state
@@ -14,7 +13,6 @@ import { Team } from '../../../lib/model/Team'
 import { SeasonManager } from '../../../lib/SeasonManager'
 import { DEBUG_CONFIG } from '../../../lib/constants/debugConfig'
 import { ChampionshipResultsModal } from './ChampionshipResultsModal'
-import { Record } from '../../../lib/model/Record'
 import { Portal } from 'react-native-paper'
 import { MatchSimulator } from '../../../lib/simulation/MatchSimulator'
 import { FrontOfficeManager } from '../../../lib/FrontOfficeManager'
@@ -38,7 +36,6 @@ export const Playoffs: React.FC<Props> = ({
     playoffBracket,
     setPlayoffBracket,
   ] = React.useState<PlayoffBracket | null>(null)
-  const [showMatch, setShowMatch] = React.useState<boolean>(false)
   const [isWinner, setIsWinner] = React.useState<boolean>(false)
   const [playoffsOutcome, setPlayoffsOutcome] = React.useState<string>('')
   const [CPUChampionId, setCPUChampionId] = React.useState<string>('')
@@ -98,74 +95,10 @@ export const Playoffs: React.FC<Props> = ({
     setPlayoffsOutcome('loss')
   }
 
-  const getIsHome = (matchup: PlayoffMatchup) => {
-    const playerTeamId = seasonManager.getPlayer().teamId
-    const opponentId = matchup.teamIds.find(
-      (id) => id !== seasonManager.getPlayer().teamId
-    ) as string
-    const opponentRecord = seasonManager.getTeamRecord(opponentId) as Record
-    const playerRecord = seasonManager.getTeamRecord(playerTeamId) as Record
-    const playerBetterRecord =
-      playerRecord.getWinLossRatio() > opponentRecord.getWinLossRatio()
-
-    if (matchup.gameNumber % 2 !== 0) {
-      return playerBetterRecord
-    } else {
-      return !playerBetterRecord
-    }
-  }
-
   const saveHeroMatchStats = (heroMatchStats: {
     [heroId: string]: HeroStats
   }) => {
     seasonManager.saveHeroMatchStats(heroMatchStats)
-  }
-
-  const applyTeamStatIncreases = (
-    matchup: PlayoffMatchup,
-    statIncreases: any
-  ) => {
-    const playerTeamId = seasonManager.getPlayer().teamId
-    const enemyTeamId = matchup.teamIds.find(
-      (id) => id !== seasonManager.getPlayer().teamId
-    ) as string
-    seasonManager.applyStatIncreases(playerTeamId, statIncreases[playerTeamId])
-    seasonManager.applyStatIncreases(enemyTeamId, statIncreases[enemyTeamId])
-  }
-
-  if (showMatch) {
-    const matchup = playoffBracket.getPlayerMatchup() as PlayoffMatchup
-    const opponentId = matchup.teamIds.find(
-      (id) => id !== seasonManager.getPlayer().teamId
-    ) as string
-
-    return (
-      <Match
-        isHome={getIsHome(matchup)}
-        playerTeam={seasonManager.getPlayer()}
-        enemyTeam={seasonManager.getTeam(opponentId) as Team}
-        onContinue={(outcome: {
-          winner: string
-          loser: string
-          enemyId: string
-          statIncreases: any
-          heroMatchStats: {
-            [heroId: string]: HeroStats
-          }
-        }) => {
-          updatePlayoffBracketScores(outcome.winner)
-          applyTeamStatIncreases(matchup, outcome.statIncreases)
-          saveHeroMatchStats(outcome.heroMatchStats)
-          simulatePlayoffBracketGames()
-          checkHasRoundWon()
-          setShowMatch(false)
-          onMatchContinue(outcome)
-        }}
-        onBack={() => {
-          setShowMatch(false)
-        }}
-      />
-    )
   }
 
   const simulateMatchup = () => {
@@ -193,7 +126,6 @@ export const Playoffs: React.FC<Props> = ({
     saveHeroMatchStats(outcome.heroMatchStats)
     simulatePlayoffBracketGames()
     checkHasRoundWon()
-    setShowMatch(false)
     onMatchContinue(outcome)
   }
 
@@ -300,32 +232,16 @@ export const Playoffs: React.FC<Props> = ({
           }}
         >
           <Button
-            text={isWinner ? 'Simulate' : 'Play'}
+            style={{ marginLeft: 10, width: 200 }}
             onPress={() => {
               if (isWinner) {
                 simulatePlayoffBracketGames()
               } else {
-                if (DEBUG_CONFIG.autoWinGames) {
-                  updatePlayoffBracketScores(seasonManager.getPlayer().teamId)
-                  simulatePlayoffBracketGames()
-                  checkHasRoundWon()
-                  setCounter(counter + 1)
-                } else {
-                  setShowMatch(true)
-                }
+                simulateMatchup()
               }
             }}
-            style={{ width: 200 }}
+            text='Simulate'
           />
-          {!isWinner && (
-            <Button
-              style={{ marginLeft: 10, width: 200 }}
-              onPress={() => {
-                simulateMatchup()
-              }}
-              text='Simulate'
-            />
-          )}
         </View>
       </View>
     </Portal.Host>

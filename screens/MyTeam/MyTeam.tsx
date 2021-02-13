@@ -12,7 +12,7 @@ import * as guildActions from '../../redux/guildWidget'
 import { connect } from 'react-redux'
 import { HeroDrilldownModal, StarterHero } from '../StarterHeroes/components'
 import { Portal } from 'react-native-paper'
-import { SubstitutionScreen } from '../Season/Match/SubstitutionScreen'
+import { SubstitutionScreen } from '../Season/components/SubstitutionScreen'
 import { DetailedRoster } from './DetailedRoster'
 
 interface Props {

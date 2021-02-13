@@ -1,121 +1,9 @@
 import * as React from 'react'
-import { View, Animated, Easing } from 'react-native'
+import { View } from 'react-native'
 import { HeroInMatch } from '../model/HeroInMatch'
 import { Move } from './Move'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { Hero } from '../model/Hero'
-import { AttackCutsceneHero } from '../../screens/Season/Match/AttackCutsceneHero'
-import { Button } from '../../components'
 import { MatchManager } from '../MatchManager'
-
-const ATKBuffAnimationIcon: React.FC = () => {
-  const [opacity] = React.useState(new Animated.Value(1))
-  const [yPos] = React.useState(new Animated.Value(60))
-  React.useEffect(() => {
-    Animated.parallel([
-      Animated.timing(opacity, {
-        toValue: 0,
-        duration: 1000,
-        useNativeDriver: false,
-      }),
-      Animated.timing(yPos, {
-        toValue: 100,
-        duration: 1000,
-        useNativeDriver: false,
-      }),
-    ]).start()
-  }, [])
-  return (
-    <Animated.View
-      style={{ position: 'absolute', bottom: yPos, right: 0, opacity }}
-    >
-      <MaterialCommunityIcons
-        style={{ color: 'blue' }}
-        name='sword-cross'
-        size={20}
-      />
-    </Animated.View>
-  )
-}
-
-export interface ATKBuffAnimationProps {
-  userTeamColor: string
-  targetTeamColor: string
-  user: HeroInMatch
-  target: HeroInMatch
-  userSide: string
-  processMove: Function
-  onFinished: Function
-}
-
-const ATKBuffAnimation: React.FC<ATKBuffAnimationProps> = ({
-  userTeamColor,
-  targetTeamColor,
-  user,
-  target,
-  userSide,
-  processMove,
-  onFinished,
-}) => {
-  const [showBuffIcon, setShowBuffIcon] = React.useState(false)
-  const [targetColor, setTargetColor] = React.useState(new Animated.Value(0))
-  const [isSkillFinished, setIsSkillFinished] = React.useState(false)
-  React.useEffect(() => {
-    Animated.sequence([
-      Animated.timing(targetColor, {
-        toValue: 1.0,
-        duration: 400,
-        easing: Easing.linear,
-        useNativeDriver: false,
-      }),
-      Animated.timing(targetColor, {
-        toValue: 0.0,
-        duration: 400,
-        easing: Easing.linear,
-        useNativeDriver: false,
-      }),
-    ]).start(() => {
-      processMove()
-      setShowBuffIcon(true)
-      setIsSkillFinished(true)
-    })
-  }, [user.getHeroRef().heroId, target.getHeroRef().heroId])
-  const targetStyle = {
-    flex: 1,
-    backgroundColor: targetColor.interpolate({
-      inputRange: [0, 1],
-      outputRange: ['white', 'blue'],
-    }),
-  }
-  return (
-    <View style={{ flexDirection: 'row' }}>
-      <Animated.View style={userSide === 'left' ? { flex: 1 } : targetStyle}>
-        {userSide === 'right' && showBuffIcon && <ATKBuffAnimationIcon />}
-        <AttackCutsceneHero
-          color={userTeamColor}
-          hero={userSide === 'left' ? user : target}
-        />
-      </Animated.View>
-      <Animated.View style={userSide === 'left' ? targetStyle : { flex: 1 }}>
-        {userSide === 'left' && showBuffIcon && <ATKBuffAnimationIcon />}
-        <AttackCutsceneHero
-          color={targetTeamColor}
-          hero={userSide === 'left' ? target : user}
-        />
-      </Animated.View>
-      {isSkillFinished && (
-        <Button
-          style={{ position: 'absolute', bottom: -20, right: 200 }}
-          text='Continue'
-          onPress={() => {
-            setShowBuffIcon(false)
-            onFinished()
-          }}
-        />
-      )}
-    </View>
-  )
-}
 
 export class ATKBuffMove implements Move {
   public name: string
@@ -167,19 +55,7 @@ export class ATKBuffMove implements Move {
     userSide: string,
     onFinished: Function
   ) {
-    return (
-      <ATKBuffAnimation
-        user={user}
-        userTeamColor={userColor}
-        targetTeamColor={targetColor}
-        target={target}
-        userSide={userSide}
-        processMove={() => {
-          this.processMove(user, target)
-        }}
-        onFinished={onFinished}
-      />
-    )
+    return <View />
   }
 
   isTargetValid(
