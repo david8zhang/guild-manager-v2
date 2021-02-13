@@ -155,6 +155,10 @@ export class SeasonManager {
     })
   }
 
+  public getTeamByName(name: string): Team | undefined {
+    return this.teams.concat(this.playerTeam).find((t: Team) => t.name === name)
+  }
+
   public getPlayer(): Team {
     return this.playerTeam
   }

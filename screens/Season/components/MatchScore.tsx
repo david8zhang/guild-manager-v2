@@ -9,6 +9,7 @@ interface Props {
   playerScore: number
   enemyScore: number
   isHome: boolean
+  style?: any
 }
 
 export const MatchScore: React.FC<Props> = ({
@@ -17,10 +18,11 @@ export const MatchScore: React.FC<Props> = ({
   playerScore,
   enemyScore,
   isHome,
+  style,
 }) => {
   const renderTeam = (team: Team, score: number) => {
     return (
-      <View style={{ flexDirection: 'column', flex: 1 }}>
+      <View style={{ flexDirection: 'column', flex: 1, ...style }}>
         <View
           style={{ flex: 3, alignItems: 'center', justifyContent: 'center' }}
         >

@@ -10,7 +10,7 @@ import { Move } from '../moves/Move'
 import { StatGainManager } from '../StatGainManager'
 
 // Match outcome can be extended to also include things like hero stats, etc.
-interface MatchOutcome {
+export interface MatchOutcome {
   heroMatchStats: any
   winnerId: string
   statIncreases: {
@@ -123,6 +123,13 @@ export class MatchSimulator {
 
     // Get post match data
     const matchStats = this.getHeroMatchStats(heroes1, heroes2)
+
+    // Handle tie breakers
+    if (score[team1.name] === score[team2.name]) {
+      const randomNum = Math.floor(Math.random() * 2)
+      if (randomNum === 1) score[team1.name] += 2
+      else score[team2.name] += 2
+    }
     const winnerId =
       score[team1.name] > score[team2.name] ? team1.teamId : team2.teamId
     const mvp = this.getMVP(winnerId === team1.teamId ? heroes1 : heroes2)
@@ -137,8 +144,8 @@ export class MatchSimulator {
       },
       score: {
         [team1.name]: score[team1.name],
-        [team2.name]: score[team2.name]
-      }
+        [team2.name]: score[team2.name],
+      },
     }
   }
 

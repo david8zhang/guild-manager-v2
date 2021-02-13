@@ -26,7 +26,11 @@ import * as seasonActions from '../../redux/seasonWidget'
 import * as frontOfficeActions from '../../redux/frontOfficeWidget'
 import * as leagueActions from '../../redux/leagueWidget'
 import { connect } from 'react-redux'
-import { MatchSimulator } from '../../lib/simulation/MatchSimulator'
+import {
+  MatchOutcome,
+  MatchSimulator,
+} from '../../lib/simulation/MatchSimulator'
+import { MatchResultModal } from './components/MatchResultModal'
 
 interface Props {
   savedSeason: any
@@ -63,7 +67,7 @@ const Season: React.FC<Props> = ({
     setFrontOfficeManager,
   ] = React.useState<FrontOfficeManager | null>(null)
 
-  const [showMatch, setShowMatch] = React.useState(false)
+  const [matchOutcome, setMatchOutcome] = React.useState<any>({})
   const [teamToShowRoster, setTeamToShowRoster] = React.useState<any>(null)
   const [showPlayoffs, setShowPlayoffs] = React.useState<boolean>(false)
   const [showSeasonOver, setShowSeasonOver] = React.useState<boolean>(false)
@@ -162,7 +166,6 @@ const Season: React.FC<Props> = ({
     frontOfficeManager.processHeroStatDecay()
     frontOfficeManager.addHallOfFamers()
     setShowPlayoffs(false)
-    setShowMatch(false)
     setIsOffseason(true)
     serializeAllStates()
   }
@@ -200,10 +203,16 @@ const Season: React.FC<Props> = ({
     const team1 = seasonManager.getPlayer()
     const team2 = seasonManager.getTeam(currentMatchup.teamInfo.teamId) as Team
     const outcome = MatchSimulator.simulateMatchup(team1, team2)
+    setMatchOutcome({ outcome, team1, team2 })
+  }
 
+  const processMatchupOutcome = (
+    outcome: MatchOutcome,
+    team1: Team,
+    team2: Team
+  ) => {
     const playerScore = outcome.score[team1.name]
     const enemyScore = outcome.score[team2.name]
-
     const loserId =
       outcome.winnerId === team1.teamId ? team2.teamId : team1.teamId
     updateTeamRecords({
@@ -227,7 +236,6 @@ const Season: React.FC<Props> = ({
       isHome: currentMatchup.isHome,
     })
     serializeAllStates()
-    setShowMatch(false)
   }
 
   if (teamToShowRoster) {
@@ -340,6 +348,16 @@ const Season: React.FC<Props> = ({
             })
           }}
           isOpen={showSeasonOver}
+        />
+        <MatchResultModal
+          isOpen={matchOutcome.outcome !== undefined}
+          onContinue={() => {
+            const { outcome, team1, team2 } = matchOutcome
+            processMatchupOutcome(outcome, team1, team2)
+            setMatchOutcome({})
+          }}
+          matchOutcome={matchOutcome.outcome}
+          seasonManager={seasonManager}
         />
         <Navbar title='Season' navigation={navigation} />
         <View style={{ flexDirection: 'row' }}>
