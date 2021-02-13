@@ -176,13 +176,6 @@ const Season: React.FC<Props> = ({
     serializeAllStates()
   }
 
-  const applyTeamStatIncreases = (statIncreases: any) => {
-    const playerTeamId = seasonManager.getPlayer().teamId
-    const enemyTeamId = currentMatchup.teamInfo.teamId
-    seasonManager.applyStatIncreases(playerTeamId, statIncreases[playerTeamId])
-    seasonManager.applyStatIncreases(enemyTeamId, statIncreases[enemyTeamId])
-  }
-
   const saveHeroMatchStats = (heroMatchStats: {
     [heroId: string]: HeroStats
   }) => {
@@ -237,49 +230,6 @@ const Season: React.FC<Props> = ({
     })
     serializeAllStates()
     setShowMatch(false)
-  }
-
-  if (showMatch) {
-    return (
-      <Match
-        isHome={currentMatchup.isHome}
-        playerTeam={playerTeam}
-        enemyTeam={
-          seasonManager.getTeam(currentMatchup.teamInfo.teamId) as Team
-        }
-        onContinue={(outcome: {
-          winner: string
-          loser: string
-          enemyId: string
-          statIncreases: {
-            [teamId: string]: any
-          }
-          heroMatchStats: {
-            [heroId: string]: HeroStats
-          }
-          score: {
-            playerScore: number
-            enemyScore: number
-          }
-        }) => {
-          const { score } = outcome
-          saveHeroMatchStats(outcome.heroMatchStats)
-          applyTeamStatIncreases(outcome.statIncreases)
-          seasonManager.addMatchResult({
-            playerScore: score.playerScore,
-            enemyScore: score.enemyScore,
-            enemyTeamId: outcome.enemyId,
-            isHome: currentMatchup.isHome,
-          })
-          updateTeamRecords(outcome)
-          serializeAllStates()
-          setShowMatch(false)
-        }}
-        onBack={() => {
-          setShowMatch(false)
-        }}
-      />
-    )
   }
 
   if (teamToShowRoster) {
@@ -415,22 +365,6 @@ const Season: React.FC<Props> = ({
                 justifyContent: 'center',
               }}
             >
-              <Button
-                onPress={() => {
-                  if (DEBUG_CONFIG.autoWinGames) {
-                    updateTeamRecords({
-                      winner: playerTeam.teamId,
-                      loser: currentMatchup.teamInfo.teamId,
-                      enemyId: currentMatchup.teamInfo.teamId,
-                    })
-                    serializeAllStates()
-                    setShowMatch(false)
-                  } else {
-                    setShowMatch(true)
-                  }
-                }}
-                text={DEBUG_CONFIG.autoWinGames ? 'Auto Win' : 'Start Game'}
-              />
               <Button
                 style={{ marginLeft: 10 }}
                 onPress={() => {
