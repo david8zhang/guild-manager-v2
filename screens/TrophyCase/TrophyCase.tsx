@@ -2,12 +2,13 @@ import * as React from 'react'
 import { View } from 'react-native'
 import { Navbar } from '../../components'
 import { connect } from 'react-redux'
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
+import { FontAwesome, FontAwesome5 } from '@expo/vector-icons'
 import { Portal } from 'react-native-paper'
 import { MenuOption } from '../Home/components'
 import { FrontOfficeManager } from '../../lib/FrontOfficeManager'
 import { TeamTrophies } from './TeamTrophies'
 import { HallOfFame } from './HallOfFame'
+import { GreatestOfAllTime } from './GreatestOfAllTime'
 
 interface Props {
   navigation: any
@@ -56,6 +57,18 @@ const TrophyCase: React.FC<Props> = ({
     )
   }
 
+  if (currPage === 'GOAT') {
+    return (
+      <GreatestOfAllTime
+        navigation={navigation}
+        frontOfficeManager={frontOfficeManager}
+        onBack={() => {
+          setCurrPage('')
+        }}
+      />
+    )
+  }
+
   return (
     <Portal.Host>
       <Navbar title='Trophy Case' navigation={navigation} />
@@ -67,6 +80,13 @@ const TrophyCase: React.FC<Props> = ({
           paddingRight: 10,
         }}
       >
+        <MenuOption
+          optionName='GOAT'
+          icon={<FontAwesome5 name='crown' size={80} />}
+          onPress={() => {
+            setCurrPage('GOAT')
+          }}
+        />
         <MenuOption
           optionName='Team Trophies'
           icon={<FontAwesome name='trophy' size={80} />}

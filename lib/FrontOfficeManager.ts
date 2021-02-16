@@ -134,6 +134,18 @@ export class FrontOfficeManager {
     return this.hallOfFamers
   }
 
+  public getGOAT(): HallOfFamer {
+    const score = (hof: HallOfFamer) => {
+      return hof.rings + hof.playoffs + hof.overall
+    }
+    return this.hallOfFamers.reduce((acc, curr) => {
+      if (score(curr) > score(acc)) {
+        acc = curr
+      }
+      return acc
+    }, this.hallOfFamers[0])
+  }
+
   public isAlreadyHallOfFamer(h: Hero) {
     return (
       this.hallOfFamers.find((hof: any) => hof.heroId === h.heroId) !==
