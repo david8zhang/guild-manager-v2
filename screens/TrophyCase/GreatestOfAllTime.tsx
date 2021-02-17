@@ -23,6 +23,9 @@ export const GreatestOfAllTime: React.FC<Props> = ({
   onBack,
 }) => {
   const goat = frontOfficeManager.getGOAT()
+  if (!goat) {
+    return <View />
+  }
   const team = frontOfficeManager.getTeam(goat.team.id) as Team
   return (
     <Portal.Host>
