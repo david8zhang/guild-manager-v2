@@ -13,7 +13,6 @@ Fire Emblem crossed with NBA 2K MyGM mode.
 - Make the entire game simulation based
 
   - Create a "sim cast" play by play announcement
-  - Remove fire emblem gameplay :(
 
 ## Future Features (ordered by priority)
 
