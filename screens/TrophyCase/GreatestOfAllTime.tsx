@@ -22,28 +22,19 @@ export const GreatestOfAllTime: React.FC<Props> = ({
   frontOfficeManager,
   onBack,
 }) => {
-  const goat = frontOfficeManager.getGOAT()
-  if (!goat) {
-    return <View />
-  }
-  const team = frontOfficeManager.getTeam(goat.team.id) as Team
-  return (
-    <Portal.Host>
-      <Navbar title='Greatest of all Time' navigation={navigation} />
-      <View style={{ padding: 10 }}>
-        <Pressable
-          onPress={() => {
-            onBack()
-          }}
-          style={{
-            alignItems: 'center',
-            flexDirection: 'row',
-          }}
-        >
-          <FontAwesome name='chevron-left' size={16} />
-          <Text style={{ fontSize: 16, marginLeft: 10 }}>Back</Text>
-        </Pressable>
-      </View>
+  const renderGOAT = () => {
+    const goat = frontOfficeManager.getGOAT()
+    if (!goat) {
+      return (
+        <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ fontSize: 20, textAlign: 'center' }}>
+            No G.O.A.T Yet...
+          </Text>
+        </View>
+      )
+    }
+    const team = frontOfficeManager.getTeam(goat.team.id) as Team
+    return (
       <View
         style={{
           alignItems: 'center',
@@ -64,7 +55,6 @@ export const GreatestOfAllTime: React.FC<Props> = ({
           />
           <Text style={{ fontSize: 18, color: team.color }}>{team.name}</Text>
         </View>
-        {/* Image */}
         <View
           style={{
             backgroundColor: 'red',
@@ -127,6 +117,27 @@ export const GreatestOfAllTime: React.FC<Props> = ({
           </View>
         </View>
       </View>
+    )
+  }
+
+  return (
+    <Portal.Host>
+      <Navbar title='Greatest of all Time' navigation={navigation} />
+      <View style={{ padding: 10 }}>
+        <Pressable
+          onPress={() => {
+            onBack()
+          }}
+          style={{
+            alignItems: 'center',
+            flexDirection: 'row',
+          }}
+        >
+          <FontAwesome name='chevron-left' size={16} />
+          <Text style={{ fontSize: 16, marginLeft: 10 }}>Back</Text>
+        </Pressable>
+      </View>
+      {renderGOAT()}
     </Portal.Host>
   )
 }
